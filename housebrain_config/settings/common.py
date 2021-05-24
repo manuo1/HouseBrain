@@ -34,6 +34,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'housebrain',
     'authentication',
+    'sensors',
+    'rooms',
+    'heaters',
 ]
 
 MIDDLEWARE = [
