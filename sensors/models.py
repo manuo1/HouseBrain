@@ -32,11 +32,7 @@ class TemperatureSensor(models.Model):
 	       return self.name
 
 class TemperatureHistory(models.Model):
-    temperature = models.DecimalField(
-        default=99.9,
-        max_digits=3,
-        decimal_places=1
-    )
+    temperature = models.IntegerField()
     date = models.DateTimeField(
         auto_now_add=True
     )
