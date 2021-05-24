@@ -10,6 +10,24 @@ class TemperatureSensorManager(models.Manager):
             except IntegrityError:
                 pass
 
+    def all_sensor_list(self):
+        list = TemperatureSensor.objects.all().order_by(
+            'name', 'sensor_folder_path'
+        )
+        return list
+
+    def save_temperature(self, new_temperature, sensor):
+        new_temperature_history = TemperatureHistory(
+            temperature = new_temperature,
+            associated_sensor = sensor
+        )
+        new_temperature_history.save()
+
+    def get_sensor_temperatures(self, sensor):
+        sensor_temperatures_list = TemperatureHistory.objects.filter(
+            associated_sensor=sensor).order_by('-date_time')
+        return sensor_temperatures_list
+
 class TemperatureSensor(models.Model):
 
     name = models.CharField(
@@ -24,19 +42,41 @@ class TemperatureSensor(models.Model):
     associated_room = models.ForeignKey(
         Room,
         on_delete=models.SET_NULL,
-         blank=True,
-         null=True,
+        blank=True,
+        null=True,
     )
 
     def __str__(self):
-	       return self.name
+        room_name = "(?)"
+        if self.associated_room:
+            room_name = self.associated_room.name
+        ret = "{} | {} ({})".format(
+            room_name,
+            self.name,
+            self.sensor_folder_path[-15:],
+        )
+        return ret
 
 class TemperatureHistory(models.Model):
     temperature = models.IntegerField()
-    date = models.DateTimeField(
+    date_time = models.DateTimeField(
         auto_now_add=True
     )
     associated_sensor = models.ForeignKey(
         TemperatureSensor,
         on_delete=models.CASCADE
     )
+
+    def __str__(self):
+        room_name = "(?)"
+        if self.associated_sensor.associated_room:
+            room_name = self.associated_sensor.associated_room.name
+
+        ret = "{} | {} ({}) | {} | {}".format(
+            room_name,
+            self.associated_sensor.name,
+            self.associated_sensor.sensor_folder_path[-15:],
+            f'{self.date_time:%d/%m/%Y %H:%M}',
+            f'{(self.temperature/1000):.2f}°C'
+        )
+        return ret

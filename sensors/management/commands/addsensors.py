@@ -2,14 +2,15 @@
 import glob
 
 from pathlib import Path
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from sensors.models import TemperatureSensorManager
 
 temperature_sensor_manager = TemperatureSensorManager()
 
 class Command(BaseCommand):
     help = """
-    Search and add sensors to the database (use for a first installation)
+    Search and add sensors to the database.
+    (only those which do not already exist will be added)
     """
 
     def add_arguments(self, addsensors):
