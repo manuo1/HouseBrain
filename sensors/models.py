@@ -25,7 +25,7 @@ class TemperatureSensorManager(models.Manager):
             new_temperature_history.save()
 
     def temperature_is_valid(self, new_temperature):
-        if new_temperature not in range(-5000,6000):
+        if new_temperature not in range(-50000,60000):
             return False
         return True
 
