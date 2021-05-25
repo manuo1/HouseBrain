@@ -1,5 +1,5 @@
 from .common import *
 
-ALLOWED_HOSTS = ["?"]
+ALLOWED_HOSTS = ["192.168.1.23"]
 
 DEBUG = False

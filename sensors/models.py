@@ -17,11 +17,17 @@ class TemperatureSensorManager(models.Manager):
         return list
 
     def save_temperature(self, new_temperature, sensor):
-        new_temperature_history = TemperatureHistory(
-            temperature = new_temperature,
-            associated_sensor = sensor
-        )
-        new_temperature_history.save()
+        if self.temperature_is_valid(new_temperature):
+            new_temperature_history = TemperatureHistory(
+                temperature = new_temperature,
+                associated_sensor = sensor
+            )
+            new_temperature_history.save()
+
+    def temperature_is_valid(self, new_temperature):
+        if new_temperature not in range(-5000,6000):
+            return False
+        return True
 
     def get_sensor_temperatures(self, sensor):
         sensor_temperatures_list = TemperatureHistory.objects.filter(

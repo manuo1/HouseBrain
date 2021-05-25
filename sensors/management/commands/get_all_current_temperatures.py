@@ -25,5 +25,5 @@ class Command(BaseCommand):
             with open (sensor.sensor_folder_path + "/temperature") as file:
                 temperature = file.readline()[:-1] #[:-1] to remove \n
         except FileNotFoundError:
-            temperature = 99999
+            temperature = 85000
         return temperature
