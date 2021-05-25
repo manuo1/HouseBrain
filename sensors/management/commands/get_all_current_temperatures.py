@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from sensors.models import TemperatureSensorManager
 
 from django.core.management.base import BaseCommand
@@ -6,9 +8,8 @@ temperature_sensor_manager = TemperatureSensorManager()
 
 class Command(BaseCommand):
     help = """
-    will save all current temperatures
+    will save all temperature sensor current temperatures
     """
-
     def add_arguments(self, get_all_current_temperatures):
         pass
 
@@ -26,4 +27,7 @@ class Command(BaseCommand):
                 temperature = file.readline()[:-1] #[:-1] to remove \n
         except FileNotFoundError:
             temperature = 85000
+        # add a false temperature measured in debug mode (no sensor connected)
+        if settings.DEBUG:
+            temperature = 54321
         return temperature

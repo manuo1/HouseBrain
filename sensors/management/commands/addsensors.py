@@ -1,3 +1,4 @@
+from django.conf import settings
 
 import glob
 
@@ -29,5 +30,16 @@ class Command(BaseCommand):
         # |     the number 28
         # glob module finds all the pathnames matching a specified pattern
         sensor_folder_paths = glob.glob(str(W1_DIRECTORY)+"/28*")
-        sensor_folder_paths = ['/sys/bus/w1/devices/28-000005c7cc82', '/sys/bus/w1/devices/28-000005c83f61', '/sys/bus/w1/devices/28-000005c7d98e', '/sys/bus/w1/devices/28-000005c6f49f', '/sys/bus/w1/devices/28-000005c83686', '/sys/bus/w1/devices/28-000005c6d2aa', '/sys/bus/w1/devices/28-000005c7824f', '/sys/bus/w1/devices/28-000005c6d680']
+        # add a false sensor_folder_paths in debug mode (no sensor connected)
+        if settings.DEBUG:
+            sensor_folder_paths = [
+                '/sys/bus/w1/devices/28-000005c7cc82',
+                '/sys/bus/w1/devices/28-000005c83f61',
+                '/sys/bus/w1/devices/28-000005c7d98e',
+                '/sys/bus/w1/devices/28-000005c6f49f',
+                '/sys/bus/w1/devices/28-000005c83686',
+                '/sys/bus/w1/devices/28-000005c6d2aa',
+                '/sys/bus/w1/devices/28-000005c7824f',
+                '/sys/bus/w1/devices/28-000005c6d680'
+            ]
         return sensor_folder_paths

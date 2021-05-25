@@ -1,4 +1,5 @@
 from django.db import models, IntegrityError
+from django.utils import timezone
 from rooms.models import Room
 
 class TemperatureSensorManager(models.Manager):
@@ -29,10 +30,16 @@ class TemperatureSensorManager(models.Manager):
             return False
         return True
 
-    def get_sensor_temperatures(self, sensor):
+    def sensor_temperatures_list(self, sensor):
         sensor_temperatures_list = TemperatureHistory.objects.filter(
             associated_sensor=sensor).order_by('-date_time')
         return sensor_temperatures_list
+
+    def last_measured_temperature(self, sensor):
+        temperature = ""
+        if self.sensor_temperatures_list(sensor):
+            temperature = self.sensor_temperatures_list(sensor)[0].temperature
+        return temperature
 
 class TemperatureSensor(models.Model):
 
