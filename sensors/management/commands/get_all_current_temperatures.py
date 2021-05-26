@@ -16,7 +16,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """main controler."""
-        for sensor in temperature_sensor_manager.all_sensor():
+        for sensor in temperature_sensor_manager.all_sensors():
             temperature_sensor_manager.save_temperature(
                 self.read_temperature(sensor),
                 sensor
