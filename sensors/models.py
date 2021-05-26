@@ -47,7 +47,7 @@ class TemperatureSensorManager(models.Manager):
         sensor.save()
 
     def reset_consecutive_errors(self, sensor):
-        if sensor.consecutive_errors != 0
+        if sensor.consecutive_errors != 0:
             sensor.consecutive_errors = 0
             sensor.save()
 
