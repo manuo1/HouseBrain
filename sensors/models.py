@@ -41,6 +41,16 @@ class TemperatureSensorManager(models.Manager):
             temperature = self.sensor_temperatures_list(sensor)[0].temperature
         return temperature
 
+    def add_an_error(self,sensor):
+        sensor.consecutive_errors +=1
+        sensor.cumulative_errors +=1
+        sensor.save()
+
+    def reset_consecutive_errors(self, sensor):
+        if sensor.consecutive_errors != 0
+            sensor.consecutive_errors = 0
+            sensor.save()
+
 class TemperatureSensor(models.Model):
 
     name = models.CharField(
@@ -58,6 +68,8 @@ class TemperatureSensor(models.Model):
         blank=True,
         null=True,
     )
+    consecutive_errors = models.IntegerField(default=0)
+    cumulative_errors = models.IntegerField(default=0)
 
     def __str__(self):
         room_name = "(?)"
