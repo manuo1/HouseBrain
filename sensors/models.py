@@ -11,7 +11,7 @@ class TemperatureSensorManager(models.Manager):
             except IntegrityError:
                 pass
 
-    def all_sensor_list(self):
+    def all_sensors(self):
         list = TemperatureSensor.objects.all().order_by(
             'name', 'sensor_folder_path'
         )
@@ -50,6 +50,15 @@ class TemperatureSensorManager(models.Manager):
         if sensor.consecutive_errors != 0:
             sensor.consecutive_errors = 0
             sensor.save()
+
+    def all_current_temperatures(self):
+        all_current_temperatures = []
+        if self.all_sensors():
+            for sensor in self.all_sensors():
+                all_current_temperatures.append(
+                    (sensor, self.last_measured_temperature(sensor))
+                )
+        return all_current_temperatures
 
 class TemperatureSensor(models.Model):
 

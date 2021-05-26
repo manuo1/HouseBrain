@@ -4,8 +4,8 @@
 {% block main %}
 
 <p>
-  ------------------------<br>
-  homepage zone<br>
-  ------------------------
+  {% for room, temperature in temperatures %}
+      <a>{{room}} | {{temperature}}</a><br>
+  {% endfor %}
 </p>
 {% endblock %}
