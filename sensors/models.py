@@ -1,5 +1,9 @@
 from django.db import models, IntegrityError
 from django.utils import timezone
+from housebrain_config.settings.constants import (
+    MAX_TEMPERATURE as max_temp,
+    MIN_TEMPERATURE as min_temp
+)
 from rooms.models import Room
 
 class TemperatureSensorManager(models.Manager):
@@ -18,15 +22,15 @@ class TemperatureSensorManager(models.Manager):
         return list
 
     def save_temperature(self, new_temperature, sensor):
-        if self.temperature_is_valid(int(new_temperature)):
+        if self.temperature_is_valid(new_temperature):
             new_temperature_history = TemperatureHistory(
-                temperature = int(new_temperature),
+                temperature = new_temperature,
                 associated_sensor = sensor
             )
             new_temperature_history.save()
 
     def temperature_is_valid(self, new_temperature):
-        if new_temperature > 60000 or new_temperature < -50000:
+        if new_temperature > max_temp or new_temperature < min_temp:
             return False
         return True
 
@@ -51,14 +55,14 @@ class TemperatureSensorManager(models.Manager):
             sensor.consecutive_errors = 0
             sensor.save()
 
-    def all_current_temperatures(self):
-        all_current_temperatures = []
+    def all_last_temperatures(self):
+        all_last_temperatures = []
         if self.all_sensors():
             for sensor in self.all_sensors():
-                all_current_temperatures.append(
+                all_last_temperatures.append(
                     (sensor, self.last_measured_temperature(sensor))
                 )
-        return all_current_temperatures
+        return all_last_temperatures
 
 class TemperatureSensor(models.Model):
 
@@ -92,6 +96,7 @@ class TemperatureSensor(models.Model):
         return ret
 
 class TemperatureHistory(models.Model):
+    """ save temperature and date_time from a temperature sensor """
     temperature = models.IntegerField()
     date_time = models.DateTimeField(
         auto_now_add=True

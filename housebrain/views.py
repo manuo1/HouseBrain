@@ -7,7 +7,7 @@ t_sensor_manager = TemperatureSensorManager()
 
 def homepage(request):
     temperatures = []
-    for sensor, temperature in t_sensor_manager.all_current_temperatures():
+    for sensor, temperature in t_sensor_manager.all_last_temperatures():
         if sensor.associated_room:
             name = sensor.associated_room.name
         else :

@@ -1,5 +1,8 @@
 from django.conf import settings
-
+from housebrain_config.settings.constants import (
+    DEBUG_SENSOR_FOLDER_PATHS,
+    W1_DIRECTORY_PATH
+)
 import glob
 
 from pathlib import Path
@@ -23,23 +26,15 @@ class Command(BaseCommand):
 
     def all_temperature_sensors(self):
         """ Search temperature sensors """
-        # Raspberry have folder with alls one wire devices at W1_DIRECTORY
-        W1_DIRECTORY = Path("/sys/bus/w1/devices")
+        # Raspberry have folder with alls one wire devices at w1_directory
+        # | set in : housebrain_config.settings.constants
+        w1_directory = Path(W1_DIRECTORY_PATH)
         # The data of each of the one-wire sensors is stored in files named by
         # |     the sensor address and the DS18B20 sensors address start with
         # |     the number 28
         # glob module finds all the pathnames matching a specified pattern
-        sensor_folder_paths = glob.glob(str(W1_DIRECTORY)+"/28*")
+        sensor_folder_paths = glob.glob(str(w1_directory)+"/28*")
         # add a false sensor_folder_paths in debug mode (no sensor connected)
         if settings.DEBUG:
-            sensor_folder_paths = [
-                '/sys/bus/w1/devices/28-000005c7cc82',
-                '/sys/bus/w1/devices/28-000005c83f61',
-                '/sys/bus/w1/devices/28-000005c7d98e',
-                '/sys/bus/w1/devices/28-000005c6f49f',
-                '/sys/bus/w1/devices/28-000005c83686',
-                '/sys/bus/w1/devices/28-000005c6d2aa',
-                '/sys/bus/w1/devices/28-000005c7824f',
-                '/sys/bus/w1/devices/28-000005c6d680'
-            ]
+            sensor_folder_paths = DEBUG_SENSOR_FOLDER_PATHS
         return sensor_folder_paths
