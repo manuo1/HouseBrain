@@ -32,11 +32,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_celery_beat',
+    'django_celery_results',
     'housebrain',
     'authentication',
     'sensors',
     'rooms',
     'heaters',
+
 ]
 
 MIDDLEWARE = [
@@ -137,3 +140,11 @@ AUTH_USER_MODEL = 'authentication.User'
 LOGIN_URL = 'authentication:login'
 LOGIN_REDIRECT_URL = 'housebrain:homepage'
 LOGOUT_REDIRECT_URL = 'housebrain:homepage'
+
+# Celery
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'

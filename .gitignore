@@ -4,3 +4,4 @@ __pycache__
 .coverage
 staticfiles
 migrations
+celerybeat-schedule

@@ -8,11 +8,11 @@ t_sensor_manager = TemperatureSensorManager()
 def homepage(request):
     temperatures = []
     for sensor, temperature in t_sensor_manager.all_last_temperatures():
+        temperature = 85000
         if sensor.associated_room:
             name = sensor.associated_room.name
         else :
             name =f'{sensor.name} ({sensor.sensor_folder_path[-15:]})'
-
         temperatures.append(
             (name , f'{(temperature/1000):.2f}°C')
         )
