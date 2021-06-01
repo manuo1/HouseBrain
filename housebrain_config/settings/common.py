@@ -110,6 +110,11 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
+# House Brain will use the django LANGUAGE_CODE setting to translate messages,
+# | if you change the value of LANGUAGE_CODE to something other
+# | than 'fr' or 'en-us' you must add your translations to all messages in
+# | /housebrain_config/settings/messages.py
+# | or errors will appear
 LANGUAGE_CODE = 'fr'
 
 TIME_ZONE = 'Europe/Paris'

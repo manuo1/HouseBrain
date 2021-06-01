@@ -1,5 +1,7 @@
 
+##############################################################################
 #false data for the debug mode (no sensor connected):
+##############################################################################
 DEBUG_SENSOR_FOLDER_PATHS = [
     '/sys/bus/w1/devices/28-000005c7cc82',
     '/sys/bus/w1/devices/28-000005c83f61',
@@ -12,12 +14,17 @@ DEBUG_SENSOR_FOLDER_PATHS = [
 ]
 DEBUG_TEMPERATURE = 54321
 
-
-#temperature sensors data :
+##############################################################################
+# Temperature sensors data :
+##############################################################################
 ERROR_TEMPERATURE = 85000
 MAX_TEMPERATURE = 60000
 MIN_TEMPERATURE = -50000
+# Maximum sensor reading errors before defining the sensor as defective
+MAX_SENSOR_READING_ERRORS = 10
 
+##############################################################################
 # Raspberry one wire devices folder paths:
+##############################################################################
 W1_DIRECTORY_PATH = "/sys/bus/w1/devices"
 TEMPERATURE_FILE = "/temperature"

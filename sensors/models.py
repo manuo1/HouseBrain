@@ -1,8 +1,15 @@
+from django.conf import settings
 from django.db import models, IntegrityError
 from django.utils import timezone
 from housebrain_config.settings.constants import (
     MAX_TEMPERATURE as max_temp,
-    MIN_TEMPERATURE as min_temp
+    MIN_TEMPERATURE as min_temp,
+    ERROR_TEMPERATURE as error_temp,
+    MAX_SENSOR_READING_ERRORS as max_errors,
+)
+from housebrain_config.settings.messages import (
+    NO_ASSOCIATED_ROOM,
+    UNNAMED_SENSOR,
 )
 from rooms.models import Room
 
@@ -23,11 +30,19 @@ class TemperatureSensorManager(models.Manager):
 
     def save_temperature(self, new_temperature, sensor):
         if self.temperature_is_valid(new_temperature):
-            new_temperature_history = TemperatureHistory(
-                temperature = new_temperature,
-                associated_sensor = sensor
-            )
-            new_temperature_history.save()
+            # every tens of minutes
+            if timezone.now().minute % 10 == 0:
+                # save in temperature history
+                new_temperature_history = TemperatureHistory(
+                    temperature = new_temperature,
+                    associated_sensor = sensor
+                )
+                new_temperature_history.save()
+            # update sensor measured temperatures
+            sensor.previous_measured_temperature = (
+                sensor.last_measured_temperature)
+            sensor.last_measured_temperature = new_temperature
+            sensor.save()
 
     def temperature_is_valid(self, new_temperature):
         if new_temperature > max_temp or new_temperature < min_temp:
@@ -39,35 +54,24 @@ class TemperatureSensorManager(models.Manager):
             associated_sensor=sensor).order_by('-date_time')
         return sensor_temperatures_list
 
-    def last_measured_temperature(self, sensor):
-        temperature = ""
-        if self.sensor_temperatures_list(sensor):
-            temperature = self.sensor_temperatures_list(sensor)[0].temperature
-        return temperature
-
     def add_an_error(self,sensor):
         sensor.consecutive_errors +=1
         sensor.cumulative_errors +=1
+        if sensor.consecutive_errors >= max_errors:
+            sensor.is_malfunctioning = True
         sensor.save()
 
     def reset_consecutive_errors(self, sensor):
         if sensor.consecutive_errors != 0:
             sensor.consecutive_errors = 0
+            if sensor.is_malfunctioning:
+                sensor.is_malfunctioning = False
             sensor.save()
 
-    def all_last_temperatures(self):
-        all_last_temperatures = []
-        if self.all_sensors():
-            for sensor in self.all_sensors():
-                all_last_temperatures.append(
-                    (sensor, self.last_measured_temperature(sensor))
-                )
-        return all_last_temperatures
-
 class TemperatureSensor(models.Model):
-
+    """ temperature sensors model """
     name = models.CharField(
-        default="unnamed",
+        default=UNNAMED_SENSOR[settings.LANGUAGE_CODE],
         max_length=100
     )
     sensor_folder_path = models.CharField(
@@ -81,11 +85,14 @@ class TemperatureSensor(models.Model):
         blank=True,
         null=True,
     )
+    last_measured_temperature = models.IntegerField(default=error_temp)
+    previous_measured_temperature = models.IntegerField(default=error_temp)
     consecutive_errors = models.IntegerField(default=0)
     cumulative_errors = models.IntegerField(default=0)
+    is_malfunctioning = models.BooleanField(default=False)
 
     def __str__(self):
-        room_name = "(?)"
+        room_name = NO_ASSOCIATED_ROOM[settings.LANGUAGE_CODE]
         if self.associated_room:
             room_name = self.associated_room.name
         ret = "{} | {} ({})".format(
@@ -107,7 +114,7 @@ class TemperatureHistory(models.Model):
     )
 
     def __str__(self):
-        room_name = "(?)"
+        room_name = NO_ASSOCIATED_ROOM[settings.LANGUAGE_CODE]
         if self.associated_sensor.associated_room:
             room_name = self.associated_sensor.associated_room.name
 
