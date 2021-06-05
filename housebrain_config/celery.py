@@ -27,10 +27,10 @@ app.autodiscover_tasks()
 
 
 app.conf.beat_schedule = {
-    # Get temperatures every Minutes
-    'Get temperatures every minutes': {
+    # Get temperatures every 10 Minutes
+    'Get temperatures every 10 minutes': {
         'task': 'sensors.tasks.get_temperatures',
-        'schedule': crontab(),
+        'schedule': crontab(minute='*/10'),
     },
 }
     # crontab() mean Execute every minute

@@ -30,8 +30,8 @@ class TemperatureSensorManager(models.Manager):
 
     def save_temperature(self, new_temperature, sensor):
         if self.temperature_is_valid(new_temperature):
-            # every tens of minutes
-            if timezone.now().minute % 10 == 0:
+            # every 30 minutes save in the history
+            if timezone.now().minute % 30 == 0:
                 # save in temperature history
                 new_temperature_history = TemperatureHistory(
                     temperature = new_temperature,

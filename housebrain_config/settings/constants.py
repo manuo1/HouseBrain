@@ -15,12 +15,12 @@ DEBUG_SENSOR_FOLDER_PATHS = [
 DEBUG_TEMPERATURE = 54321
 
 ##############################################################################
-# Temperature sensors data :
+# Temperature sensors settings :
 ##############################################################################
 ERROR_TEMPERATURE = 85000
 MAX_TEMPERATURE = 60000
 MIN_TEMPERATURE = -50000
-# Maximum sensor reading errors before defining the sensor as defective
+# Maximum consecutive reading errors before defining the sensor defective
 MAX_SENSOR_READING_ERRORS = 10
 
 ##############################################################################

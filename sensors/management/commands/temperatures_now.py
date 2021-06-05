@@ -46,8 +46,7 @@ class Command(BaseCommand):
                     {sensor.sensor_folder_path + TEMPERATURE_FILE}
                     """
                 )
-                # if the measurement returns an incorrect temperature,
-                # | increments the sensor error counter
+                # increments the sensor error counter
                 temperature_sensor_manager.add_an_error(sensor)
 
         return temperature
