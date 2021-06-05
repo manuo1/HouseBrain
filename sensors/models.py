@@ -68,6 +68,9 @@ class TemperatureSensorManager(models.Manager):
                 sensor.is_malfunctioning = False
             sensor.save()
 
+    def clear_all_temperature_history(self):
+        TemperatureHistory.objects.all().delete()
+
 class TemperatureSensor(models.Model):
     """ temperature sensors model """
     name = models.CharField(
