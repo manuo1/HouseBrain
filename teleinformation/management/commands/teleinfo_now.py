@@ -38,6 +38,7 @@ class Command(BaseCommand):
         else :
             first_key_that_was_read  = ""
             teleinfo_is_complete = False
+            data = []
 
             import serial
             serial_port = serial.Serial(
