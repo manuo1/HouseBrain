@@ -48,15 +48,15 @@ class Command(BaseCommand):
                     data = self.get_data_in_line(line)
                     # if the key corresponds to the one read first, the
                     # | teleinfo has made a complete loop
-                    if data[key] == first_key_that_was_read:
+                    if data["key"] == first_key_that_was_read:
                         teleinfo_is_complete = True
                         break
                     # checks if the data is valid with the checksum
                     if self.data_is_valid(data):
                         # and finaly store data in teleinfo dict
                         if all(value == "" for value in self.teleinfo.values()):
-                            first_key_that_was_read  = data[key]
-                            self.teleinfo[data[key]] = data[value]
+                            first_key_that_was_read  = data["key"]
+                            self.teleinfo[data["key"]] = data["value"]
         for key, value in self.teleinfo.items():
             self.stdout.write(key + " = " + value)
 
