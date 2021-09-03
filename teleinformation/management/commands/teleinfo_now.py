@@ -114,3 +114,4 @@ class Command(BaseCommand):
             bytesize=serial.SEVENBITS,
             timeout=SERIAL_TIMEOUT
         )
+        return serial_port
