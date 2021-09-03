@@ -26,14 +26,14 @@ class Command(BaseCommand):
         # (2 first are _state and id )
         model_fields_list = list(instance.__dict__.keys())[2:]
         # Create the dictionary with blank values
-        teleinfo = {key: "" for key in model_fields_list}
+        self.teleinfo = {key: "" for key in model_fields_list}
 
 
 
         """ false data for the debug mode (no teleinfo connected) """
         if settings.UNPLUGGED_MODE:
-            for key in teleinfo.keys():
-                teleinfo[key] = "1"
+            for key in self.teleinfo.keys():
+                self.teleinfo[key] = "1"
             self.stdout.write("---- UNPLUGGED_MODE ----")
         else :
             first_key_that_was_read  = ""
@@ -54,17 +54,17 @@ class Command(BaseCommand):
                     # checks if the data is valid with the checksum
                     if self.data_is_valid(data):
                         # and finaly store data in teleinfo dict
-                        if all(value == "" for value in teleinfo.values()):
+                        if all(value == "" for value in self.teleinfo.values()):
                             first_key_that_was_read  = data[key]
-                            teleinfo[data[key]] = data[value]
-        for key, value in teleinfo.items():
+                            self.teleinfo[data[key]] = data[value]
+        for key, value in self.teleinfo.items():
             self.stdout.write(key + " = " + value)
 
 
     def get_data_in_line(self, line):
         # check if a teleinfo key is present in the line
         data = {}
-        for key in teleinfo.keys():
+        for key in self.teleinfo.keys():
             if key in line:
                 data["key"] = key
                 #get value in line
