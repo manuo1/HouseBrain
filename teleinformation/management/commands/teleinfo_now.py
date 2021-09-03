@@ -75,7 +75,7 @@ class Command(BaseCommand):
 
 
 
-    def data_is_valid(self, key, value, wanted_checksum):
+    def data_is_valid(self, data):
         """
         The "checksum" is calculated on the whole of the characters
         going from the beginning of the label field to the end of
@@ -88,18 +88,19 @@ class Command(BaseCommand):
         The result will always be a printable ASCII character
         (sign, number, capital letter) going from 32 to 95.
         """
+
         #add spacing character ASCII codes
         calculated_checksum = 32
         #adds the sum of the ascii codes of the label characters
-        calculated_checksum += sum([ord(char) for char in key])
+        calculated_checksum += sum([ord(char) for char in data[key]])
         #adds the sum of the ascii codes of the data characters
-        calculated_checksum += sum([ord(char) for char in value])
+        calculated_checksum += sum([ord(char) for char in data[value]])
         #logical AND between the sum previously calculated and 63
         calculated_checksum = calculated_checksum & 63
         #Finally, we add 32
         calculated_checksum = chr(calculated_checksum + 32)
 
-        return calculated_checksum == wanted_checksum
+        return calculated_checksum == data[wanted_checksum]
 
 
 
