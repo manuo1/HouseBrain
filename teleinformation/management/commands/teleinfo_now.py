@@ -52,10 +52,11 @@ class Command(BaseCommand):
                         teleinfo_is_complete = True
                     # checks if the data is valid with the checksum
                     if self.data_is_valid(data) and not teleinfo_is_complete:
-                        # and finaly store data in teleinfo dict
+                        # store the first key read
                         if all(value == "" for value in self.teleinfo.values()):
                             first_key_that_was_read  = data["key"]
-                            self.teleinfo[data["key"]] = data["value"]
+                        # and finaly store data in teleinfo dict
+                        self.teleinfo[data["key"]] = data["value"]
         for key, value in self.teleinfo.items():
             self.stdout.write(key + " = " + value)
 
