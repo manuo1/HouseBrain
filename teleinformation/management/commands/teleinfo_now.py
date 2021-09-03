@@ -50,9 +50,8 @@ class Command(BaseCommand):
                     # | teleinfo has made a complete loop
                     if data["key"] == first_key_that_was_read:
                         teleinfo_is_complete = True
-                        #break
                     # checks if the data is valid with the checksum
-                    if self.data_is_valid(data):
+                    if self.data_is_valid(data) and not teleinfo_is_complete:
                         # and finaly store data in teleinfo dict
                         if all(value == "" for value in self.teleinfo.values()):
                             first_key_that_was_read  = data["key"]
