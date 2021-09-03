@@ -38,7 +38,16 @@ class Command(BaseCommand):
         else :
             first_key_that_was_read  = ""
             teleinfo_is_complete = False
-            serial_port = get_serial_port()
+
+            import serial
+            serial_port = serial.Serial(
+                port=SERIAL_PORT,
+                baudrate = SERIAL_BAUDRATE,
+                parity=serial.PARITY_NONE,
+                stopbits=serial.STOPBITS_ONE,
+                bytesize=serial.SEVENBITS,
+                timeout=SERIAL_TIMEOUT
+            )
             # if there is data in serial port
             if serial_port.readline():
                 # as long as the teleinfo has not completed a complete loop
@@ -100,17 +109,3 @@ class Command(BaseCommand):
             calculated_checksum = chr(calculated_checksum + 32)
 
             return calculated_checksum == wanted_checksum
-
-
-
-        def get_serial_port():
-            """ Raspberry serial port config """
-            import serial
-            serial_port = serial.Serial(
-                port=SERIAL_PORT,
-                baudrate = SERIAL_BAUDRATE,
-                parity=serial.PARITY_NONE,
-                stopbits=serial.STOPBITS_ONE,
-                bytesize=serial.SEVENBITS,
-                timeout=SERIAL_TIMEOUT
-            )
