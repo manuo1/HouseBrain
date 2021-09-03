@@ -92,15 +92,15 @@ class Command(BaseCommand):
         #add spacing character ASCII codes
         calculated_checksum = 32
         #adds the sum of the ascii codes of the label characters
-        calculated_checksum += sum([ord(char) for char in data[key]])
+        calculated_checksum += sum([ord(char) for char in data["key"]])
         #adds the sum of the ascii codes of the data characters
-        calculated_checksum += sum([ord(char) for char in data[value]])
+        calculated_checksum += sum([ord(char) for char in data["value"]])
         #logical AND between the sum previously calculated and 63
         calculated_checksum = calculated_checksum & 63
         #Finally, we add 32
         calculated_checksum = chr(calculated_checksum + 32)
 
-        return calculated_checksum == data[wanted_checksum]
+        return calculated_checksum == data["wanted_checksum"]
 
 
 
