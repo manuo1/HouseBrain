@@ -38,8 +38,7 @@ class Command(BaseCommand):
         else :
             first_key_that_was_read  = ""
             teleinfo_is_complete = False
-            data = {}
-
+            
             import serial
             serial_port = serial.Serial(
                 port=SERIAL_PORT,
@@ -71,42 +70,42 @@ class Command(BaseCommand):
             self.stdout.write(key + " = " + value)
 
 
-        def get_data_in_line(line):
-            # check if a teleinfo key is present in the line
-            data = {}
-            for key in teleinfo.keys():
-                if key in line:
-                    data["key"] = key
-                    #get value in line
-                    data["value"] = line.split()[1]
-                    #get checsum in line
-                    data["wanted_checksum"] = line.split()[2][0:1]
-            return data
+    def get_data_in_line(line):
+        # check if a teleinfo key is present in the line
+        data = {}
+        for key in teleinfo.keys():
+            if key in line:
+                data["key"] = key
+                #get value in line
+                data["value"] = line.split()[1]
+                #get checsum in line
+                data["wanted_checksum"] = line.split()[2][0:1]
+        return data
 
 
 
-        def data_is_valid(key, value, wanted_checksum):
-            """
-            The "checksum" is calculated on the whole of the characters
-            going from the beginning of the label field to the end of
-            the given field, spacing character (SP) included.
-            First of all, the ASCII codes of all these characters are
-            summed. To avoid introducing ASCII functions (00 to 31),
-            we keep only the six least significant bits of the result
-            obtained (this operation results in a logical AND between
-            the sum previously calculated and 63). Finally, we add 32.
-            The result will always be a printable ASCII character
-            (sign, number, capital letter) going from 32 to 95.
-            """
-            #add spacing character ASCII codes
-            calculated_checksum = 32
-            #adds the sum of the ascii codes of the label characters
-            calculated_checksum += sum([ord(char) for char in key])
-            #adds the sum of the ascii codes of the data characters
-            calculated_checksum += sum([ord(char) for char in value])
-            #logical AND between the sum previously calculated and 63
-            calculated_checksum = calculated_checksum & 63
-            #Finally, we add 32
-            calculated_checksum = chr(calculated_checksum + 32)
+    def data_is_valid(key, value, wanted_checksum):
+        """
+        The "checksum" is calculated on the whole of the characters
+        going from the beginning of the label field to the end of
+        the given field, spacing character (SP) included.
+        First of all, the ASCII codes of all these characters are
+        summed. To avoid introducing ASCII functions (00 to 31),
+        we keep only the six least significant bits of the result
+        obtained (this operation results in a logical AND between
+        the sum previously calculated and 63). Finally, we add 32.
+        The result will always be a printable ASCII character
+        (sign, number, capital letter) going from 32 to 95.
+        """
+        #add spacing character ASCII codes
+        calculated_checksum = 32
+        #adds the sum of the ascii codes of the label characters
+        calculated_checksum += sum([ord(char) for char in key])
+        #adds the sum of the ascii codes of the data characters
+        calculated_checksum += sum([ord(char) for char in value])
+        #logical AND between the sum previously calculated and 63
+        calculated_checksum = calculated_checksum & 63
+        #Finally, we add 32
+        calculated_checksum = chr(calculated_checksum + 32)
 
-            return calculated_checksum == wanted_checksum
+        return calculated_checksum == wanted_checksum
