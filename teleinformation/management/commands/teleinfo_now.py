@@ -59,7 +59,7 @@ class Command(BaseCommand):
                         self.teleinfo[data["key"]] = data["value"]
         self.teleinfo["date_time"] = timezone.now()
         for key, value in self.teleinfo.items():
-            self.stdout.write(key + " = " + value)
+            self.stdout.write(key + " = " + str(value))
 
 
     def get_data_in_line(self, line):
