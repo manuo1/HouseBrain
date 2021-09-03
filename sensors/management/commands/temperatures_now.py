@@ -28,7 +28,7 @@ class Command(BaseCommand):
     def read_temperature(self, sensor):
         if settings.UNPLUGGED_MODE:
             temperature = DEBUG_TEMPERATURE
-            self.stdout.write("---- UNPLUGGED_MODE ----")
+            self.stdout.write("reading temp in ---- UNPLUGGED_MODE ----")
         else :
             try:
                 with open (

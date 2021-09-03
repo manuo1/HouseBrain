@@ -34,7 +34,7 @@ class Command(BaseCommand):
         if settings.UNPLUGGED_MODE:
             for key in self.teleinfo.keys():
                 self.teleinfo[key] = "1"
-            self.stdout.write("---- UNPLUGGED_MODE ----")
+            self.stdout.write("reading teleinfo in ---- UNPLUGGED_MODE ----")
         else :
             first_key_that_was_read  = ""
             teleinfo_is_complete = False
@@ -57,6 +57,7 @@ class Command(BaseCommand):
                             first_key_that_was_read  = data["key"]
                         # and finaly store data in teleinfo dict
                         self.teleinfo[data["key"]] = data["value"]
+        self.teleinfo["date_time"] = timezone.now()
         for key, value in self.teleinfo.items():
             self.stdout.write(key + " = " + value)
 
