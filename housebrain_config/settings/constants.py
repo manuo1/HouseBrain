@@ -28,3 +28,10 @@ MAX_SENSOR_READING_ERRORS = 10
 ##############################################################################
 W1_DIRECTORY_PATH = "/sys/bus/w1/devices"
 TEMPERATURE_FILE = "/temperature"
+
+##############################################################################
+# Raspberry serial port reading settings (teleinfo):
+##############################################################################
+SERIAL_PORT='/dev/ttyS0'
+SERIAL_BAUDRATE = 1200
+SERIAL_TIMEOUT=1

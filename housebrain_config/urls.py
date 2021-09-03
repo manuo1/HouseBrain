@@ -10,4 +10,5 @@ urlpatterns = [
     path('sensors/', include('sensors.urls')),
     path('rooms/', include('rooms.urls')),
     path('heaters/', include('heaters.urls')),
+    path('teleinformation/', include('teleinformation.urls')),
 ]

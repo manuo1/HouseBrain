@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'sensors',
     'rooms',
     'heaters',
-
+    'teleinformation',
 ]
 
 MIDDLEWARE = [
