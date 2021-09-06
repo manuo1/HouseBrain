@@ -51,15 +51,15 @@ class Command(BaseCommand):
             self.stdout.write(key + " = " + str(value))
 
 
-    def get_false_data_for_unplugged_mode():
+    def get_false_data_for_unplugged_mode(self):
         """ false data for the debug mode (no teleinfo connected) """
-        teleinfo  = {}
+        false_teleinfo  = {}
         for key in self.teleinfo.keys():
-            teleinfo[key] = "1"
-        return teleinfo
+            false_teleinfo[key] = "1"
+        return false_teleinfo
 
 
-    def get_TeleinformationHistory_model_fields():
+    def get_TeleinformationHistory_model_fields(self):
         """ create dictionary of all TeleinformationHistory attributes """
         teleinfo  = {}
         # Get an instance of TeleinformationHistory model
