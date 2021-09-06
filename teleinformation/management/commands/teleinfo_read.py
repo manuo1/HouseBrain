@@ -23,7 +23,7 @@ class Command(BaseCommand):
         # Get an instance of TeleinformationHistory model
         instance = TeleinformationHistory()
         # list all attributes and remove 2 first
-        # (2 first are _state and id )
+        # (we don't need the 2 first which are _state and id )
         model_fields_list = list(instance.__dict__.keys())[2:]
         # Create the dictionary with blank values
         self.teleinfo = {key: "" for key in model_fields_list}
@@ -52,7 +52,7 @@ class Command(BaseCommand):
                         teleinfo_is_complete = True
                     # checks if the data is valid with the checksum
                     if self.data_is_valid(data) and not teleinfo_is_complete:
-                        # store the first key read
+                        # store the first key read in frame
                         if all(value == "" for value in self.teleinfo.values()):
                             first_key_that_was_read  = data["key"]
                         # and finaly store data in teleinfo dict
