@@ -28,16 +28,16 @@ class TemperatureSensorManager(models.Manager):
         )
         return list
 
+    def save_temperature_history(self):
+        for sensor in self.all_sensors():
+            new_temperature_history = TemperatureHistory(
+                temperature = sensor.last_measured_temperature,
+                associated_sensor = sensor
+            )
+            new_temperature_history.save()
+
     def save_temperature(self, new_temperature, sensor):
         if self.temperature_is_valid(new_temperature):
-            # every 30 minutes save in the history
-            if timezone.now().minute % 30 == 0:
-                # save in temperature history
-                new_temperature_history = TemperatureHistory(
-                    temperature = new_temperature,
-                    associated_sensor = sensor
-                )
-                new_temperature_history.save()
             # update sensor measured temperatures
             sensor.previous_measured_temperature = (
                 sensor.last_measured_temperature)

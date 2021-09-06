@@ -18,22 +18,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """main controler."""
 
-        """ create dictionary of all the fields in TeleinformationHistory model """
+        # get dictionary of all the fields in TeleinformationHistory model
+        self.teleinfo = self.get_TeleinformationHistory_model_fields()
 
-        # Get an instance of TeleinformationHistory model
-        instance = TeleinformationHistory()
-        # list all attributes and remove 2 first
-        # (we don't need the 2 first which are _state and id )
-        model_fields_list = list(instance.__dict__.keys())[2:]
-        # Create the dictionary with blank values
-        self.teleinfo = {key: "" for key in model_fields_list}
-
-
-
-        """ false data for the debug mode (no teleinfo connected) """
         if settings.UNPLUGGED_MODE:
-            for key in self.teleinfo.keys():
-                self.teleinfo[key] = "1"
+            self.teleinfo = self.get_false_data_for_unplugged_mode()
             self.stdout.write("reading teleinfo in ---- UNPLUGGED_MODE ----")
         else :
             first_key_that_was_read  = ""
@@ -60,6 +49,28 @@ class Command(BaseCommand):
         self.teleinfo["date_time"] = timezone.now()
         for key, value in self.teleinfo.items():
             self.stdout.write(key + " = " + str(value))
+
+
+    def get_false_data_for_unplugged_mode():
+        """ false data for the debug mode (no teleinfo connected) """
+        teleinfo  = {}
+        for key in self.teleinfo.keys():
+            teleinfo[key] = "1"
+        return teleinfo
+
+
+    def get_TeleinformationHistory_model_fields():
+        """ create dictionary of all TeleinformationHistory attributes """
+        teleinfo  = {}
+        # Get an instance of TeleinformationHistory model
+        instance = TeleinformationHistory()
+        # list all attributes and remove 2 first
+        # (we don't need the 2 first which are _state and id )
+        model_fields_list = list(instance.__dict__.keys())[2:]
+        # Create the dictionary with blank values
+        teleinfo = {key: "" for key in model_fields_list}
+
+        return teleinfo
 
 
     def get_data_in_line(self, line):
