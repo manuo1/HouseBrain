@@ -7,12 +7,14 @@ from django.core.management.base import BaseCommand
 from housebrain_config.settings.constants import (
     SERIAL_PORT, SERIAL_BAUDRATE, SERIAL_TIMEOUT
 )
+from teleinformation.models import TeleinfoManager
+teleinfo_manager = TeleinfoManager()
 
 class Command(BaseCommand):
     help = """
-    will display in consol Teleinformation
+    will save in database Teleinformation
     """
-    def add_arguments(self, teleinfo_read):
+    def add_arguments(self, teleinfo_save):
         pass
 
     def handle(self, *args, **options):
@@ -47,8 +49,7 @@ class Command(BaseCommand):
                         # and finaly store data in teleinfo dict
                         self.teleinfo[data["key"]] = data["value"]
         self.teleinfo["date_time"] = timezone.now()
-        for key, value in self.teleinfo.items():
-            self.stdout.write(key + " = " + str(value))
+        teleinfo_manager.save_teleinfo(self.teleinfo)
 
 
     def get_false_data_for_unplugged_mode(self):

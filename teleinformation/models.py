@@ -6,12 +6,16 @@ from django.db import models
 """
 
 class TeleinfoManager(models.Manager):
-    def save_teleinfo():
-        pass
+    def save_teleinfo(self, teleinfo):
+        new_teleinfo_history = TeleinformationHistory()
+        new_teleinfo_history.save()
+        new_teleinfo_history = TeleinformationHistory(
+            id=new_teleinfo_history.id, **teleinfo)
+        new_teleinfo_history.save()
 
 class TeleinformationHistory(models.Model):
 
-    date_time = models.DateTimeField()
+    date_time = models.DateTimeField(null=True, blank=True)
     # Adresse du compteur : ADCO
     # | (12 caractères)
     ADCO = models.CharField(max_length=12)
