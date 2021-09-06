@@ -12,4 +12,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """main controler."""
-        temperature_sensor_manager.clear_all_teleinformation_history()
+        teleinfo_manager.clear_all_teleinformation_history()
