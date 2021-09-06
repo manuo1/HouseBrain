@@ -86,7 +86,7 @@ class Command(BaseCommand):
                 #|can't use split because checksum can be a blanck char
                 data["wanted_checksum"] = line[-6:][0]
                 #and if the line is the last of the frame another way...
-                if key == "MODETAT":
+                if key == "MOTDETAT":
                     data["wanted_checksum"] = line[-14:][0]
         return data
 
