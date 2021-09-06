@@ -7,7 +7,7 @@ class Command(BaseCommand):
     help = """
     will delette all temperatures history
     """
-    def add_arguments(self, temperatures_now):
+    def add_arguments(self, temperatures_history_reset):
         pass
 
     def handle(self, *args, **options):

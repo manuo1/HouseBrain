@@ -12,7 +12,7 @@ class Command(BaseCommand):
     help = """
     will save in database Teleinformation
     """
-    def add_arguments(self, teleinfo_now):
+    def add_arguments(self, teleinfo_read):
         pass
 
     def handle(self, *args, **options):

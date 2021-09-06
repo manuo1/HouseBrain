@@ -4,7 +4,7 @@ from celery import shared_task
 from django.core import management
 
 @shared_task
-def get_temperatures():
-    """ run the manage.py command : temperatures_now """
+def read_and_save_temperatures():
+    """ run the manage.py command : temperatures_save """
     # periodiode is configured in django admin
-    management.call_command('temperatures_now')
+    management.call_command('temperatures_save')

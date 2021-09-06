@@ -14,7 +14,7 @@ class Command(BaseCommand):
     help = """
     will save in database all temperature sensors current temperatures
     """
-    def add_arguments(self, temperatures_now):
+    def add_arguments(self, temperatures_save):
         pass
 
     def handle(self, *args, **options):
