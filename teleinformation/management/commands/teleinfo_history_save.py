@@ -14,7 +14,7 @@ class Command(BaseCommand):
     help = """
     will save in database Teleinformation
     """
-    def add_arguments(self, teleinfo_save):
+    def add_arguments(self, teleinfo_history_save):
         pass
 
     def handle(self, *args, **options):
@@ -86,7 +86,7 @@ class Command(BaseCommand):
                 #|can't use split because checksum can be a blanck char
                 data["wanted_checksum"] = line[-6:][0]
                 #and if the line is the last of the frame another way...
-                if key = "MODETAT":
+                if key == "MODETAT":
                     data["wanted_checksum"] = line[-14:][0]
         return data
 
