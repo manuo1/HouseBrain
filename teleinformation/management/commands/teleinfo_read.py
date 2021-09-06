@@ -82,7 +82,8 @@ class Command(BaseCommand):
                 #get value in line
                 data["value"] = line.split()[1]
                 #get checsum in line
-                data["wanted_checksum"] = line.split()[2][0:1]
+                #|can't use split because checksum can be a blanck char
+                data["wanted_checksum"] = line[-6:][0]
         return data
 
 

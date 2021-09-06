@@ -13,6 +13,8 @@ class TeleinfoManager(models.Manager):
             id=new_teleinfo_history.id, **teleinfo)
         new_teleinfo_history.save()
 
+
+
 class TeleinformationHistory(models.Model):
 
     date_time = models.DateTimeField(null=True, blank=True)
@@ -108,3 +110,6 @@ class TeleinformationHistory(models.Model):
     # Mot d’état (autocontrôle) : MOTDETAT
     # | (6 car.)
     MOTDETAT = models.CharField(max_length=6)
+
+    def __str__(self):
+        return f'{self.ADCO} | {self.date_time:%d/%m/%Y %H:%M}'
