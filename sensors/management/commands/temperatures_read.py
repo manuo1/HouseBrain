@@ -21,7 +21,7 @@ class Command(BaseCommand):
         """main controler."""
         for sensor in temperature_sensor_manager.all_sensors():
             self.stdout.write(
-                sensor.name
+                str(sensor)
                 + " = " +
                 str(self.read_temperature(sensor)/1000)
             )
