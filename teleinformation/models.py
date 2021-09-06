@@ -13,6 +13,8 @@ class TeleinfoManager(models.Manager):
             id=new_teleinfo_history.id, **teleinfo)
         new_teleinfo_history.save()
 
+    def clear_all_teleinformation_history(self):
+        TeleinformationHistory.objects.all().delete()
 
 
 class TeleinformationHistory(models.Model):
