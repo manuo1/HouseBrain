@@ -26,11 +26,21 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks()
 
 
+# app.conf.beat_schedule will create base celery tasks and setttings
+# | you can change tasks settings from django admin at :
+# | your_server/admin/django_celery_beat/periodictask/
+
 app.conf.beat_schedule = {
-    # Get temperatures every 10 Minutes
-    'Get temperatures every 10 minutes': {
-        'task': 'sensors.tasks.get_temperatures',
-        'schedule': crontab(minute='*/10'),
+    # Save temperatures every 10 minutes
+    'Save temperatures every 5 minutes': {
+        'task': 'sensors.tasks.sensors.tasks.read_and_save_temperatures',
+        'schedule': crontab(minute='*/5 * * * *'),
+    },
+    'Save temperatures history every 30 minutes': {
+        'task': 'sensors.tasks.sensors.tasks.save_temperature_history',
+        'schedule': crontab(minute='*/30 * * * *'),
     },
 }
+
+
     # crontab() mean Execute every minute
