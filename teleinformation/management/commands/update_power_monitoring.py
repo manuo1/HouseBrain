@@ -12,7 +12,7 @@ class Command(BaseCommand):
     help = """
     will read and save IINST in teleinformation frame for power monitoring
     """
-    def add_arguments(self, teleinfo_read):
+    def add_arguments(self, update_power_monitoring):
         pass
 
     def handle(self, *args, **options):

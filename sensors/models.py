@@ -88,6 +88,7 @@ class TemperatureSensor(models.Model):
         blank=True,
         null=True,
     )
+    last_update = models.DateTimeField(auto_now_add=True)
     last_measured_temperature = models.IntegerField(default=error_temp)
     previous_measured_temperature = models.IntegerField(default=error_temp)
     consecutive_errors = models.IntegerField(default=0)
