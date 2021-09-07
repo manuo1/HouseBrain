@@ -21,6 +21,7 @@ class TeleinfoManager(models.Manager):
         power_monitoring = self.get_power_monitoring_object()
         power_monitoring.IINST = iinst
         power_monitoring.save()
+        print(self.get_power_monitoring_object())
 
     def get_power_monitoring_object(self):
         if PowerMonitoring.objects.all().count() > 0:
@@ -32,7 +33,7 @@ class TeleinfoManager(models.Manager):
 
 class PowerMonitoring(models.Model):
 
-    date_time = models.DateTimeField(auto_now_add=True)
+    date_time = models.DateTimeField(auto_now=True)
     # Intensité instantanée : IINST
     # | ( 3 car. unité = ampères)
     IINST = models.SmallIntegerField(default=ERROR_IINST)

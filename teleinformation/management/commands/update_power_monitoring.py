@@ -43,7 +43,6 @@ class Command(BaseCommand):
                         if self.data_is_valid(data):
                             # and finaly store data in teleinfo dict
                             self.iinst = int(data["value"])
-        self.stdout.write("IINST = " + str(self.iinst))
         teleinfo_manager.save_power_monitoring(self.iinst)
 
 

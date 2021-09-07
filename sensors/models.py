@@ -89,7 +89,7 @@ class TemperatureSensor(models.Model):
         blank=True,
         null=True,
     )
-    last_update = models.DateTimeField(auto_now_add=True)
+    date_time_update = models.DateTimeField(auto_now=True)
     last_measured_temperature = models.IntegerField(default=error_temp)
     previous_measured_temperature = models.IntegerField(default=error_temp)
     consecutive_errors = models.IntegerField(default=0)
@@ -105,7 +105,7 @@ class TemperatureSensor(models.Model):
             self.name,
             self.sensor_folder_path[-15:],
             LAST_TEMPERATURE_MEASUREMENT[settings.LANGUAGE_CODE],
-            f'{self.last_update:%d/%m/%Y %H:%M}',
+            f'{self.date_time_update:%d/%m/%Y %H:%M}',
         )
         return ret
 
