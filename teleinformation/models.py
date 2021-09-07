@@ -23,8 +23,8 @@ class TeleinfoManager(models.Manager):
         power_monitoring.save()
 
     def get_power_monitoring_object(self):
-        if TeleinformationHistory.objects.all().count() > 0:
-            power_monitoring = TeleinformationHistory.objects.all()[0]
+        if PowerMonitoring.objects.all().count() > 0:
+            power_monitoring = PowerMonitoring.objects.all()[0]
         else:
             power_monitoring = PowerMonitoring()
             power_monitoring.save()
