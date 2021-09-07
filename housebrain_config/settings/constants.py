@@ -41,3 +41,4 @@ SERIAL_TIMEOUT=1
 ##############################################################################
 ERROR_IINST = 999
 DEBUG_IINST = 123
+TELEINFO_TIMEOUT = 5 # [seconds]

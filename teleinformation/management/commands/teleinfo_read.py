@@ -6,7 +6,8 @@ from teleinformation.models import TeleinformationHistory
 from django.core.management.base import BaseCommand
 
 from housebrain_config.settings.constants import (
-    SERIAL_PORT, SERIAL_BAUDRATE, SERIAL_TIMEOUT
+    SERIAL_PORT, SERIAL_BAUDRATE, SERIAL_TIMEOUT,
+    TELEINFO_TIMEOUT,
 )
 
 class Command(BaseCommand):
@@ -26,7 +27,7 @@ class Command(BaseCommand):
             self.teleinfo = self.get_false_data_for_unplugged_mode()
             self.stdout.write("reading teleinfo in ---- UNPLUGGED_MODE ----")
         else :
-            timeout = 300   # [seconds]
+            timeout = 300
             timeout_start = time.time()
             first_key_that_was_read  = ""
             teleinfo_is_complete = False

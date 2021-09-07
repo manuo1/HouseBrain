@@ -6,7 +6,8 @@ from teleinformation.models import TeleinformationHistory
 from django.core.management.base import BaseCommand
 
 from housebrain_config.settings.constants import (
-    SERIAL_PORT, SERIAL_BAUDRATE, SERIAL_TIMEOUT
+    SERIAL_PORT, SERIAL_BAUDRATE, SERIAL_TIMEOUT,
+    TELEINFO_TIMEOUT,
 )
 from teleinformation.models import TeleinfoManager
 teleinfo_manager = TeleinfoManager()
@@ -28,13 +29,15 @@ class Command(BaseCommand):
             self.teleinfo = self.get_false_data_for_unplugged_mode()
             self.stdout.write("reading teleinfo in ---- UNPLUGGED_MODE ----")
         else :
+            timeout = TELEINFO_TIMEOUT
+            timeout_start = time.time()
             first_key_that_was_read  = ""
             teleinfo_is_complete = False
             serial_port = self.get_serial_port()
             # if there is data in serial port
             if serial_port.readline():
                 # as long as the teleinfo has not completed a complete loop
-                while not teleinfo_is_complete:
+                while not teleinfo_is_complete or time.time() < (timeout_start + timeout):
                     # for each line of the teleinfo frame
                     line = str(serial_port.readline())
                     data = self.get_data_in_line(line)

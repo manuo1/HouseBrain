@@ -6,7 +6,8 @@ from teleinformation.models import TeleinfoManager
 from django.core.management.base import BaseCommand
 
 from housebrain_config.settings.constants import (
-    SERIAL_PORT, SERIAL_BAUDRATE, SERIAL_TIMEOUT, ERROR_IINST, DEBUG_IINST
+    SERIAL_PORT, SERIAL_BAUDRATE, SERIAL_TIMEOUT,
+    ERROR_IINST, DEBUG_IINST, TELEINFO_TIMEOUT,
 )
 
 teleinfo_manager = TeleinfoManager()
@@ -27,7 +28,7 @@ class Command(BaseCommand):
             self.iinst = DEBUG_IINST
             self.stdout.write("reading teleinfo IINST in ---- UNPLUGGED_MODE ----")
         else :
-            timeout = 300   # [seconds]
+            timeout = TELEINFO_TIMEOUT
             timeout_start = time.time()
             serial_port = self.get_serial_port()
             # as long as the iinst value is not read or the timeout is exceeded
