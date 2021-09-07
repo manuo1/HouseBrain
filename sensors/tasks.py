@@ -11,6 +11,6 @@ def read_and_save_temperatures():
 
 @shared_task
 def save_temperatures_history():
-    """ run the manage.py command : save_temperature_history """
+    """ run the manage.py command : temperatures_history_save """
     # periodiode is configured in django admin
     management.call_command('temperatures_history_save')

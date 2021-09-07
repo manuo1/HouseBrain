@@ -37,7 +37,7 @@ app.conf.beat_schedule = {
         'schedule': crontab(minute='*/5'),
     },
     'Save temperatures history every 30 minutes': {
-        'task': 'sensors.tasks.save_temperature_history',
+        'task': 'sensors.tasks.save_temperatures_history',
         'schedule': crontab(minute='*/30'),
     },
     'Save teleinformation history every hours': {
