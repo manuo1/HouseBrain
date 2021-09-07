@@ -1,4 +1,5 @@
 from django.db import models
+from housebrain_config.settings.constants import (ERROR_IINST)
 
 """
 /!\ Teleinformation comes from the French electric network, docstrings
@@ -15,6 +16,16 @@ class TeleinfoManager(models.Manager):
 
     def clear_all_teleinformation_history(self):
         TeleinformationHistory.objects.all().delete()
+
+class PowerMonitoring(models.Model):
+
+    date_time = models.DateTimeField(auto_now_add=True)
+    # Intensité instantanée : IINST
+    # | ( 3 car. unité = ampères)
+    IINST = models.SmallIntegerField(default=ERROR_IINST)
+
+    def __str__(self):
+        return f'{self.IINST} | {self.date_time:%d/%m/%Y %H:%M}'
 
 
 class TeleinformationHistory(models.Model):

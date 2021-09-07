@@ -45,8 +45,6 @@ app.conf.beat_schedule = {
         'schedule': crontab(minute='0'),
     },
 
-#read_and_save_teleinformation
-
 }
 
 

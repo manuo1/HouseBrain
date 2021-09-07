@@ -35,3 +35,9 @@ TEMPERATURE_FILE = "/temperature"
 SERIAL_PORT='/dev/ttyS0'
 SERIAL_BAUDRATE = 1200
 SERIAL_TIMEOUT=1
+
+##############################################################################
+# Teleinformation
+##############################################################################
+ERROR_IINST = 999
+DEBUG_IINST = 123
