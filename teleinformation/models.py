@@ -20,13 +20,14 @@ class TeleinfoManager(models.Manager):
     def save_power_monitoring(self, iinst):
         power_monitoring = self.get_power_monitoring_object()
         power_monitoring.IINST = iinst
-        power_monitoring.save
+        power_monitoring.save()
 
     def get_power_monitoring_object(self):
         if TeleinformationHistory.objects.all().count() > 0:
             power_monitoring = TeleinformationHistory.objects.all()[0]
         else:
             power_monitoring = PowerMonitoring()
+            power_monitoring.save()
         return power_monitoring
 
 class PowerMonitoring(models.Model):
