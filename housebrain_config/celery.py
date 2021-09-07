@@ -33,15 +33,15 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     # Save temperatures every 10 minutes
     'Save temperatures every 5 minutes': {
-        'task': 'sensors.tasks.sensors.tasks.read_and_save_temperatures',
+        'task': 'sensors.tasks.read_and_save_temperatures',
         'schedule': crontab(minute='*/5'),
     },
     'Save temperatures history every 30 minutes': {
-        'task': 'sensors.tasks.sensors.tasks.save_temperature_history',
+        'task': 'sensors.tasks.save_temperature_history',
         'schedule': crontab(minute='*/30'),
     },
     'Save teleinformation history every hours': {
-        'task': 'teleinformation.tasks.teleinformation.tasks.read_and_save_teleinformation',
+        'task': 'teleinformation.tasks.read_and_save_teleinformation',
         'schedule': crontab(minute='0'),
     },
 
