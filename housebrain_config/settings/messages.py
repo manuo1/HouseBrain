@@ -14,3 +14,9 @@ UNNAMED_SENSOR ={
     'en-us' : 'Unnamed sensor',
     'fr' : 'Sonde non nommée'
 }
+
+'last temperature measurement'
+LAST_TEMPERATURE_MEASUREMENT ={
+    'en-us' : 'Last temperature measurement',
+    'fr' : 'Dernière mesure de température'
+}

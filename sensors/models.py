@@ -10,6 +10,7 @@ from housebrain_config.settings.constants import (
 from housebrain_config.settings.messages import (
     NO_ASSOCIATED_ROOM,
     UNNAMED_SENSOR,
+    LAST_TEMPERATURE_MEASUREMENT,
 )
 from rooms.models import Room
 
@@ -99,10 +100,12 @@ class TemperatureSensor(models.Model):
         room_name = NO_ASSOCIATED_ROOM[settings.LANGUAGE_CODE]
         if self.associated_room:
             room_name = self.associated_room.name
-        ret = "{} | {} ({})".format(
+        ret = "{} | {} ({}) ({} : {})".format(
             room_name,
             self.name,
             self.sensor_folder_path[-15:],
+            LAST_TEMPERATURE_MEASUREMENT[settings.LANGUAGE_CODE],
+            f'{self.last_update:%d/%m/%Y %H:%M}',
         )
         return ret
 
