@@ -17,6 +17,18 @@ class TeleinfoManager(models.Manager):
     def clear_all_teleinformation_history(self):
         TeleinformationHistory.objects.all().delete()
 
+    def save_power_monitoring(self, iinst):
+        power_monitoring = self.get_power_monitoring_object()
+        power_monitoring.IINST = iinst
+        power_monitoring.save
+
+    def get_power_monitoring_object(self):
+        if TeleinformationHistory.objects.all().count() > 0:
+            power_monitoring = TeleinformationHistory.objects.all()[0]
+        else:
+            power_monitoring = PowerMonitoring()
+        return power_monitoring
+
 class PowerMonitoring(models.Model):
 
     date_time = models.DateTimeField(auto_now_add=True)

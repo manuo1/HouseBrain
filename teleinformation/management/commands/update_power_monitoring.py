@@ -1,12 +1,15 @@
+import time
 from django.conf import settings
 from django.utils import timezone
 
-from teleinformation.models import TeleinformationHistory
+from teleinformation.models import TeleinfoManager
 from django.core.management.base import BaseCommand
 
 from housebrain_config.settings.constants import (
     SERIAL_PORT, SERIAL_BAUDRATE, SERIAL_TIMEOUT, ERROR_IINST, DEBUG_IINST
 )
+
+teleinfo_manager = TeleinfoManager()
 
 class Command(BaseCommand):
     help = """
@@ -24,9 +27,11 @@ class Command(BaseCommand):
             self.iinst = DEBUG_IINST
             self.stdout.write("reading teleinfo IINST in ---- UNPLUGGED_MODE ----")
         else :
+            timeout = 300   # [seconds]
+            timeout_start = time.time()
             serial_port = self.get_serial_port()
-            # if there is data in serial port
-            while self.iinst == ERROR_IINST:
+            # as long as the iinst value is not read or the timeout is exceeded
+            while self.iinst == ERROR_IINST or time.time() < (timeout_start + timeout):
                 if serial_port.readline():
                     # read a line
                     line = str(serial_port.readline())
@@ -38,6 +43,7 @@ class Command(BaseCommand):
                             # and finaly store data in teleinfo dict
                             self.iinst = int(data["value"])
         self.stdout.write("IINST = " + str(self.iinst))
+        teleinfo_manager.save_power_monitoring(self.iinst)
 
 
     def get_data_in_line(self, line):
