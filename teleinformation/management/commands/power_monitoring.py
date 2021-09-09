@@ -24,7 +24,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """main controler."""
 
-        self.monitoring = {}
+        self.monitoring = {"IINST":"", "ISOUC":""}
 
         if settings.UNPLUGGED_MODE:
             self.monitoring["IINST"] = DEBUG_IINST
@@ -38,11 +38,12 @@ class Command(BaseCommand):
             if serial_port.readline():
                 # as long as self.monitoring is not complet or timeout
                 while (len(self.monitoring.keys()) < 2) or (time.time() < (timeout_start + TELEINFO_TIMEOUT)):
+                    print("self.monitoring")
                     print(self.monitoring)
                     # for each line of the teleinfo frame
                     line = str(serial_port.readline())
-                    print(line)
                     data = self.get_data_in_line(line)
+                    print("data")
                     print(data)
                     # checks if the data is valid with the checksum
                     if data:
