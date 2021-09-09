@@ -36,9 +36,9 @@ class Command(BaseCommand):
             serial_port = self.get_serial_port()
             # if there is data in serial port
             if serial_port.readline():
-                timeout = time.time() < (timeout_start + TELEINFO_TIMEOUT)
+                print(self.monitoring)
                 # as long as self.monitoring is not complet or timeout
-                while (len(self.monitoring.keys()) < 2) or timeout:
+                while (len(self.monitoring.keys()) < 2) or (time.time() < (timeout_start + TELEINFO_TIMEOUT)):
                     # for each line of the teleinfo frame
                     line = str(serial_port.readline())
                     data = self.get_data_in_line(line)
