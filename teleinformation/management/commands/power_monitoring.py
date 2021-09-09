@@ -24,7 +24,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """main controler."""
 
-        self.monitoring = {"IINST":"", "ISOUC":""}
+        self.monitoring = {"IINST":"", "ISOUSC":""}
 
         if settings.UNPLUGGED_MODE:
             self.monitoring["IINST"] = DEBUG_IINST
