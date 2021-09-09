@@ -38,7 +38,9 @@ class Command(BaseCommand):
             # if there is data in serial port
             if serial_port.readline():
                 # as long as self.monitoring is not complet or timeout
-                while (not monitoring_is_complete == True) or (time.time() < (timeout_start + TELEINFO_TIMEOUT)):
+                while not monitoring_is_complete:
+                    if time.time() < (timeout_start + TELEINFO_TIMEOUT):
+                        break
                     print("self.monitoring")
                     print(self.monitoring)
                     # for each line of the teleinfo frame
@@ -53,7 +55,6 @@ class Command(BaseCommand):
                             self.monitoring[data["key"]] = data["value"]
                     if self.monitoring["IINST"] != DEBUG_IINST and self.monitoring["ISOUSC"] != DEBUG_ISOUSC:
                         monitoring_is_complete = True
-                        print(monitoring_is_complete)
         print(self.monitoring)
         #teleinfo_manager.save_power_monitoring(self.iinst)
 
