@@ -32,28 +32,29 @@ class Command(BaseCommand):
 
             self.stdout.write("reading teleinfo IINST in ---- UNPLUGGED_MODE ----")
         else :
-            monitoring_is_complete = False
             timeout_start = time.time()
             serial_port = self.get_serial_port()
             # if there is data in serial port
             if serial_port.readline():
                 timeout = time.time() > (timeout_start + TELEINFO_TIMEOUT)
                 # as long as self.monitoring is not complet or timeout
-                while not monitoring_is_complete:
+                while not self.monitoring_is_complete():
                     if timeout:
                         break
                     # for each line of the teleinfo frame
                     line = str(serial_port.readline())
                     data = self.get_data_in_line(line)
                     # checks if the data is valid with the checksum
-                    if data:
-                        if self.data_is_valid(data):
-                            # store data in monitoring dict
-                            self.monitoring[data["key"]] = data["value"]
-                    if self.monitoring["IINST"] != ERROR_IINST and self.monitoring["ISOUSC"] != ERROR_ISOUSC:
-                        monitoring_is_complete = True
+                    if self.data_is_valid(data):
+                        # store data
+                        self.monitoring[data["key"]] = data["value"]
+
         print(self.monitoring)
         #teleinfo_manager.save_power_monitoring(self.iinst)
+
+    def monitoring_is_complete(self):
+        check = self.monitoring["IINST"] != ERROR_IINST and self.monitoring["ISOUSC"] != ERROR_ISOUSC
+        return check
 
 
     def get_data_in_line(self, line):
@@ -87,21 +88,25 @@ class Command(BaseCommand):
         The result will always be a printable ASCII character
         (sign, number, capital letter) going from 32 to 95.
         """
+        result = False
+        if len(data) == 3 :
+            #add spacing character ASCII codes
+            calculated_checksum = 32
+            #adds the sum of the ascii codes of the label characters
+            #| ord() return an integer representing the Unicode code
+            #| point of that character
+            calculated_checksum += sum([ord(char) for char in data["key"]])
+            #adds the sum of the ascii codes of the data characters
+            calculated_checksum += sum([ord(char) for char in data["value"]])
+            #logical AND between the sum previously calculated and 63
+            calculated_checksum = calculated_checksum & 63
+            #Finally, we add 32
+            calculated_checksum = chr(calculated_checksum + 32)
 
-        #add spacing character ASCII codes
-        calculated_checksum = 32
-        #adds the sum of the ascii codes of the label characters
-        #| ord() return an integer representing the Unicode code
-        #| point of that character
-        calculated_checksum += sum([ord(char) for char in data["key"]])
-        #adds the sum of the ascii codes of the data characters
-        calculated_checksum += sum([ord(char) for char in data["value"]])
-        #logical AND between the sum previously calculated and 63
-        calculated_checksum = calculated_checksum & 63
-        #Finally, we add 32
-        calculated_checksum = chr(calculated_checksum + 32)
+            if calculated_checksum == data["wanted_checksum"]:
+                result = True
 
-        return calculated_checksum == data["wanted_checksum"]
+        return result
 
     def get_serial_port(self):
         """ Raspberry serial port config """
