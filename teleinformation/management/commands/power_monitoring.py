@@ -40,9 +40,9 @@ class Command(BaseCommand):
             # if there is data in serial port
             if serial_port.readline():
                 # as long as self.monitoring is not complet
-                while (self.monitoring["IINST"] == DEBUG_IINST
-                    and self.monitoring["ISOUC"] == DEBUG_ISOUC)
-                    or time.time() < (timeout_start + TELEINFO_TIMEOUT):
+                while (self.monitoring["IINST"] == ERROR_IINST and
+                    self.monitoring["ISOUC"] == ERROR_ISOUC) or
+                    time.time() < (timeout_start + TELEINFO_TIMEOUT):
                     # for each line of the teleinfo frame
                     line = str(serial_port.readline())
                     data = self.get_data_in_line(line)
