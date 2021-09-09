@@ -41,7 +41,9 @@ class Command(BaseCommand):
                     print(self.monitoring)
                     # for each line of the teleinfo frame
                     line = str(serial_port.readline())
+                    print(line)
                     data = self.get_data_in_line(line)
+                    print(data)
                     # checks if the data is valid with the checksum
                     if data:
                         if self.data_is_valid(data):
