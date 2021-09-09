@@ -35,7 +35,6 @@ class Command(BaseCommand):
             )
         else :
             timeout_start = time.time()
-            print(time.time() - timeout_start)
             serial_port = self.get_serial_port()
             # if there is data in serial port
             if serial_port.readline():
@@ -52,7 +51,6 @@ class Command(BaseCommand):
                         # store data
                         self.monitoring[data_in_ligne["key"]] = data_in_ligne["value"]
 
-        print(time.time() - timeout_start)
         print(self.monitoring)
         #teleinfo_manager.save_power_monitoring(self.iinst)
 
