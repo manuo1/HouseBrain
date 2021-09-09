@@ -41,7 +41,7 @@ SERIAL_TIMEOUT=1
 ##############################################################################
 ERROR_IINST = 999
 DEBUG_IINST = 123
-ERROR_ISOUC = 456
-DEBUG_ISOUC = 456
+ERROR_ISOUSC = 456
+DEBUG_ISOUSC = 456
 TELEINFO_TIMEOUT = 10 # [seconds]
 REMAINING_POWER_MONITORING_STEPS = [50,75,90,95] # % of remaining power

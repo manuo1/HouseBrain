@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand
 
 from housebrain_config.settings.constants import (
     SERIAL_PORT, SERIAL_BAUDRATE, SERIAL_TIMEOUT,
-    ERROR_IINST, DEBUG_IINST, ERROR_ISOUC, DEBUG_ISOUC,
+    ERROR_IINST, DEBUG_IINST, ERROR_ISOUSC, DEBUG_ISOUSC,
     REMAINING_POWER_MONITORING_STEPS,
     TELEINFO_TIMEOUT,
 )
@@ -28,7 +28,7 @@ class Command(BaseCommand):
 
         if settings.UNPLUGGED_MODE:
             self.monitoring["IINST"] = DEBUG_IINST
-            self.monitoring["ISOUC"] = DEBUG_ISOUC
+            self.monitoring["ISOUSC"] = DEBUG_ISOUSC
 
             self.stdout.write("reading teleinfo IINST in ---- UNPLUGGED_MODE ----")
         else :
@@ -37,7 +37,9 @@ class Command(BaseCommand):
             # if there is data in serial port
             if serial_port.readline():
                 # as long as self.monitoring is not complet or timeout
-                while (len(self.monitoring.keys()) < 2) or (time.time() < (timeout_start + TELEINFO_TIMEOUT)):
+                print("len(self.monitoring.values())")
+                print(len(self.monitoring.values()))
+                while (len(self.monitoring.values()) < 2) or (time.time() < (timeout_start + TELEINFO_TIMEOUT)):
                     print("self.monitoring")
                     print(self.monitoring)
                     # for each line of the teleinfo frame
