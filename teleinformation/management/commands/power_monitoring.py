@@ -2,84 +2,62 @@ import time
 from django.conf import settings
 from django.utils import timezone
 
-from teleinformation.models import TeleinformationHistory
+from teleinformation.models import TeleinfoManager
 from django.core.management.base import BaseCommand
 
 from housebrain_config.settings.constants import (
     SERIAL_PORT, SERIAL_BAUDRATE, SERIAL_TIMEOUT,
+    ERROR_IINST, DEBUG_IINST, ERROR_ISOUC, DEBUG_ISOUC,
+    REMAINING_POWER_MONITORING_STEPS,
     TELEINFO_TIMEOUT,
 )
 
+teleinfo_manager = TeleinfoManager()
+
 class Command(BaseCommand):
     help = """
-    will display in consol Teleinformation
+    will check IINST in teleinformation frame for power monitoring
     """
-    def add_arguments(self, teleinfo_read):
+    def add_arguments(self, power_monitoring):
         pass
 
     def handle(self, *args, **options):
         """main controler."""
 
-        # get dictionary of all the fields in TeleinformationHistory model
-        self.teleinfo = self.get_TeleinformationHistory_model_fields()
+        self.monitoring = {
+            "IINST" : ERROR_IINST,
+            "ISOUC" : ERROR_ISOUC
+        }
 
         if settings.UNPLUGGED_MODE:
-            self.teleinfo = self.get_false_data_for_unplugged_mode()
-            self.stdout.write("reading teleinfo in ---- UNPLUGGED_MODE ----")
+            self.monitoring["IINST"] = DEBUG_IINST
+            self.monitoring["ISOUC"] = DEBUG_ISOUC
+
+            self.stdout.write("reading teleinfo IINST in ---- UNPLUGGED_MODE ----")
         else :
             timeout_start = time.time()
-            first_key_that_was_read  = ""
-            teleinfo_is_complete = False
             serial_port = self.get_serial_port()
             # if there is data in serial port
             if serial_port.readline():
-                # as long as the teleinfo has not completed a complete loop or the timeout is exceeded
-                while not teleinfo_is_complete or time.time() < (timeout_start + TELEINFO_TIMEOUT):
+                # as long as self.monitoring is not complet
+                while (self.monitoring["IINST"] == DEBUG_IINST
+                    and self.monitoring["ISOUC"] == DEBUG_ISOUC)
+                    or time.time() < (timeout_start + TELEINFO_TIMEOUT):
                     # for each line of the teleinfo frame
                     line = str(serial_port.readline())
                     data = self.get_data_in_line(line)
-                    # if the key corresponds to the one read first, the
-                    # | teleinfo has made a complete loop
-                    if data["key"] == first_key_that_was_read:
-                        teleinfo_is_complete = True
                     # checks if the data is valid with the checksum
-                    if self.data_is_valid(data) and not teleinfo_is_complete:
-                        # store the first key read in frame
-                        if all(value == "" for value in self.teleinfo.values()):
-                            first_key_that_was_read  = data["key"]
-                        # and finaly store data in teleinfo dict
-                        self.teleinfo[data["key"]] = data["value"]
-        self.teleinfo["date_time"] = timezone.now()
-        for key, value in self.teleinfo.items():
-            self.stdout.write(key + " = " + str(value))
-
-
-    def get_false_data_for_unplugged_mode(self):
-        """ false data for the debug mode (no teleinfo connected) """
-        false_teleinfo  = {}
-        for key in self.teleinfo.keys():
-            false_teleinfo[key] = "1"
-        return false_teleinfo
-
-
-    def get_TeleinformationHistory_model_fields(self):
-        """ create dictionary of all TeleinformationHistory attributes """
-        teleinfo  = {}
-        # Get an instance of TeleinformationHistory model
-        instance = TeleinformationHistory()
-        # list all attributes and remove 2 first
-        # (we don't need the 2 first which are _state and id )
-        model_fields_list = list(instance.__dict__.keys())[2:]
-        # Create the dictionary with blank values
-        teleinfo = {key: "" for key in model_fields_list}
-
-        return teleinfo
+                    if self.data_is_valid(data):
+                        # store data in monitoring dict
+                        self.monitoring[data["key"]] = data["value"]
+        print(self.monitoring)
+        #teleinfo_manager.save_power_monitoring(self.iinst)
 
 
     def get_data_in_line(self, line):
         # check if a teleinfo key is present in the line
         data = {}
-        for key in self.teleinfo.keys():
+        for key in self.monitoring.keys():
             if key in line:
                 data["key"] = key
                 #get value in line
@@ -87,6 +65,7 @@ class Command(BaseCommand):
                 #get checsum in line
                 #|can't use split because checksum can be a blanck char
                 data["wanted_checksum"] = line[-6:][0]
+                #and if the line is the last of the frame another way...
                 if key == "MOTDETAT":
                     data["wanted_checksum"] = line[-14:][0]
         return data
@@ -119,8 +98,6 @@ class Command(BaseCommand):
         calculated_checksum = chr(calculated_checksum + 32)
 
         return calculated_checksum == data["wanted_checksum"]
-
-
 
     def get_serial_port(self):
         """ Raspberry serial port config """

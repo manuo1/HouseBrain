@@ -29,7 +29,6 @@ class Command(BaseCommand):
             self.teleinfo = self.get_false_data_for_unplugged_mode()
             self.stdout.write("reading teleinfo in ---- UNPLUGGED_MODE ----")
         else :
-            timeout = TELEINFO_TIMEOUT
             timeout_start = time.time()
             first_key_that_was_read  = ""
             teleinfo_is_complete = False
@@ -37,7 +36,7 @@ class Command(BaseCommand):
             # if there is data in serial port
             if serial_port.readline():
                 # as long as the teleinfo has not completed a complete loop
-                while not teleinfo_is_complete or time.time() < (timeout_start + timeout):
+                while not teleinfo_is_complete or time.time() < (timeout_start + TELEINFO_TIMEOUT):
                     # for each line of the teleinfo frame
                     line = str(serial_port.readline())
                     data = self.get_data_in_line(line)

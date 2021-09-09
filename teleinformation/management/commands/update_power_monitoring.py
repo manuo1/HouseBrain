@@ -26,20 +26,20 @@ class Command(BaseCommand):
 
         if settings.UNPLUGGED_MODE:
             self.iinst = DEBUG_IINST
+
             self.stdout.write("reading teleinfo IINST in ---- UNPLUGGED_MODE ----")
         else :
-            timeout = TELEINFO_TIMEOUT
             timeout_start = time.time()
             serial_port = self.get_serial_port()
             # as long as the iinst value is not read or the timeout is exceeded
-            while self.iinst == ERROR_IINST or time.time() < (timeout_start + timeout):
+            while self.iinst == ERROR_IINST or time.time() < (timeout_start + TELEINFO_TIMEOUT):
                 if serial_port.readline():
                     # read a line
                     line = str(serial_port.readline())
-                    # extract data if "IINST" is present in line
+                    # extract IINST data if "IINST" is present in line
                     if "IINST" in line:
                         data = self.get_data_in_line(line)
-                        # checks if the data is valid with the checksum
+                        # checks if data is valid with the checksum
                         if self.data_is_valid(data):
                             # and finaly store data in teleinfo dict
                             self.iinst = int(data["value"])
