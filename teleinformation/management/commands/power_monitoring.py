@@ -39,7 +39,7 @@ class Command(BaseCommand):
             if serial_port.readline():
                 # as long as self.monitoring is not complet or timeout
                 while not monitoring_is_complete:
-                    if time.time() < (timeout_start + TELEINFO_TIMEOUT):
+                    if time.time() > (timeout_start + TELEINFO_TIMEOUT):
                         break
                     print("self.monitoring")
                     print(self.monitoring)
