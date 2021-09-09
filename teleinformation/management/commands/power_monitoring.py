@@ -30,25 +30,29 @@ class Command(BaseCommand):
             self.monitoring["IINST"] = DEBUG_IINST
             self.monitoring["ISOUSC"] = DEBUG_ISOUSC
 
-            self.stdout.write("reading teleinfo IINST in ---- UNPLUGGED_MODE ----")
+            self.stdout.write(
+                "reading teleinfo IINST in ---- UNPLUGGED_MODE ----"
+            )
         else :
             timeout_start = time.time()
+            print(time.time() - timeout_start)
             serial_port = self.get_serial_port()
             # if there is data in serial port
             if serial_port.readline():
-                timeout = time.time() > (timeout_start + TELEINFO_TIMEOUT)
-                # as long as self.monitoring is not complet or timeout
+                # as long as self.monitoring is not complet
                 while not self.monitoring_is_complete():
-                    if timeout:
+                    # break if timout
+                    if time.time() > (timeout_start + TELEINFO_TIMEOUT):
                         break
                     # for each line of the teleinfo frame
                     line = str(serial_port.readline())
-                    data = self.get_data_in_line(line)
+                    data_in_ligne = self.get_data_in_line(line)
                     # checks if the data is valid with the checksum
-                    if self.data_is_valid(data):
+                    if self.data_is_valid(data_in_ligne):
                         # store data
-                        self.monitoring[data["key"]] = data["value"]
+                        self.monitoring[data_in_ligne["key"]] = data_in_ligne["value"]
 
+        print(time.time() - timeout_start)
         print(self.monitoring)
         #teleinfo_manager.save_power_monitoring(self.iinst)
 
@@ -59,19 +63,19 @@ class Command(BaseCommand):
 
     def get_data_in_line(self, line):
         # check if a teleinfo key is present in the line
-        data = {}
+        data_in_ligne = {}
         for key in self.monitoring.keys():
             if key in line:
-                data["key"] = key
+                data_in_ligne["key"] = key
                 #get value in line
-                data["value"] = line.split()[1]
+                data_in_ligne["value"] = line.split()[1]
                 #get checsum in line
                 #|can't use split because checksum can be a blanck char
-                data["wanted_checksum"] = line[-6:][0]
+                data_in_ligne["wanted_checksum"] = line[-6:][0]
                 #and if the line is the last of the frame another way...
                 if key == "MOTDETAT":
-                    data["wanted_checksum"] = line[-14:][0]
-        return data
+                    data_in_ligne["wanted_checksum"] = line[-14:][0]
+        return data_in_ligne
 
 
 
@@ -88,7 +92,7 @@ class Command(BaseCommand):
         The result will always be a printable ASCII character
         (sign, number, capital letter) going from 32 to 95.
         """
-        result = False
+        data_is_valid = False
         if len(data) == 3 :
             #add spacing character ASCII codes
             calculated_checksum = 32
@@ -102,11 +106,10 @@ class Command(BaseCommand):
             calculated_checksum = calculated_checksum & 63
             #Finally, we add 32
             calculated_checksum = chr(calculated_checksum + 32)
+            # check if calculated = wanted
+            data_is_valid = calculated_checksum == data["wanted_checksum"]
 
-            if calculated_checksum == data["wanted_checksum"]:
-                result = True
-
-        return result
+        return data_is_valid
 
     def get_serial_port(self):
         """ Raspberry serial port config """
