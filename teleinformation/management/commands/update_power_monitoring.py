@@ -76,6 +76,8 @@ class Command(BaseCommand):
         #add spacing character ASCII codes
         calculated_checksum = 32
         #adds the sum of the ascii codes of the label characters
+        #| ord() return an integer representing the Unicode code
+        #| point of that character
         calculated_checksum += sum([ord(char) for char in data["key"]])
         #adds the sum of the ascii codes of the data characters
         calculated_checksum += sum([ord(char) for char in data["value"]])

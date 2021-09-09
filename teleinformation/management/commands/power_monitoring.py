@@ -48,9 +48,10 @@ class Command(BaseCommand):
                     line = str(serial_port.readline())
                     data = self.get_data_in_line(line)
                     # checks if the data is valid with the checksum
-                    if self.data_is_valid(data):
-                        # store data in monitoring dict
-                        self.monitoring[data["key"]] = data["value"]
+                    if data:
+                        if self.data_is_valid(data):
+                            # store data in monitoring dict
+                            self.monitoring[data["key"]] = data["value"]
         print(self.monitoring)
         #teleinfo_manager.save_power_monitoring(self.iinst)
 
@@ -90,6 +91,8 @@ class Command(BaseCommand):
         #add spacing character ASCII codes
         calculated_checksum = 32
         #adds the sum of the ascii codes of the label characters
+        #| ord() return an integer representing the Unicode code
+        #| point of that character
         calculated_checksum += sum([ord(char) for char in data["key"]])
         #adds the sum of the ascii codes of the data characters
         calculated_checksum += sum([ord(char) for char in data["value"]])

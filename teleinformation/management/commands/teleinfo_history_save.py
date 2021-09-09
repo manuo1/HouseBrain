@@ -40,17 +40,18 @@ class Command(BaseCommand):
                     # for each line of the teleinfo frame
                     line = str(serial_port.readline())
                     data = self.get_data_in_line(line)
-                    # if the key corresponds to the one read first, the
-                    # | teleinfo has made a complete loop
-                    if data["key"] == first_key_that_was_read:
-                        teleinfo_is_complete = True
-                    # checks if the data is valid with the checksum
-                    if self.data_is_valid(data) and not teleinfo_is_complete:
-                        # store the first key read in frame
-                        if all(value == "" for value in self.teleinfo.values()):
-                            first_key_that_was_read  = data["key"]
-                        # and finaly store data in teleinfo dict
-                        self.teleinfo[data["key"]] = data["value"]
+                    if data:
+                        # if the key corresponds to the one read first, the
+                        # | teleinfo has made a complete loop
+                        if data["key"] == first_key_that_was_read:
+                            teleinfo_is_complete = True
+                        # checks if the data is valid with the checksum
+                        if self.data_is_valid(data) and not teleinfo_is_complete:
+                            # store the first key read in frame
+                            if all(value == "" for value in self.teleinfo.values()):
+                                first_key_that_was_read  = data["key"]
+                            # and finaly store data in teleinfo dict
+                            self.teleinfo[data["key"]] = data["value"]
         self.teleinfo["date_time"] = timezone.now()
         teleinfo_manager.save_teleinfo(self.teleinfo)
 
