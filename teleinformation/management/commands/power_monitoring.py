@@ -24,7 +24,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """main controler."""
 
-        self.monitoring = {"IINST":"", "ISOUSC":""}
+        self.monitoring = {"IINST": ERROR_IINST, "ISOUSC": ERROR_ISOUSC}
 
         if settings.UNPLUGGED_MODE:
             self.monitoring["IINST"] = DEBUG_IINST
@@ -32,26 +32,27 @@ class Command(BaseCommand):
 
             self.stdout.write("reading teleinfo IINST in ---- UNPLUGGED_MODE ----")
         else :
+            monitoring_is_complete = False
             timeout_start = time.time()
             serial_port = self.get_serial_port()
             # if there is data in serial port
             if serial_port.readline():
                 # as long as self.monitoring is not complet or timeout
-                print("len(self.monitoring.values())")
-                print(len(self.monitoring.values()))
-                while (len(self.monitoring.values()) < 2) or (time.time() < (timeout_start + TELEINFO_TIMEOUT)):
+                while monitoring_is_complete or (time.time() < (timeout_start + TELEINFO_TIMEOUT)):
                     print("self.monitoring")
                     print(self.monitoring)
                     # for each line of the teleinfo frame
                     line = str(serial_port.readline())
+                    print("line")
+                    print(line)
                     data = self.get_data_in_line(line)
-                    print("data")
-                    print(data)
                     # checks if the data is valid with the checksum
                     if data:
                         if self.data_is_valid(data):
                             # store data in monitoring dict
                             self.monitoring[data["key"]] = data["value"]
+                    if self.monitoring["IINST"] != DEBUG_IINST and self.monitoring["ISOUSC"] != DEBUG_ISOUSC:
+                        monitoring_is_complete = True
         print(self.monitoring)
         #teleinfo_manager.save_power_monitoring(self.iinst)
 
