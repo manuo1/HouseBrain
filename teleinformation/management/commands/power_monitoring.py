@@ -53,7 +53,7 @@ class Command(BaseCommand):
                         if self.data_is_valid(data):
                             # store data in monitoring dict
                             self.monitoring[data["key"]] = data["value"]
-                    if self.monitoring["IINST"] != DEBUG_IINST and self.monitoring["ISOUSC"] != DEBUG_ISOUSC:
+                    if self.monitoring["IINST"] != ERROR_IINST and self.monitoring["ISOUSC"] != ERROR_ISOUSC:
                         monitoring_is_complete = True
         print(self.monitoring)
         #teleinfo_manager.save_power_monitoring(self.iinst)
