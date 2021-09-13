@@ -17,15 +17,20 @@ class TeleinfoManager(models.Manager):
     def clear_all_teleinformation_history(self):
         TeleinformationHistory.objects.all().delete()
 
-    def save_power_monitoring(self, iinst):
-        power_monitoring = self.get_power_monitoring_object()
-        power_monitoring.IINST = iinst
-        power_monitoring.save()
-        print(self.get_power_monitoring_object())
+    def update_power_monitoring(self, new_monitoring):
+        last_monitoring = self.get_last_power_monitoring()
+        new_monitoring = PowerMonitoring(
+            id=last_monitoring.id, **new_monitoring)
+        new_monitoring.save()
 
-    def get_power_monitoring_object(self):
-        if PowerMonitoring.objects.all().count() > 0:
-            power_monitoring = PowerMonitoring.objects.all()[0]
+    def save_critical_remaining_power(self, new_monitoring):
+        new_monitoring = PowerMonitoring(**new_monitoring)
+        new_monitoring.save()
+
+
+    def get_last_power_monitoring(self):
+        if PowerMonitoring.objects.exists():
+            power_monitoring = PowerMonitoring.objects.latest('date_time')
         else:
             power_monitoring = PowerMonitoring()
             power_monitoring.save()
@@ -37,9 +42,11 @@ class PowerMonitoring(models.Model):
     # Intensité instantanée : IINST
     # | ( 3 car. unité = ampères)
     IINST = models.SmallIntegerField(default=ERROR_IINST)
+    ISOUSC = models.SmallIntegerField(default=ERROR_IINST)
+    percentage_remaining_power = models.SmallIntegerField(default=0)
 
     def __str__(self):
-        return f'{self.IINST} | {self.date_time:%d/%m/%Y %H:%M}'
+        return f'{self.date_time:%d/%m/%Y %H:%M} | P > {self.percentage_remaining_power}%'
 
 
 class TeleinformationHistory(models.Model):

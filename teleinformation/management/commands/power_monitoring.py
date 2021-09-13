@@ -8,7 +8,7 @@ from django.core.management.base import BaseCommand
 from housebrain_config.settings.constants import (
     SERIAL_PORT, SERIAL_BAUDRATE, SERIAL_TIMEOUT,
     ERROR_IINST, DEBUG_IINST, ERROR_ISOUSC, DEBUG_ISOUSC,
-    REMAINING_POWER_MONITORING_STEPS,
+    REMAINING_POWER_MONITORING_STEPS, CRITICAL_REMAINING_POWER,
     TELEINFO_TIMEOUT,
 )
 
@@ -45,14 +45,39 @@ class Command(BaseCommand):
                         break
                     # for each line of the teleinfo frame
                     line = str(serial_port.readline())
+                    # get data in the line
                     data_in_ligne = self.get_data_in_line(line)
-                    # checks if the data is valid with the checksum
+                    # checks if the data is valid
                     if self.data_is_valid(data_in_ligne):
-                        # store data
+                        # if valid => store data
                         self.monitoring[data_in_ligne["key"]] = data_in_ligne["value"]
+        # add the remaining prower to the monitoring
+        self.monitoring["percentage_remaining_power"] = self.percentage_remaining_power()
+        # update power monitoring only if the remaining power has changed steps
+        if self.percentage_remaining_power_has_changed():
+            teleinfo_manager.update_power_monitoring(self.monitoring)
+        # save new entry if remaining power is critical
+        if self.remaining_power_is_critical():
+            teleinfo_manager.save_critical_remaining_power(self.monitoring)
 
-        print(self.monitoring)
-        #teleinfo_manager.save_power_monitoring(self.iinst)
+
+    def remaining_power_is_critical(self):
+        return self.monitoring["percentage_remaining_power"] < CRITICAL_REMAINING_POWER
+
+    def percentage_remaining_power_has_changed(self):
+        last_power_remaining = teleinfo_manager.get_last_power_monitoring().percentage_remaining_power
+        new_power_remaining = self.monitoring["percentage_remaining_power"]
+        return last_power_remaining != new_power_remaining
+
+
+    def percentage_remaining_power(self):
+        # real percentage of remaining power
+        real_percentage = 100-(self.monitoring["IINST"] / self.monitoring["ISOUSC"]*100)
+        percentage_remaining_power = 0
+        for step in sorted(REMAINING_POWER_MONITORING_STEPS):
+            if real_percentage > step:
+                percentage_remaining_power = step
+        return percentage_remaining_power
 
     def monitoring_is_complete(self):
         check = self.monitoring["IINST"] != ERROR_IINST and self.monitoring["ISOUSC"] != ERROR_ISOUSC
@@ -95,8 +120,8 @@ class Command(BaseCommand):
             #add spacing character ASCII codes
             calculated_checksum = 32
             #adds the sum of the ascii codes of the label characters
-            #| ord() return an integer representing the Unicode code
-            #| point of that character
+            #| ord() return an integer representing the Unicode code point
+            #| of that character
             calculated_checksum += sum([ord(char) for char in data["key"]])
             #adds the sum of the ascii codes of the data characters
             calculated_checksum += sum([ord(char) for char in data["value"]])
