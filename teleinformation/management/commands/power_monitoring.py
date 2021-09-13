@@ -50,7 +50,7 @@ class Command(BaseCommand):
                     # checks if the data is valid
                     if self.data_is_valid(data_in_ligne):
                         # if valid => store data
-                        self.monitoring[data_in_ligne["key"]] = data_in_ligne["value"]
+                        self.monitoring[data_in_ligne["key"]] = int(data_in_ligne["value"])
         # add the remaining prower to the monitoring
         self.monitoring["percentage_remaining_power"] = self.percentage_remaining_power()
         # update power monitoring only if the remaining power has changed steps
