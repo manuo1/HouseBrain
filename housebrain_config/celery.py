@@ -44,9 +44,9 @@ app.conf.beat_schedule = {
         'task': 'teleinformation.tasks.read_and_save_teleinformation',
         'schedule': crontab(minute='0'),
     },
-    'Check remaining power every 5 seconds': {
+    'Check remaining power every 15 seconds': {
         'task': 'teleinformation.tasks.check_remaining_power',
-        'schedule': 5,
+        'schedule': 15,
     },
 
 }
