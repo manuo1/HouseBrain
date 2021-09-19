@@ -56,9 +56,9 @@ class Command(BaseCommand):
         # update power monitoring only if the remaining power has changed steps
         if self.percentage_remaining_power_has_changed():
             teleinfo_manager.update_power_monitoring(self.monitoring)
-        # save new entry if remaining power is critical
-        if self.remaining_power_is_critical():
-            teleinfo_manager.save_critical_remaining_power(self.monitoring)
+            # save new entry if remaining power is critical
+            if self.remaining_power_is_critical():
+                teleinfo_manager.save_critical_remaining_power(self.monitoring)
 
 
     def remaining_power_is_critical(self):
