@@ -3,7 +3,8 @@ from django.utils import timezone
 from housebrain_config.settings.constants import (
     DEBUG_TEMPERATURE,
     ERROR_TEMPERATURE,
-    TEMPERATURE_FILE
+    TEMPERATURE_FILE,
+    TEMPERATURE_HISTORY_DELTA,
 )
 from sensors.models import TemperatureSensorManager
 from django.core.management.base import BaseCommand
@@ -14,7 +15,7 @@ class Command(BaseCommand):
     help = """
     will save in database all temperature sensors current temperatures
     """
-    def add_arguments(self, temperatures_save):
+    def add_arguments(self, temperature_monitoring):
         pass
 
     def handle(self, *args, **options):
@@ -24,6 +25,8 @@ class Command(BaseCommand):
                 self.read_temperature(sensor),
                 sensor
             )
+        if timezone.now().minute % TEMPERATURE_HISTORY_DELTA == 0:
+            temperature_sensor_manager.save_temperature_history()
 
     def read_temperature(self, sensor):
         if settings.UNPLUGGED_MODE:
@@ -40,13 +43,6 @@ class Command(BaseCommand):
             except FileNotFoundError:
                 # if there is a reading error returns the error temperature
                 temperature = ERROR_TEMPERATURE
-                self.stdout.write(
-                    f"""
-                    {f'{timezone.now():%d/%m/%Y %H:%M}'}
-                     - temperature reading error, cannot find path
-                    {sensor.sensor_folder_path + TEMPERATURE_FILE}
-                    """
-                )
                 # increments the sensor error counter
                 temperature_sensor_manager.add_an_error(sensor)
 

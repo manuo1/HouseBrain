@@ -22,6 +22,7 @@ MAX_TEMPERATURE = 60000
 MIN_TEMPERATURE = -50000
 # Maximum consecutive reading errors before defining the sensor defective
 MAX_SENSOR_READING_ERRORS = 10
+TEMPERATURE_HISTORY_DELTA = 30 # save temperature history every X minutes
 
 ##############################################################################
 # Raspberry one wire devices folder paths:

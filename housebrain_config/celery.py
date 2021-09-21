@@ -36,16 +36,9 @@ app.conf.beat_schedule = {
         'task': 'sensors.tasks.read_and_save_temperatures',
         'schedule': crontab(minute='*/5'),
     },
-    'Save temperatures history every 30 minutes': {
-        'task': 'sensors.tasks.save_temperatures_history',
-        'schedule': crontab(minute='*/30'),
-    },
     'Check remaining power every 15 seconds': {
         'task': 'teleinformation.tasks.check_remaining_power',
         'schedule': 15,
     },
 
 }
-
-
-    # crontab() mean Execute every minute
