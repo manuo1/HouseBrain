@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from housebrain_config.settings.constants import (ERROR_IINST)
 
 """
@@ -8,7 +9,6 @@ from housebrain_config.settings.constants import (ERROR_IINST)
 
 class TeleinfoManager(models.Manager):
     def save_teleinfo(self, teleinfo):
-
         new_teleinfo_history = TeleinformationHistory()
         new_teleinfo_history.save()
         new_teleinfo_history = TeleinformationHistory(
@@ -29,15 +29,18 @@ class TeleinfoManager(models.Manager):
         new_monitoring.save()
 
     def get_last_teleinfo_history(self):
-        return TeleinformationHistory.objects.latest('date_time')
+        if TeleinformationHistory.objects.exists():
+            last_teleinfo_history = TeleinformationHistory.objects.latest('date_time')
+        else:
+            last_teleinfo_history=TeleinformationHistory()
+            last_teleinfo_history.save()
+        return last_teleinfo_history
 
     def get_last_power_monitoring(self):
-        if PowerMonitoring.objects.exists():
-            power_monitoring = PowerMonitoring.objects.latest('date_time')
-        else:
-            power_monitoring = PowerMonitoring()
-            power_monitoring.save()
-        return power_monitoring
+        if not PowerMonitoring.objects.exists():
+            self.save_teleinfo()
+
+        return PowerMonitoring.objects.latest('date_time')
 
 class PowerMonitoring(models.Model):
 
