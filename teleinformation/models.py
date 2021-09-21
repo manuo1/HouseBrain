@@ -38,7 +38,8 @@ class TeleinfoManager(models.Manager):
 
     def get_last_power_monitoring(self):
         if not PowerMonitoring.objects.exists():
-            self.save_teleinfo()
+            db_start_date_time = timezone.now() - timezone.timedelta(minutes=5)
+            self.save_teleinfo({"date_time" : db_start_date_time})
 
         return PowerMonitoring.objects.latest('date_time')
 
