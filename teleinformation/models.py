@@ -37,7 +37,7 @@ class TeleinfoManager(models.Manager):
             self.save_teleinfo(
                 {
                 "date_time" : db_start_date_time,
-                "ADCO" :""
+                "ADCO" :"FIRST"
                 }
             )
         return last_teleinfo_history
