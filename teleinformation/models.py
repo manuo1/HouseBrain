@@ -34,7 +34,12 @@ class TeleinfoManager(models.Manager):
             last_teleinfo_history = TeleinformationHistory.objects.latest('date_time')
         else:
             db_start_date_time = timezone.now() - timezone.timedelta(minutes=5)
-            self.save_teleinfo({"date_time" : db_start_date_time})
+            self.save_teleinfo(
+                {
+                "date_time" : db_start_date_time,
+                "ADCO" :""
+                }
+            )
         return last_teleinfo_history
 
     def get_last_power_monitoring(self):
