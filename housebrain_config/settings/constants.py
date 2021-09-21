@@ -50,3 +50,4 @@ CRITICAL_REMAINING_POWER = 5    # % of remaining power which triggers the
                                 #| electrical load shedding.
                                 #| Must be smaller than
                                 #| the REMAINING_POWER_MONITORING_STEPS
+TELEINFO_HISTORY_DELTA = 30 # save teleinformation history every X minutes

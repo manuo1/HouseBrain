@@ -40,10 +40,6 @@ app.conf.beat_schedule = {
         'task': 'sensors.tasks.save_temperatures_history',
         'schedule': crontab(minute='*/30'),
     },
-    'Save teleinformation history every hours': {
-        'task': 'teleinformation.tasks.read_and_save_teleinformation',
-        'schedule': crontab(minute='0'),
-    },
     'Check remaining power every 15 seconds': {
         'task': 'teleinformation.tasks.check_remaining_power',
         'schedule': 15,
