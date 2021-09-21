@@ -8,6 +8,7 @@ from housebrain_config.settings.constants import (ERROR_IINST)
 
 class TeleinfoManager(models.Manager):
     def save_teleinfo(self, teleinfo):
+
         new_teleinfo_history = TeleinformationHistory()
         new_teleinfo_history.save()
         new_teleinfo_history = TeleinformationHistory(
@@ -27,6 +28,8 @@ class TeleinfoManager(models.Manager):
         new_monitoring = PowerMonitoring(**new_monitoring)
         new_monitoring.save()
 
+    def get_last_teleinfo_history(self):
+        return TeleinformationHistory.objects.latest('date_time')
 
     def get_last_power_monitoring(self):
         if PowerMonitoring.objects.exists():
