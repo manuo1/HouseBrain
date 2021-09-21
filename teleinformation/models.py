@@ -29,18 +29,11 @@ class TeleinfoManager(models.Manager):
         new_monitoring = PowerMonitoring(**new_monitoring)
         new_monitoring.save()
 
-    def get_last_teleinfo_history(self):
+    def minute_of_the_last_history_backup(self):
+        last_minute_saved = 5
         if TeleinformationHistory.objects.exists():
-            last_teleinfo_history = TeleinformationHistory.objects.latest('date_time')
-        else:
-            db_start_date_time = timezone.now() - timezone.timedelta(minutes=5)
-            self.save_teleinfo(
-                {
-                "date_time" : db_start_date_time,
-                "ADCO" :"FIRST"
-                }
-            )
-        return last_teleinfo_history
+            last_minute_saved = TeleinformationHistory.objects.latest('date_time').minute
+        return last_minute_saved
 
     def get_last_power_monitoring(self):
         if PowerMonitoring.objects.exists():
