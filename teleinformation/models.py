@@ -9,12 +9,12 @@ from housebrain_config.settings.constants import (ERROR_IINST)
 
 class TeleinfoManager(models.Manager):
     def save_teleinfo(self, teleinfo):
-
-        new_teleinfo_history = TeleinformationHistory()
-        new_teleinfo_history.save()
-        new_teleinfo_history = TeleinformationHistory(
-            id=new_teleinfo_history.id, **teleinfo)
-        new_teleinfo_history.save()
+        if teleinfo["date_time"].minute != self.last_teleinfo_minute():
+            new_teleinfo_history = TeleinformationHistory()
+            new_teleinfo_history.save()
+            new_teleinfo_history = TeleinformationHistory(
+                id=new_teleinfo_history.id, **teleinfo)
+            new_teleinfo_history.save()
 
     def clear_all_teleinformation_history(self):
         TeleinformationHistory.objects.all().delete()
@@ -29,7 +29,7 @@ class TeleinfoManager(models.Manager):
         new_monitoring = PowerMonitoring(**new_monitoring)
         new_monitoring.save()
 
-    def minute_of_the_last_history_backup(self):
+    def last_teleinfo_minute(self):
         last_minute_saved = 5
         if TeleinformationHistory.objects.exists():
             last_teleinfo_history = TeleinformationHistory.objects.latest('date_time')
