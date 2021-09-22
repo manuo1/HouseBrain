@@ -58,6 +58,7 @@ class Command(BaseCommand):
                         self.teleinfo[data["key"]] = data["value"]
         self.teleinfo["date_time"] = timezone.now()
         # save teleinfo every *TELEINFO_HISTORY_DELTA* minutes
+        print(teleinfo_manager.minute_of_the_last_history_backup())
         if (self.teleinfo["date_time"].minute % TELEINFO_HISTORY_DELTA == 0 and
             self.teleinfo["date_time"].minute != teleinfo_manager.minute_of_the_last_history_backup()):
                 teleinfo_manager.save_teleinfo(self.teleinfo)

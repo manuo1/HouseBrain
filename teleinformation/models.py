@@ -32,7 +32,8 @@ class TeleinfoManager(models.Manager):
     def minute_of_the_last_history_backup(self):
         last_minute_saved = 5
         if TeleinformationHistory.objects.exists():
-            last_minute_saved = TeleinformationHistory.objects.latest('date_time').minute
+            last_teleinfo_history = TeleinformationHistory.objects.latest('date_time')
+            last_minute_saved = last_teleinfo_history.date_time.minute
         return last_minute_saved
 
     def get_last_power_monitoring(self):
