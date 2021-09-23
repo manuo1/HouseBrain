@@ -11,7 +11,10 @@ from housebrain_config.settings.constants import (
 )
 from teleinformation.models import TeleinformationHistory
 from teleinformation.models import TeleinfoManager
+from heaters.models import HeaterManager
+
 teleinfo_manager = TeleinfoManager()
+heater_manager = HeaterManager()
 
 class Command(BaseCommand):
     help = """
@@ -67,6 +70,7 @@ class Command(BaseCommand):
             # save new entry if remaining power is critical
             if self.remaining_power_is_critical():
                 teleinfo_manager.save_critical_remaining_power(self.monitoring)
+                heater_manager.turn_off_all_heaters()
 
 
 
