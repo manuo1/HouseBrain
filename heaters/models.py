@@ -68,6 +68,12 @@ class Heater(models.Model):
 
         return self.name + " : " + state
 
+"""
+    django.db.models.signals.post_save
+    Use Django signals sent at the end of a model’s save() method.
+    Every change on Heater objects will run update_heater_state commande
+    to update the real state of the heaters
+"""
 def update_real_heater_state(sender, instance, created, **kwargs):
     management.call_command('update_heater_state')
 post_save.connect(update_real_heater_state, sender=Heater)
