@@ -61,3 +61,10 @@ class Heater(models.Model):
 
     def __str__(self):
 	       return self.name
+
+    def save(self, *args, **kwargs):
+        """
+        overide save to update real states of heaters when state change
+        """
+        management.call_command('update_heater_state')
+        return super().save(*args, **kwargs)
