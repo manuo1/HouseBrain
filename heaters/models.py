@@ -1,3 +1,4 @@
+from django.core import management
 from django.db import models
 from rooms.models import Room
 
