@@ -1,5 +1,6 @@
 from django.core import management
 from django.db import models
+from django.db.models.signals import post_save
 from rooms.models import Room
 
 class HeaterManager(models.Manager):
@@ -61,11 +62,12 @@ class Heater(models.Model):
         )
 
     def __str__(self):
-	       return self.name
+        state = "OFF"
+        if self.is_on is True:
+            state = "ON"
 
-    def save(self, *args, **kwargs):
-        """
-        overide save to update real states of heaters when state change
-        """
-        management.call_command('update_heater_state')
-        return super().save(*args, **kwargs)
+        return self.name + " : " + state
+
+def update_real_heater_state(sender, instance, created, **kwargs):
+    management.call_command('update_heater_state')
+post_save.connect(update_real_heater_state, sender=Heater)
