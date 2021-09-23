@@ -1,36 +1,29 @@
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from heaters.models import HeaterManager
 
+heater_manager = HeaterManager()
 
 class Command(BaseCommand):
     help = """
     will manage the real state of heaters
     """
-    def add_arguments(self, change_heater_state):
-
-        change_heater_state.add_argument(
-            'pin',
-            type=int,
-            help='Define MCP23017 pin used',
-        )
-        change_heater_state.add_argument(
-            'state',
-            type=str,
-            help='State of the pin (ON or OFF) ',
-        )
-
+    def add_arguments(self, update_heater_state):
+        pass
 
     def handle(self, *args, **options):
         """main controler."""
 
+        pin_states = self.all_heaters_states()
+
+
         if settings.UNPLUGGED_MODE:
-            self.stdout.write(
-                "change heater mode" + " " +
-                str(options['pin']) + " " +
-                options['state']
-            )
+            self.stdout.write("heater states in ---- UNPLUGGED_MODE ----")
+            for pin, state in pin_states:
+                self.stdout.write(str(pin) + " , " + str(state))
 
         else:
+
             # import Raspberry modules for I2C and MCP23017
 
             # MCP23017 is a port expander that gives you virtually identical
@@ -55,15 +48,14 @@ class Command(BaseCommand):
             #| resistors, only pull-up!).  For the MCP23017 you specify a pin
             #| number from 0 to 15
 
-            mcp_pin = mcp.get_pin(options['pin'])
-            # Setup pin as an output that's at a high logic level.
-            mcp_pin.switch_to_output(value=True)
+            for pin, state in pin_states:
+                mcp_pin = mcp.get_pin(pin)
+                # Setup pin as an output that's at a high logic level.
+                mcp_pin.switch_to_output(value=state)
 
 
-            # apply the new pin state
-            if options['state'] == "ON":
-                mcp_pin.value = True
-            elif options['state'] == "OFF":
-                mcp_pin.value = False
-            else:
-                mcp_pin.value = False
+    def all_heaters_states(self):
+        pin_states = []
+        for heater in heater_manager.all_heaters():
+            pin_states.append((heater.control_pin, heater.is_on))
+        return pin_states
