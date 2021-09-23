@@ -12,14 +12,6 @@ import os
 from django.core.wsgi import get_wsgi_application
 from dotenv import find_dotenv, load_dotenv
 
-
-from django_celery_beat.models import (
-    PeriodicTask,
-    IntervalSchedule,
-    CrontabSchedule
-)
-
-
 """ this part will load environment variable and designate the """
 """ right settings file to use depending on the environment"""
 load_dotenv(find_dotenv())
@@ -31,9 +23,15 @@ os.environ.setdefault(
 
 application = get_wsgi_application()
 
-
 # delete all previous tasks and schedule
 # | schedule will be create at every new restart
+from django_celery_beat.models import (
+    PeriodicTask,
+    IntervalSchedule,
+    CrontabSchedule
+)
+
+
 PeriodicTask.objects.all().delete()
 IntervalSchedule.objects.all().delete()
 CrontabSchedule.objects.all().delete()
