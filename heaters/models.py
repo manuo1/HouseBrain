@@ -26,7 +26,6 @@ class HeaterManager(models.Manager):
 class Heater(models.Model):
 
     class ControlPinChoices(models.IntegerChoices):
-        NONE = 99, 'Aucun'
         PIN_00 = 0, 'Pin 0'
         PIN_01 = 1, 'Pin 1'
         PIN_02 = 2, 'Pin 2'
@@ -50,7 +49,8 @@ class Heater(models.Model):
     maximum_power_consumption = models.IntegerField()
     control_pin = models.IntegerField(
         unique=True,
-        default=ControlPinChoices.NONE,
+        blank=True,
+        null=True,
         choices=ControlPinChoices.choices
         )
     is_on = models.BooleanField(default=False)

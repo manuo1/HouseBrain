@@ -23,14 +23,17 @@ os.environ.setdefault(
 
 application = get_wsgi_application()
 
-# delete all previous tasks and schedule
-# | schedule will be create at every new restart
+
+"""
+Sometimes celery periodic celery tasks don't work any more after an update or
+a server restart. By deleting the previous celery will recreate them
+at each start
+"""
 from django_celery_beat.models import (
     PeriodicTask,
     IntervalSchedule,
     CrontabSchedule
 )
-
 
 PeriodicTask.objects.all().delete()
 IntervalSchedule.objects.all().delete()
