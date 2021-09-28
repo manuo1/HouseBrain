@@ -23,6 +23,8 @@ os.environ.setdefault(
 
 application = get_wsgi_application()
 
+""" check if new sensors are present when app is starting """
+management.call_command('addsensors')
 
 """
 Sometimes celery periodic celery tasks don't work any more after an update or
