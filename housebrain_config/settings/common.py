@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rooms',
     'heaters',
     'teleinformation',
+    'heating_manager',
 ]
 
 MIDDLEWARE = [

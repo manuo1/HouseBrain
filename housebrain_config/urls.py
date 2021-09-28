@@ -11,4 +11,5 @@ urlpatterns = [
     path('rooms/', include('rooms.urls')),
     path('heaters/', include('heaters.urls')),
     path('teleinformation/', include('teleinformation.urls')),
+    path('heating_manager/', include('heating_manager.urls')),
 ]
