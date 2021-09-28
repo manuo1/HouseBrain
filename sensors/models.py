@@ -2,8 +2,6 @@ from django.conf import settings
 from django.db import models, IntegrityError
 from django.utils import timezone
 from housebrain_config.settings.constants import (
-    MAX_TEMPERATURE as max_temp,
-    MIN_TEMPERATURE as min_temp,
     ERROR_TEMPERATURE as error_temp,
     MAX_SENSOR_READING_ERRORS as max_errors,
 )
@@ -38,17 +36,11 @@ class TemperatureSensorManager(models.Manager):
             new_temperature_history.save()
 
     def save_temperature(self, new_temperature, sensor):
-        if self.temperature_is_valid(new_temperature):
-            # update sensor measured temperatures
-            sensor.previous_measured_temperature = (
-                sensor.last_measured_temperature)
-            sensor.last_measured_temperature = new_temperature
-            sensor.save()
-
-    def temperature_is_valid(self, new_temperature):
-        if new_temperature > max_temp or new_temperature < min_temp:
-            return False
-        return True
+        # update sensor measured temperatures
+        sensor.previous_measured_temperature = (
+            sensor.last_measured_temperature)
+        sensor.last_measured_temperature = new_temperature
+        sensor.save()
 
     def sensor_temperatures_list(self, sensor):
         sensor_temperatures_list = TemperatureHistory.objects.filter(

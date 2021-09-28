@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.utils import timezone
 from housebrain_config.settings.constants import (
+    MAX_TEMPERATURE as max_temp,
+    MIN_TEMPERATURE as min_temp,
     DEBUG_TEMPERATURE,
     ERROR_TEMPERATURE,
     TEMPERATURE_FILE,
@@ -21,10 +23,14 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """main controler."""
         for sensor in temperature_sensor_manager.all_sensors():
-            temperature_sensor_manager.save_temperature(
-                self.read_temperature(sensor),
-                sensor
-            )
+            if self.temperature_is_valid(self.read_temperature(sensor)):
+                temperature_sensor_manager.save_temperature(
+                    self.read_temperature(sensor),
+                    sensor
+                )
+            else:
+                temperature_sensor_manager.add_an_error(sensor)
+                
         if timezone.now().minute % TEMPERATURE_HISTORY_DELTA == 0:
             temperature_sensor_manager.save_temperature_history()
 
@@ -47,3 +53,8 @@ class Command(BaseCommand):
                 temperature_sensor_manager.add_an_error(sensor)
 
         return temperature
+
+    def temperature_is_valid(self, new_temperature):
+        if new_temperature > max_temp or new_temperature < min_temp:
+            return False
+        return True
