@@ -24,6 +24,7 @@ os.environ.setdefault(
 application = get_wsgi_application()
 
 """ check if new sensors are present when app is starting """
+from django.core import management
 management.call_command('addsensors')
 
 """
