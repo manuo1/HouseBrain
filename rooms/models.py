@@ -1,4 +1,6 @@
+from django.core import management
 from django.db import models
+from django.db.models.signals import post_save
 from django.conf import settings
 
 from housebrain_config.settings.messages import (
@@ -37,3 +39,13 @@ class Room(models.Model):
             str(self.HeatingModeChoices.choices[self.heating_mode][1])
         )
         return ret
+
+"""
+    django.db.models.signals.post_save
+    Use Django signals sent at the end of a model’s save() method.
+    Every change on Room objects will run manage_heaters commande
+    to update room heaters state
+"""
+def update_room_heaters_state(sender, instance, created, **kwargs):
+    management.call_command('manage_heaters')
+post_save.connect(update_room_heaters_state, sender=Room)
