@@ -11,7 +11,7 @@ from housebrain_config.settings.messages import (
 class RoomManager(models.Manager):
 
     def all_rooms(self):
-        return Room.objects.all()
+        return Room.objects.all()order_by('heating_priority', 'name')
 
 class Room(models.Model):
 
@@ -20,7 +20,7 @@ class Room(models.Model):
         MANUAL = 1, manual[settings.LANGUAGE_CODE]
 
     name = models.CharField(max_length=100)
-    heating_priority = models.IntegerField(default=1)
+    heating_priority = models.IntegerField(default=100)
     heating_mode = models.IntegerField(
         default=HeatingModeChoices.AUTO,
         choices=HeatingModeChoices.choices

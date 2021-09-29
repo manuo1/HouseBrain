@@ -82,5 +82,6 @@ class Command(BaseCommand):
 
     def turn_on_the_room_heaters(self, room):
         for heater in room["heaters"]:
+            # need to add power remaining check
             if not heater.is_on:
                 heater_manager.turn_on(heater)
