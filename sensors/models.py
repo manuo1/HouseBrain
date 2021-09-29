@@ -92,12 +92,14 @@ class TemperatureSensor(models.Model):
         room_name = NO_ASSOCIATED_ROOM[settings.LANGUAGE_CODE]
         if self.associated_room:
             room_name = self.associated_room.name
-        ret = "{} | {} ({}) ({} : {})".format(
+        ret = "{} | {} ({}) ({} : {}) -  ( {} - {} )".format(
             room_name,
             self.name,
             self.sensor_folder_path[-15:],
             LAST_TEMPERATURE_MEASUREMENT[settings.LANGUAGE_CODE],
             f'{self.date_time_update:%d/%m/%Y %H:%M}',
+            self.consecutive_errors,
+            self.cumulative_errors,
         )
         return ret
 
@@ -122,6 +124,6 @@ class TemperatureHistory(models.Model):
             self.associated_sensor.name,
             self.associated_sensor.sensor_folder_path[-15:],
             f'{self.date_time:%d/%m/%Y %H:%M}',
-            f'{(self.temperature/1000):.2f}°C'
+            f'{(self.temperature/1000):.2f}°C',
         )
         return ret

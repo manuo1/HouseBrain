@@ -48,7 +48,8 @@ class HeatingPeriod(models.Model):
         null=True,
     )
     def __str__(self):
-        ret = "{} - {} ( {} -> {} ) {}°C".format(
+        ret = "{} | {} - {} ( {} -> {} ) {}°C".format(
+            self.associated_heating_mode.name,
             self.DayOfTheWeekChoices.choices[self.day_of_the_week][1] ,
             self.associated_room.name,
             self.start_time,
