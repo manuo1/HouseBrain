@@ -8,6 +8,11 @@ from housebrain_config.settings.messages import (
     SETPOINT_TEMPERATURE
 )
 
+class RoomManager(models.Manager):
+
+    def all_rooms(self):
+        return Room.objects.all()
+
 class Room(models.Model):
 
     class HeatingModeChoices(models.IntegerChoices):
@@ -20,7 +25,7 @@ class Room(models.Model):
         default=HeatingModeChoices.AUTO,
         choices=HeatingModeChoices.choices
         )
-    setpoint_temperature = models.IntegerField(default=5)
+    setpoint_temperature = models.IntegerField(default=5000)
 
     def __str__(self):
         ret = "{} | {} : {} | {} : {} | mode : {}".format(

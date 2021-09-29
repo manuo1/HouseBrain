@@ -15,8 +15,8 @@ UNNAMED_SENSOR = {
 }
 
 LAST_TEMPERATURE_MEASUREMENT = {
-    'en-us' : 'Last temperature measurement',
-    'fr' : 'Dernière mesure de température'
+    'en-us' : 'Last measurement',
+    'fr' : 'Dernière mesure'
 }
 
 HEATINGMODE_AUTO = {

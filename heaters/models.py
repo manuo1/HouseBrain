@@ -5,6 +5,9 @@ from rooms.models import Room
 
 class HeaterManager(models.Manager):
 
+    def room_heaters(self, room):
+        return Heater.objects.filter(associated_room=room.id)
+
     def all_heaters(self):
         list = Heater.objects.all()
         return list

@@ -13,6 +13,13 @@ from housebrain_config.settings.messages import (
 from rooms.models import Room
 
 class TemperatureSensorManager(models.Manager):
+
+    def room_sensor(self, room):
+        sensor = TemperatureSensor.objects.filter(associated_room=room.id)
+        if not sensor:
+            sensor = [None]
+        return sensor[0]
+
     def add_sensors(self, sensor_folder_paths):
         for path in sensor_folder_paths:
             temperature_sensor = TemperatureSensor(sensor_folder_path = path)
@@ -75,7 +82,7 @@ class TemperatureSensor(models.Model):
         blank=True,
         unique=True,
     )
-    associated_room = models.ForeignKey(
+    associated_room = models.OneToOneField(
         Room,
         on_delete=models.SET_NULL,
         blank=True,
@@ -92,12 +99,13 @@ class TemperatureSensor(models.Model):
         room_name = NO_ASSOCIATED_ROOM[settings.LANGUAGE_CODE]
         if self.associated_room:
             room_name = self.associated_room.name
-        ret = "{} | {} ({}) ({} : {}) -  ( {} - {} )".format(
+        ret = "{} | {} ({}) ({} : {} = {}) -  ( {} - {} )".format(
             room_name,
             self.name,
             self.sensor_folder_path[-15:],
             LAST_TEMPERATURE_MEASUREMENT[settings.LANGUAGE_CODE],
             f'{self.date_time_update:%d/%m/%Y %H:%M}',
+            self.last_measured_temperature,
             self.consecutive_errors,
             self.cumulative_errors,
         )
