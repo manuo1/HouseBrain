@@ -11,7 +11,7 @@ from housebrain_config.settings.messages import (
 class RoomManager(models.Manager):
 
     def all_rooms(self):
-        return Room.objects.all()order_by('heating_priority', 'name')
+        return Room.objects.all().order_by('heating_priority', 'name')
 
 class Room(models.Model):
 
