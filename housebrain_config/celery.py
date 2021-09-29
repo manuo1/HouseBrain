@@ -34,9 +34,9 @@ app.conf.beat_schedule = {
         'task': 'sensors.tasks.read_and_save_temperatures',
         'schedule': crontab(minute='*/5'),
     },
-    'Manage heaters every 10 minutes': {
+    'Manage heaters 1 minute after saving temperatures': {
         'task': 'heating_manager.tasks.manage_heaters',
-        'schedule': crontab(minute='*/10'),
+        'schedule': crontab(minute='1,6,11,16,21,26,31,36,41,46,51,56'),
     },
     'Check remaining power every 15 seconds': {
         'task': 'teleinformation.tasks.check_remaining_power',
