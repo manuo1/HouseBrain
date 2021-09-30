@@ -49,7 +49,7 @@ class Heater(models.Model):
 
 
     name = models.CharField(max_length=100)
-    maximum_power_consumption = models.IntegerField()
+    watts = models.IntegerField()
     control_pin = models.IntegerField(
         unique=True,
         blank=True,

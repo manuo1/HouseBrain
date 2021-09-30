@@ -46,3 +46,9 @@ ERROR_ISOUSC = 1
 DEBUG_ISOUSC = 1
 TELEINFO_TIMEOUT = 10 # [seconds]
 TELEINFO_HISTORY_DELTA = 30 # save teleinformation history every X minutes
+
+##############################################################################
+# Heating manager
+##############################################################################
+MANAGE_HEATERS_TIMEOUT = 10 # [seconds]
+HEATER_VOLTAGE = 220

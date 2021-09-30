@@ -4,7 +4,7 @@ from housebrain_config.settings.constants import (ERROR_IINST)
 
 """
 /!\ Teleinformation comes from the French electric network, docstrings
-/!\ on the models will be in French.
+/!\ on the models TeleinformationHistory will be in French.
 """
 
 class TeleinfoManager(models.Manager):
@@ -20,7 +20,7 @@ class TeleinfoManager(models.Manager):
         TeleinformationHistory.objects.all().delete()
 
     def update_power_monitoring(self, new_monitoring):
-        last_monitoring = self.get_last_power_monitoring()
+        last_monitoring = self.last_power_monitoring()
         new_monitoring = PowerMonitoring(
             id=last_monitoring.id, **new_monitoring)
         new_monitoring.save()
@@ -36,7 +36,7 @@ class TeleinfoManager(models.Manager):
             last_minute_saved = last_teleinfo_history.date_time.minute
         return last_minute_saved
 
-    def get_last_power_monitoring(self):
+    def last_power_monitoring(self):
         if PowerMonitoring.objects.exists():
             power_monitoring = PowerMonitoring.objects.latest('date_time')
         else:
@@ -53,7 +53,7 @@ class PowerMonitoring(models.Model):
     ISOUSC = models.SmallIntegerField(default=ERROR_IINST)
 
     def __str__(self):
-        return f'{self.date_time:%d/%m/%Y %H:%M} | {self.IINST}/{self.ISOUSC}'
+        return f'{self.date_time:%d/%m/%Y %H:%M} | {self.IINST}/{self.ISOUSC} A'
 
 
 class TeleinformationHistory(models.Model):

@@ -1,6 +1,7 @@
 import time
 from django.conf import settings
 from django.utils import timezone
+from django.core import management
 from django.core.management.base import BaseCommand
 
 from housebrain_config.settings.constants import (
@@ -69,6 +70,7 @@ class Command(BaseCommand):
         if self.remaining_power_is_critical():
             teleinfo_manager.save_critical_remaining_power(self.monitoring)
             heater_manager.turn_off_all_heaters()
+            management.call_command('manage_heaters')
 
     def remaining_power_is_critical(self):
         return self.monitoring["IINST"] >= self.monitoring["ISOUSC"]
