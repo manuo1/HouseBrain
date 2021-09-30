@@ -6,7 +6,6 @@ from django.core.management.base import BaseCommand
 from housebrain_config.settings.constants import (
     SERIAL_PORT, SERIAL_BAUDRATE, SERIAL_TIMEOUT,
     ERROR_IINST, DEBUG_IINST, ERROR_ISOUSC, DEBUG_ISOUSC,
-    REMAINING_POWER_MONITORING_STEPS, CRITICAL_REMAINING_POWER,
     TELEINFO_TIMEOUT, TELEINFO_HISTORY_DELTA,
 )
 from teleinformation.models import TeleinformationHistory
@@ -64,35 +63,20 @@ class Command(BaseCommand):
         if self.teleinfo["date_time"].minute % TELEINFO_HISTORY_DELTA == 0:
             teleinfo_manager.save_teleinfo(self.teleinfo)
         self.monitoring = self.build_monitoring_data()
-        # update power monitoring only if the remaining power has changed steps
-        if self.percentage_remaining_power_has_changed():
-            teleinfo_manager.update_power_monitoring(self.monitoring)
-            # save new entry if remaining power is critical
-            if self.remaining_power_is_critical():
-                teleinfo_manager.save_critical_remaining_power(self.monitoring)
-                heater_manager.turn_off_all_heaters()
-
-
+        # update power monitoring
+        teleinfo_manager.update_power_monitoring(self.monitoring)
+        # save new entry if remaining power is critical
+        if self.remaining_power_is_critical():
+            teleinfo_manager.save_critical_remaining_power(self.monitoring)
+            heater_manager.turn_off_all_heaters()
 
     def remaining_power_is_critical(self):
-        return self.monitoring["percentage_remaining_power"] < CRITICAL_REMAINING_POWER
-
-    def percentage_remaining_power_has_changed(self):
-        last_power_remaining = teleinfo_manager.get_last_power_monitoring().percentage_remaining_power
-        new_power_remaining = self.monitoring["percentage_remaining_power"]
-        return last_power_remaining != new_power_remaining
+        return self.monitoring["IINST"] >= self.monitoring["ISOUSC"]
 
     def build_monitoring_data(self):
         monitoring = {}
         monitoring["IINST"] = int(self.teleinfo["IINST"])
         monitoring["ISOUSC"] = int(self.teleinfo["ISOUSC"])
-        # real percentage of remaining power
-        real_percentage = 100-(monitoring["IINST"] / monitoring["ISOUSC"]*100)
-        percentage_remaining_power = 0
-        for step in sorted(REMAINING_POWER_MONITORING_STEPS):
-            if real_percentage > step:
-                percentage_remaining_power = step
-        monitoring["percentage_remaining_power"] = percentage_remaining_power
         return monitoring
 
 

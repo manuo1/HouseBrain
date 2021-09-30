@@ -25,20 +25,21 @@ class Command(BaseCommand):
                 self.turn_off_the_room_heaters(room)
             else:
                 temperature = self.temperature_level(room)
-                # check if temperature is too low, too high or equal
+                # check if temperature is too low, too high or correct
                 if temperature == "too low":
                     self.turn_on_the_room_heaters(room)
                 elif temperature == "too high":
                     self.turn_off_the_room_heaters(room)
-                elif temperature == "correct":
-                    # if the temperature is equal check if the temperatures
-                    #| increase, decrease or is stable
+                else:
+                    # if the temperature is correct check if the temperatures
+                    # | increase, decrease or is stable
                     temperature = self.temperature_variation(room)
                     if temperature == "increasing":
                         self.turn_off_the_room_heaters(room)
                     elif temperature == "decreasing":
                         self.turn_on_the_room_heaters(room)
-
+                    else:
+                        pass
 
     def rooms_with_heaters_and_sensor(self):
         rooms_with_heaters_and_sensor = []
@@ -54,7 +55,7 @@ class Command(BaseCommand):
         return rooms_with_heaters_and_sensor
 
     def temperature_level(self, room):
-        temperature_level = "correct"
+        temperature_level = ""
         delta = (room["sensor"].last_measured_temperature -
             room["room"].setpoint_temperature
         )
@@ -62,10 +63,12 @@ class Command(BaseCommand):
             temperature_level = "too high"
         elif delta < 0:
             temperature_level = "too low"
+        else:
+            temperature_level = "correct"
         return temperature_level
 
     def temperature_variation(self,room):
-        temperature_variation = "stable"
+        temperature_variation = ""
         delta = ( room["sensor"].last_measured_temperature -
             room["sensor"].previous_measured_temperature
         )
@@ -73,6 +76,8 @@ class Command(BaseCommand):
             temperature_variation = "increasing"
         elif delta < 0:
             temperature_variation = "decreasing"
+        else:
+            temperature_variation = "stable"
         return  temperature_variation
 
     def turn_off_the_room_heaters(self, room):

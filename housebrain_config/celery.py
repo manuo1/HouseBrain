@@ -38,9 +38,9 @@ app.conf.beat_schedule = {
         'task': 'heating_manager.tasks.manage_heaters',
         'schedule': crontab(minute='1,6,11,16,21,26,31,36,41,46,51,56'),
     },
-    'Check remaining power every 15 seconds': {
+    'Check remaining power every 5 seconds': {
         'task': 'teleinformation.tasks.check_remaining_power',
-        'schedule': 15,
+        'schedule': 5,
     },
 
 }
