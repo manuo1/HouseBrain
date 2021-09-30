@@ -81,17 +81,17 @@ class Command(BaseCommand):
 
     def usable_intensity_measurement(self):
         intensity = 0
-        previous = actual = teleinfo_manager.last_power_monitoring().date_time
+        previous = actual = teleinfo_manager.last_power_monitoring()
         timeout_start = time.time()
         # wait for a new power_monitoring measurement
-        while actual == previous:
+        while actual.date_time == previous.date_time:
             # break if timout
             if time.time() > (timeout_start + timeout):
                 break
-            actual = teleinfo_manager.last_power_monitoring().date_time
+            actual = teleinfo_manager.last_power_monitoring()
             time.sleep(0.5)
         # if the power monitoring measurement has changed
-        if actual != previous:
+        if actual.date_time != previous.date_time:
             intensity = actual.ISOUSC - actual.IINST
         return intensity
 
