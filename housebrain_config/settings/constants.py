@@ -52,3 +52,20 @@ TELEINFO_HISTORY_DELTA = 30 # save teleinformation history every X minutes
 ##############################################################################
 MANAGE_HEATERS_TIMEOUT = 10 # [seconds]
 HEATER_VOLTAGE = 220
+
+##############################################################################
+# HEATERS PILOTING MODE
+##############################################################################
+
+
+#the heating is controlled by pilot wire, when you want to stop the heating,
+#| a signal is sent to the radiator (negative half-wave) to place the heating in
+#| frost protection position. You must therefore activate the output to turn off
+#| the heating.
+
+
+#The "HEATERS_PILOTING_MODE" value:
+#| in position "on when on": turns on the heating when the output is activated
+#| in position "on when off": turns on the heating when the output is deactivated
+
+HEATERS_PILOTING_MODE = "on when off"

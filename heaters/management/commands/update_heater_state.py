@@ -1,6 +1,9 @@
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from heaters.models import HeaterManager
+from housebrain_config.settings.constants import (
+    HEATERS_PILOTING_MODE as piloting_mode
+)
 
 heater_manager = HeaterManager()
 
@@ -51,7 +54,10 @@ class Command(BaseCommand):
             for pin, state in pin_states:
                 mcp_pin = mcp.get_pin(pin)
                 # Setup pin as an output that's at a high logic level.
-                mcp_pin.switch_to_output(value=state)
+                if piloting_mode == "on when off":
+                    mcp_pin.switch_to_output(value= not state)
+                else:
+                    mcp_pin.switch_to_output(value=state)
 
 
     def all_heaters_states(self):
