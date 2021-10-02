@@ -47,20 +47,26 @@ class Command(BaseCommand):
                 with open (
                     sensor.sensor_folder_path + TEMPERATURE_FILE
                 ) as file:
-                    line = file.readline()
-                    if line :
-                        temperature = int(line[:-1]) #[:-1] remove \n
-                    else:
-                        temperature = ERROR_TEMPERATURE
-                        sensor_manager.add_an_error(sensor)
-                # reset the consecutive measurement error counter
-                sensor_manager.reset_consecutive_errors(sensor)
+                    lines = file.readlines()
+                    if len(lines) >= 2:
+                        line_1_split = lines[0].split()
+                        crc="NO"
+                        if line_1_split:
+                            crc=line_1_split[-1]
+                        if crc == "YES":
+                            temperature = lines[1].split()[-1][2:]
+                            try:
+                                temperature = int(temperature)
+                            except ValueError:
+                                temperature = ERROR_TEMPERATURE
+                                sensor_manager.add_an_error(sensor)
+                        else:
+                            temperature = ERROR_TEMPERATURE
+                            sensor_manager.add_an_error(sensor)
             except FileNotFoundError:
-                # if there is a reading error returns the error temperature
                 temperature = ERROR_TEMPERATURE
-                # increments the sensor error counter
                 sensor_manager.add_an_error(sensor)
-
+        print(temperature)
         return temperature
 
     def temperature_is_valid(self, new_temperature, sensor):

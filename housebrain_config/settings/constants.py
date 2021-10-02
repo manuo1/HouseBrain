@@ -29,7 +29,7 @@ TEMPERATURE_HISTORY_DELTA = 30 # save temperature history every X minutes
 # Raspberry one wire devices folder paths:
 ##############################################################################
 W1_DIRECTORY_PATH = "/sys/bus/w1/devices"
-TEMPERATURE_FILE = "/temperature"
+TEMPERATURE_FILE = "/w1_slave"
 
 ##############################################################################
 # Raspberry serial port reading settings (teleinfo):
