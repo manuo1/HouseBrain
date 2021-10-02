@@ -25,7 +25,7 @@ class Command(BaseCommand):
         """main controler."""
         for sensor in sensor_manager.all_sensors():
             new_temperature = self.read_temperature(sensor)
-            if self.temperature_is_valid(new_temperature, sensor):
+            if self.temperature_is_valid(new_temperature):
                 sensor_manager.save_temperature(
                     new_temperature, sensor
                 )
@@ -69,17 +69,5 @@ class Command(BaseCommand):
         print(temperature)
         return temperature
 
-    def temperature_is_valid(self, new_temperature, sensor):
-        is_valid = True
-        # check if new_temperature is between possible max an min temperatures
-        if (new_temperature > max_temp or new_temperature < min_temp):
-            is_valid = False
-        # check if there is not too much difference between the new one and
-        #| the previous measurement (does not check this condition if the
-        #| sensor has just been created, when creating the sensor,
-        #| last_temperature = ERROR_TEMPERATURE)
-        last_temperature = sensor.last_measured_temperature
-        delta_temp = abs(last_temperature - new_temperature)
-        if (last_temperature != ERROR_TEMPERATURE and delta_temp > max_delta):
-            is_valid = False
-        return is_valid
+    def temperature_is_valid(self, new_temperature):
+        return new_temperature > max_temp or new_temperature < min_temp
