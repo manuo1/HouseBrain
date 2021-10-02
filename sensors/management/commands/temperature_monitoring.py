@@ -24,13 +24,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """main controler."""
         for sensor in sensor_manager.all_sensors():
-            new_temperature = self.read_temperature(sensor)
-            if self.temperature_is_valid(new_temperature):
-                sensor_manager.save_temperature(
-                    new_temperature, sensor
+            sensor_manager.save_temperature(
+                self.read_temperature(sensor),
+                sensor
                 )
-            else:
-                sensor_manager.add_an_error(sensor)
 
         if self.it_s_time_to_save_temperature_history():
             sensor_manager.save_temperature_history()
@@ -68,6 +65,3 @@ class Command(BaseCommand):
                 sensor_manager.add_an_error(sensor)
         print(temperature)
         return temperature
-
-    def temperature_is_valid(self, new_temperature):
-        return new_temperature > max_temp or new_temperature < min_temp
