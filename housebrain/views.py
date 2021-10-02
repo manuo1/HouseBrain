@@ -18,11 +18,11 @@ def homepage(request):
             name = sensor.associated_room.name
             heaters = heater_manager.room_heaters(sensor.associated_room)
             setpoint_temperature = sensor.associated_room.setpoint_temperature
-
-            if heaters[0].is_on:
-                heaters_state = "ON"
-            elif not heaters[0].is_on:
-                heaters_state = "OFF"
+            if heaters:
+                if heaters[0].is_on:
+                    heaters_state = "ON"
+                elif not heaters[0].is_on:
+                    heaters_state = "OFF"
         else :
             name =f'{sensor.name} ({sensor.sensor_folder_path[-15:]})'
         temperatures.append(
