@@ -69,7 +69,7 @@ class Heater(models.Model):
         if self.is_on is True:
             state = "ON"
 
-        return self.name + " : " + state
+        return f'{self.name} : {state} ( Pin : {self.control_pin})'
 
 """
     django.db.models.signals.post_save

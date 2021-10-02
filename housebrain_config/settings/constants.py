@@ -20,6 +20,7 @@ DEBUG_TEMPERATURE = 54321
 ERROR_TEMPERATURE = 85000
 MAX_TEMPERATURE = 60000
 MIN_TEMPERATURE = -50000
+MAX_DELTA_TEMPERATURE = 4
 # Maximum consecutive reading errors before defining the sensor defective
 MAX_SENSOR_READING_ERRORS = 10
 TEMPERATURE_HISTORY_DELTA = 30 # save temperature history every X minutes

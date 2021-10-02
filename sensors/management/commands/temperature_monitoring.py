@@ -3,6 +3,7 @@ from django.utils import timezone
 from housebrain_config.settings.constants import (
     MAX_TEMPERATURE as max_temp,
     MIN_TEMPERATURE as min_temp,
+    MAX_DELTA_TEMPERATURE as max_delta,
     DEBUG_TEMPERATURE,
     ERROR_TEMPERATURE,
     TEMPERATURE_FILE,
@@ -11,7 +12,7 @@ from housebrain_config.settings.constants import (
 from sensors.models import TemperatureSensorManager
 from django.core.management.base import BaseCommand
 
-temperature_sensor_manager = TemperatureSensorManager()
+sensor_manager = TemperatureSensorManager()
 
 class Command(BaseCommand):
     help = """
@@ -22,17 +23,20 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """main controler."""
-        for sensor in temperature_sensor_manager.all_sensors():
-            if self.temperature_is_valid(self.read_temperature(sensor)):
-                temperature_sensor_manager.save_temperature(
-                    self.read_temperature(sensor),
-                    sensor
+        for sensor in sensor_manager.all_sensors():
+            new_temperature = self.read_temperature(sensor)
+            if self.temperature_is_valid(new_temperature, sensor):
+                sensor_manager.save_temperature(
+                    new_temperature, sensor
                 )
             else:
-                temperature_sensor_manager.add_an_error(sensor)
-                
-        if timezone.now().minute % TEMPERATURE_HISTORY_DELTA == 0:
-            temperature_sensor_manager.save_temperature_history()
+                sensor_manager.add_an_error(sensor)
+
+        if self.it_s_time_to_save_temperature_history():
+            sensor_manager.save_temperature_history()
+
+    def it_s_time_to_save_temperature_history(self):
+        return timezone.now().minute % TEMPERATURE_HISTORY_DELTA == 0
 
     def read_temperature(self, sensor):
         if settings.UNPLUGGED_MODE:
@@ -43,18 +47,33 @@ class Command(BaseCommand):
                 with open (
                     sensor.sensor_folder_path + TEMPERATURE_FILE
                 ) as file:
-                    temperature = int(file.readline()[:-1]) #[:-1] remove \n
+                    line = file.readline()
+                    if line :
+                        temperature = int(line[:-1]) #[:-1] remove \n
+                    else:
+                        temperature = ERROR_TEMPERATURE
+                        sensor_manager.add_an_error(sensor)
                 # reset the consecutive measurement error counter
-                temperature_sensor_manager.reset_consecutive_errors(sensor)
+                sensor_manager.reset_consecutive_errors(sensor)
             except FileNotFoundError:
                 # if there is a reading error returns the error temperature
                 temperature = ERROR_TEMPERATURE
                 # increments the sensor error counter
-                temperature_sensor_manager.add_an_error(sensor)
+                sensor_manager.add_an_error(sensor)
 
         return temperature
 
-    def temperature_is_valid(self, new_temperature):
-        if new_temperature > max_temp or new_temperature < min_temp:
-            return False
-        return True
+    def temperature_is_valid(self, new_temperature, sensor):
+        is_valid = True
+        # check if new_temperature is between possible max an min temperatures
+        if (new_temperature > max_temp or new_temperature < min_temp):
+            is_valid = False
+        # check if there is not too much difference between the new one and
+        #| the previous measurement (does not check this condition if the
+        #| sensor has just been created, when creating the sensor,
+        #| last_temperature = ERROR_TEMPERATURE)
+        last_temperature = sensor.last_measured_temperature
+        delta_temp = abs(last_temperature - new_temperature)
+        if (last_temperature != ERROR_TEMPERATURE and delta_temp > max_delta):
+            is_valid = False
+        return is_valid
