@@ -3,30 +3,77 @@
 {% block title %}House Brain{% endblock %}
 {% block main %}
 
-<p>
 
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th scope="col">Etat</th>
-      <th scope="col">Nom</th>
-      <th scope="col">Consigne</th>
-      <th scope="col">Mesure</th>
-    </tr>
-  </thead>
-  <tbody>
+
+
+
+
+
+
+
+<div class="accordion accordion-flush" id="accordionFlush">
+
+<div class="accordion-item">
+  <h2 class="accordion-header">
+    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse{{room.id}}" aria-expanded="false" aria-controls="flush-collapse{{room.id}}">
+
+      <div class="col-1 text-truncate">
+        Etat
+      </div>
+      <div class="col-7 text-truncate">
+        Nom
+      </div>
+      <div class="col-2 text-truncate">
+        Consigne
+      </div>
+      <div class="col-2 text-truncate">
+        Température
+      </div>
+
+    </button>
+  </h2>
+</div>
+
+
+
+
 
     {% for room in data %}
-    <tr>
-      <th scope="row" class="{{room.color}}">{{room.heater_state}}</th>
-      <td>{{room.name}}</td>
-      <td>{{room.setpoint_temperature}}</td>
-      <td>{{room.measured_temperature}}</td>
-    </tr>
+      <div class="accordion-item">
+
+        <!-- visible part -->
+        <h2 class="accordion-header" id="flush-heading{{room.id}}">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse{{room.id}}" aria-expanded="false" aria-controls="flush-collapse{{room.id}}">
+
+                <div class="col-1 {{room.color}}">
+                  {{room.heater_state}}
+                </div>
+                <div class="col-7 text-truncate">
+                  {{room.name}}
+                </div>
+                <div class="col-2">
+                  {{room.setpoint_temperature}}
+                </div>
+                <div class="col-2">
+                  {{room.measured_temperature}}
+                </div>
+
+          </button>
+        </h2>
+
+        <!-- collapsible part -->
+        <div id="flush-collapse{{room.id}}" class="accordion-collapse collapse" aria-labelledby="flush-heading{{room.id}}" data-bs-parent="#accordionFlush">
+          <div class="accordion-body">
+            Bouton
+          </div>
+        </div>
+
+
+      </div>
     {% endfor %}
 
-  </tbody>
-</table>
-</p>
+
+</div>
+
 
 {% endblock %}

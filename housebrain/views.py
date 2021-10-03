@@ -45,6 +45,7 @@ def homepage(request):
         else :
             name =f'{sensor.name} ({sensor.sensor_folder_path[-15:]})'
         room = {
+                "id" : sensor.id,
                 "color" : heater_state_color,
                 "heater_state" : heater_state,
                 "name" : name,
