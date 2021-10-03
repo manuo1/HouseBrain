@@ -18,10 +18,10 @@
 
     {% for room in data %}
     <tr>
-      <th scope="row">{{room.0}}</th>
-      <td>{{room.1}}</td>
-      <td>{{room.2}}</td>
-      <td>{{room.3}}</td>
+      <th scope="row" class="{{room.color}}">{{room.heater_state}}</th>
+      <td>{{room.name}}</td>
+      <td>{{room.setpoint_temperature}}</td>
+      <td>{{room.measured_temperature}}</td>
     </tr>
     {% endfor %}
 

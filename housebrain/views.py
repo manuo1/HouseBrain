@@ -9,7 +9,8 @@ t_sensor_manager = TemperatureSensorManager()
 
 def homepage(request):
     data = []
-    heaters_state = "No Heater"
+    heater_state = "No Heater"
+    heater_state_color = ""
     setpoint_temperature = "-°C"
     measured_temperature = "-°C"
 
@@ -33,13 +34,23 @@ def homepage(request):
                 )
             if heaters:
                 if heaters[0].is_on:
-                    heaters_state = "ON"
+                    heater_state = "ON"
+                    heater_state_color = "bg-danger"
                 elif not heaters[0].is_on:
-                    heaters_state = "OFF"
+                    heater_state = "OFF"
+                    heater_state_color = ""
+                else:
+                    heater_state_color = ""
         # if sensor don't have  an associated room return sensor name and path
         else :
             name =f'{sensor.name} ({sensor.sensor_folder_path[-15:]})'
-        room = [heaters_state, name, setpoint_temperature, measured_temperature]
+        room = {
+                "color" : heater_state_color,
+                "heater_state" : heater_state,
+                "name" : name,
+                "setpoint_temperature" : setpoint_temperature,
+                "measured_temperature" : measured_temperature,
+                }
         data.append(room)
     context = {
         'date_time': f'{timezone.now():%d/%m/%Y %H:%M}',
