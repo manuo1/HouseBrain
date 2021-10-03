@@ -60,4 +60,4 @@ def homepage(request):
     return render(request, 'homepage.html', context)
 
 def format_temperature(temperature):
-    return f'{(temperature/1000):.2f}°C'
+    return f'{(temperature/1000):.1f}°'
