@@ -10,7 +10,7 @@ t_sensor_manager = TemperatureSensorManager()
 def homepage(request):
     data = []
     heater_state = "No Heater"
-    heater_state_color = ""
+    heater_state_color = "bg-light"
     setpoint_temperature = "-°C"
     measured_temperature = "-°C"
 
@@ -19,18 +19,18 @@ def homepage(request):
 
         if sensor.last_measured_temperature:
             measured_temperature = format_temperature(
-                sensor.last_measured_temperature
+                sensor.last_measured_temperature,1
                 )
+            if sensor.last_measured_temperature == ERROR_TEMPERATURE:
+                measured_temperature = "-"
         else:
-            measured_temperature = format_temperature(
-                ERROR_TEMPERATURE
-                )
+            measured_temperature = "-"
         # if sensor have an associated room get data
         if sensor.associated_room:
             name = sensor.associated_room.name
             heaters = heater_manager.room_heaters(sensor.associated_room)
             setpoint_temperature = format_temperature(
-                sensor.associated_room.setpoint_temperature
+                sensor.associated_room.setpoint_temperature,0
                 )
             if heaters:
                 if heaters[0].is_on:
@@ -38,9 +38,9 @@ def homepage(request):
                     heater_state_color = "bg-danger"
                 elif not heaters[0].is_on:
                     heater_state = "OFF"
-                    heater_state_color = ""
+                    heater_state_color = "bg-light"
                 else:
-                    heater_state_color = ""
+                    heater_state_color = "bg-light"
         # if sensor don't have  an associated room return sensor name and path
         else :
             name =f'{sensor.name} ({sensor.sensor_folder_path[-15:]})'
@@ -59,5 +59,5 @@ def homepage(request):
     }
     return render(request, 'homepage.html', context)
 
-def format_temperature(temperature):
-    return f'{(temperature/1000):.1f}°'
+def format_temperature(temperature, digit):
+    return f'{(temperature/1000):.{digit}f}°'
