@@ -5,7 +5,38 @@
 
     <div class="accordion" id="accordion">
 
-      {% for room in data %}
+
+      <!-- all rooms with temperature sensor only -->
+
+      {% for room in rooms_with_temperature_sensor_only %}
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="heading{{room.id}}">
+          <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{room.id}}" aria-expanded="false" aria-controls="collapse{{room.id}}">
+            <div class="container px-1">
+
+              <div class="row gx-1 px-0">
+                <div class="col-6">
+                  <div class="border rounded-3 bg-light text-truncate py-1 px-1">{{room.name}}</div>
+                </div>
+                <div class="col-6">
+                 <div class="border rounded-3 bg-light text-center py-1">{{room.measured_temperature}}</div>
+                </div>
+              </div>
+
+            </div>
+          </button>
+        </h2>
+        <div id="collapse{{room.id}}" class="accordion-collapse collapse" aria-labelledby="heading{{room.id}}" data-bs-parent="#accordion">
+          <div class="accordion-body">
+            next
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+
+      <!-- all rooms with heating -->
+
+      {% for room in rooms_with_heating %}
       <div class="accordion-item">
         <h2 class="accordion-header" id="heading{{room.id}}">
           <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{room.id}}" aria-expanded="false" aria-controls="collapse{{room.id}}">
