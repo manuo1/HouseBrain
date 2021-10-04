@@ -76,6 +76,6 @@ def rooms_with_temperature_sensor_only_data(data):
 
 def format_temperature(temperature, digit):
     formated_temperature = f'{(temperature/1000):.{digit}f}°'
-    if temperature = ERROR_TEMPERATURE:
+    if temperature == ERROR_TEMPERATURE:
         formated_temperature = "-"
     return formated_temperature
