@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models, IntegrityError
 from django.utils import timezone
+from datetime import timedelta
 from housebrain_config.settings.constants import (
     ERROR_TEMPERATURE as error_temp,
     MAX_SENSOR_READING_ERRORS as max_errors,
@@ -13,6 +14,16 @@ from housebrain_config.settings.messages import (
 from rooms.models import Room
 
 class TemperatureSensorManager(models.Manager):
+
+    def seven_days_sensor_temperature_history(self,sensor):
+
+        now = timezone.now()
+        seven_days_before = now - timedelta(days=7)
+        result = TemperatureHistory.objects.filter(
+                associated_sensor = sensor,
+                date_time__range=(seven_days_before,now),
+            )
+        return result
 
     def room_sensor(self, room):
         sensor = TemperatureSensor.objects.filter(associated_room=room.id)

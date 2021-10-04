@@ -68,6 +68,7 @@ def rooms_with_temperature_sensor_only_data(data):
             "id" : data["room"].id,
             "name" : data["room"].name,
             "measured_temperature" : "",
+            "temperature_history" : temperature_history(data["sensor"]),
             }
     room_data["measured_temperature"] = format_temperature(
             data["sensor"].last_measured_temperature,1
@@ -79,3 +80,16 @@ def format_temperature(temperature, digit):
     if temperature == ERROR_TEMPERATURE:
         formated_temperature = "-"
     return formated_temperature
+
+def temperature_history(sensor):
+    temperature_history = []
+    history = t_sensor_manager.seven_days_sensor_temperature_history(sensor)
+    for save in history:
+        temperature_history.append(
+            {
+            "date_time" : f'{save.date_time:%d/%m %H:%M}',
+            "temperature" : format_temperature(save.temperature,1)
+            }
+        )
+    print(temperature_history)
+    return temperature_history

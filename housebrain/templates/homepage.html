@@ -28,7 +28,9 @@
         </h2>
         <div id="collapse{{room.id}}" class="accordion-collapse collapse" aria-labelledby="heading{{room.id}}" data-bs-parent="#accordion">
           <div class="accordion-body">
-            next
+            {% for history in room.temperature_history %}
+              {{history.date_time}} - {{history.temperature}}<br>
+            {% endfor %}
           </div>
         </div>
       </div>
