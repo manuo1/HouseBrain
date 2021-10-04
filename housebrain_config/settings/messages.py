@@ -67,3 +67,8 @@ SETPOINT_TEMPERATURE = {
     'en-us' : 'Setpoint temperature',
     'fr' : 'Température de consigne'
 }
+
+DAYOFTHEWEEK_LIST = {
+    'en-us' : ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+    'fr' : ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"]
+}

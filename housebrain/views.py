@@ -1,6 +1,10 @@
+from django.conf import settings
 from django.utils import timezone
 from django.shortcuts import render
 from housebrain_config.settings.constants import (ERROR_TEMPERATURE)
+from housebrain_config.settings.messages import (
+    DAYOFTHEWEEK_LIST as week_day_list
+)
 from sensors.models import TemperatureSensorManager
 from heaters.models import HeaterManager
 from rooms.models import RoomManager
@@ -82,14 +86,18 @@ def format_temperature(temperature, digit):
     return formated_temperature
 
 def temperature_history(sensor):
-    temperature_history = []
+    temperature_history = {
+        day:[] for day in week_day_list[settings.LANGUAGE_CODE]
+    }
     history = t_sensor_manager.seven_days_sensor_temperature_history(sensor)
     for save in history:
-        temperature_history.append(
-            {
-            "date_time" : f'{save.date_time:%d/%m %H:%M}',
-            "temperature" : format_temperature(save.temperature,1)
+        if save.date_time.minute%60==0:
+            week_day = week_day_list[settings.LANGUAGE_CODE][save.date_time.weekday()]
+            data = {
+                "date_time" : f'{save.date_time:%d/%m %H:%M}',
+                "temperature" : format_temperature(save.temperature,1)
             }
-        )
-    print(temperature_history)
+            temperature_history[week_day].append(
+                data
+            )
     return temperature_history

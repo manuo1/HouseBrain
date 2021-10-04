@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db import models, IntegrityError
 from django.utils import timezone
-from datetime import timedelta
+from datetime import datetime, timedelta
 from housebrain_config.settings.constants import (
     ERROR_TEMPERATURE as error_temp,
     MAX_SENSOR_READING_ERRORS as max_errors,
@@ -18,10 +18,18 @@ class TemperatureSensorManager(models.Manager):
     def seven_days_sensor_temperature_history(self,sensor):
 
         now = timezone.now()
-        seven_days_before = now - timedelta(days=7)
+        now_hour = datetime(
+                year=now.year,
+                month=now.month,
+                day=now.day,
+                hour=now.hour,
+                minute=0,
+                second=0
+            )
+        seven_days_before = now_hour - timedelta(days=7)
         result = TemperatureHistory.objects.filter(
                 associated_sensor = sensor,
-                date_time__range=(seven_days_before,now),
+                date_time__range=(seven_days_before,now_hour),
             )
         return result
 
@@ -126,7 +134,7 @@ class TemperatureHistory(models.Model):
     """ save temperature and date_time from a temperature sensor """
     temperature = models.IntegerField()
     date_time = models.DateTimeField(
-        auto_now_add=True
+        default=timezone.now()
     )
     associated_sensor = models.ForeignKey(
         TemperatureSensor,
