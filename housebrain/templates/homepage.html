@@ -28,12 +28,39 @@
         </h2>
         <div id="collapse{{room.id}}" class="accordion-collapse collapse" aria-labelledby="heading{{room.id}}" data-bs-parent="#accordion">
           <div class="accordion-body">
-            {% for day, day_data in room.temperature_history.items %}
-              <hr>{{day}} {{day_data.0.date}}<br><hr><br>
-              {% for data in day_data %}
-                {{data.time}} - {{data.temperature}}<br>
-              {% endfor %}
-            {% endfor %}
+
+
+            <table class="table table-sm">
+              <thead class="thead-dark">
+                <tr>
+                  <th scope="col" class="text-center">Heure</th>
+                  {% for day, day_data in room.temperature_history.items %}
+                  <th scope="col" class="text-center">{{day}} {{day_data.0.date}}</th>
+                  {% endfor %}
+                </tr>
+              </thead>
+
+              <tbody>
+
+                    {% for hour in hours_list %}
+                    <tr>
+                      <td class="text-center">{{hour}}H</td>
+                      {% for day, day_data in room.temperature_history.items %}
+                      <td class="text-center">
+                        {% for data in day_data %}
+                          {% if data.time == hour %}
+                            {{data.temperature}}
+                          {% endif %}
+                        {% endfor %}
+                      </td>
+                      {% endfor %}
+                    </tr>
+                    {% endfor %}
+
+              </tbody>
+            </table>
+
+
           </div>
         </div>
       </div>
