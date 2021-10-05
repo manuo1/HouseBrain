@@ -33,9 +33,9 @@
             <table class="table table-sm">
               <thead class="thead-dark">
                 <tr>
-                  <th scope="col" class="text-center">Heure</th>
+                  <th scope="col" class="text-center"><sup>Heure</sup></th>
                   {% for day, day_data in room.temperature_history.items %}
-                  <th scope="col" class="text-center">{{day}} {{day_data.0.date}}</th>
+                  <th scope="col" class="text-center"><sup>{{day|slice:":3" }} {{day_data.0.date}}</sup></th>
                   {% endfor %}
                 </tr>
               </thead>
