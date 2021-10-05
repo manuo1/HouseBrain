@@ -38,7 +38,6 @@ def homepage(request):
                         rooms_with_temperature_sensor_only_data(data)
                     )
 
-
     context = {
         'date_time': f'{timezone.now():%d/%m/%Y %H:%M}',
         'rooms_with_heating': rooms_with_heating,
@@ -96,8 +95,8 @@ def temperature_history(sensor):
             week_day = week_day_list[settings.LANGUAGE_CODE][save.date_time.weekday()]
             data = {
                 "date" : f'{save.date_time:%d/%m}',
-                "time" : int(f'{save.date_time:%H}'),
-                "temperature" : format_temperature(save.temperature,1)
+                "time" : save.date_time.hour,
+                "temperature" : format_temperature(save.temperature,1),
             }
             temperature_history[week_day].append(
                 data

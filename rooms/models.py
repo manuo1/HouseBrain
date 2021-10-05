@@ -15,6 +15,10 @@ class RoomManager(models.Manager):
     def all_rooms(self):
         return Room.objects.all().order_by('heating_priority', 'name')
 
+    def change_setpoint_temperature(self, room, temperature):
+        room.setpoint_temperature = temperature
+        room.save()
+
 class Room(models.Model):
 
     class HeatingModeChoices(models.IntegerChoices):
@@ -46,6 +50,9 @@ class Room(models.Model):
     Every change on Room objects will run manage_heaters commande
     to update room heaters state
 """
+#removed since manage_heating_periods was created
+"""
 def update_room_heaters_state(sender, instance, created, **kwargs):
     management.call_command('manage_heaters')
 post_save.connect(update_room_heaters_state, sender=Room)
+"""

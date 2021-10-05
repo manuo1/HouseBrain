@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 from housebrain_config.settings.messages import (
     DAYOFTHEWEEK_MONDAY as monday,
     DAYOFTHEWEEK_TUESDAY as tuesday,
@@ -10,6 +11,30 @@ from housebrain_config.settings.messages import (
     DAYOFTHEWEEK_SUNDAY as sunday,
 )
 from rooms.models import Room
+
+class HeatingPeriodManager(models.Manager):
+    def current_heating_period_setpoint_temperature(self,room):
+        temperature = 0
+        current_heating_period = self.current_heating_period(room)
+        if current_heating_period:
+            temperature = current_heating_period[0].setpoint_temperature
+        return temperature
+
+    def current_heating_period(self, room):
+        now = timezone.now()
+        current_heating_mode = CurrentHeatingMode.objects.all()
+        if current_heating_mode:
+            current_heating_mode = current_heating_mode[0].heating_mode
+
+        heating_period = HeatingPeriod.objects.filter(
+            associated_heating_mode = current_heating_mode,
+            day_of_the_week = now.weekday(),
+            associated_room = room,
+            start_time__lt = now.time(), #lower than now
+            end_time__gte = now.time() #Greater than or equal to now
+        )
+        return heating_period
+
 
 class HeatingMode(models.Model):
     name = models.CharField(max_length=100)
@@ -57,3 +82,13 @@ class HeatingPeriod(models.Model):
             self.setpoint_temperature,
         )
         return ret
+
+class CurrentHeatingMode(models.Model):
+    heating_mode = models.OneToOneField(
+        HeatingMode,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
+    def __str__(self):
+        return f'Current : {self.heating_mode.name}'

@@ -10,6 +10,7 @@
 
       {% for room in rooms_with_temperature_sensor_only %}
       <div class="accordion-item">
+        <!-- visible part  -->
         <h2 class="accordion-header" id="heading{{room.id}}">
           <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{room.id}}" aria-expanded="false" aria-controls="collapse{{room.id}}">
             <div class="container px-1">
@@ -26,11 +27,11 @@
             </div>
           </button>
         </h2>
+        <!-- collapsible part  -->
         <div id="collapse{{room.id}}" class="accordion-collapse collapse" aria-labelledby="heading{{room.id}}" data-bs-parent="#accordion">
           <div class="accordion-body">
 
-
-            <table class="table table-sm">
+          <table class="table table-sm">
               <thead class="thead-dark">
                 <tr>
                   <th scope="col" class="text-center"><sup>Heure</sup></th>
@@ -41,7 +42,6 @@
               </thead>
 
               <tbody>
-
                     {% for hour in hours_list %}
                     <tr>
                       <td class="text-center">{{hour}}H</td>
@@ -56,10 +56,9 @@
                       {% endfor %}
                     </tr>
                     {% endfor %}
-
               </tbody>
-            </table>
 
+            </table>
 
           </div>
         </div>
