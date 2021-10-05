@@ -26,7 +26,9 @@ class TemperatureSensorManager(models.Manager):
                 minute=0,
                 second=0
             )
+        print(now_hour)
         seven_days_before = now_hour - timedelta(days=7)
+        print(seven_days_before)
         result = TemperatureHistory.objects.filter(
                 associated_sensor = sensor,
                 date_time__range=(seven_days_before,now_hour),
@@ -133,9 +135,7 @@ class TemperatureSensor(models.Model):
 class TemperatureHistory(models.Model):
     """ save temperature and date_time from a temperature sensor """
     temperature = models.IntegerField()
-    date_time = models.DateTimeField(
-        default=timezone.now()
-    )
+    date_time = models.DateTimeField(auto_now_add=True)
     associated_sensor = models.ForeignKey(
         TemperatureSensor,
         on_delete=models.CASCADE
