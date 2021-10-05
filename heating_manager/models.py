@@ -29,8 +29,7 @@ class HeatingPeriodManager(models.Manager):
 
         heating_period = HeatingPeriod.objects.filter(
             associated_heating_mode = current_heating_mode,
-            week_day_start__lt = now.weekday(),
-            week_day_stop__gte = now.weekday(),
+            week_day = now.weekday(),
             associated_room = room,
             start_time__lt = now.time(), #lower than now
             end_time__gte = now.time() #Greater than or equal to now
@@ -55,11 +54,7 @@ class HeatingPeriod(models.Model):
         SATURDAY = 5, saturday[settings.LANGUAGE_CODE]
         SUNDAY = 6, sunday[settings.LANGUAGE_CODE]
 
-    week_day_start = models.IntegerField(
-        default=DayOfTheWeekChoices.MONDAY,
-        choices=DayOfTheWeekChoices.choices
-        )
-    week_day_stop = models.IntegerField(
+    week_day = models.IntegerField(
         default=DayOfTheWeekChoices.MONDAY,
         choices=DayOfTheWeekChoices.choices
         )
@@ -79,10 +74,9 @@ class HeatingPeriod(models.Model):
         null=True,
     )
     def __str__(self):
-        ret = "{} | {} {} - {} ( {} -> {} ) {}°C".format(
+        ret = "{} | {} - {} ( {} -> {} ) {}°C".format(
             self.associated_heating_mode.name,
-            self.DayOfTheWeekChoices.choices[self.week_day_start][1] ,
-            self.DayOfTheWeekChoices.choices[self.week_day_stop][1] ,
+            self.DayOfTheWeekChoices.choices[self.week_day][1] ,
             self.associated_room.name,
             self.start_time,
             self.end_time,
