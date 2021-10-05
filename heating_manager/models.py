@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
 from housebrain_config.settings.messages import (
@@ -28,7 +29,8 @@ class HeatingPeriodManager(models.Manager):
 
         heating_period = HeatingPeriod.objects.filter(
             associated_heating_mode = current_heating_mode,
-            day_of_the_week = now.weekday(),
+            week_day_start__lt = now.weekday(),
+            week_day_stop__gte = now.weekday(),
             associated_room = room,
             start_time__lt = now.time(), #lower than now
             end_time__gte = now.time() #Greater than or equal to now
@@ -53,7 +55,11 @@ class HeatingPeriod(models.Model):
         SATURDAY = 5, saturday[settings.LANGUAGE_CODE]
         SUNDAY = 6, sunday[settings.LANGUAGE_CODE]
 
-    day_of_the_week = models.IntegerField(
+    week_day_start = models.IntegerField(
+        default=DayOfTheWeekChoices.MONDAY,
+        choices=DayOfTheWeekChoices.choices
+        )
+    week_day_stop = models.IntegerField(
         default=DayOfTheWeekChoices.MONDAY,
         choices=DayOfTheWeekChoices.choices
         )
