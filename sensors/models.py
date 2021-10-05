@@ -18,20 +18,10 @@ class TemperatureSensorManager(models.Manager):
     def seven_days_sensor_temperature_history(self,sensor):
 
         now = timezone.now()
-        now_hour = datetime(
-                year=now.year,
-                month=now.month,
-                day=now.day,
-                hour=now.hour,
-                minute=0,
-                second=0
-            )
-        print(now_hour)
-        seven_days_before = now_hour - timedelta(days=7)
-        print(seven_days_before)
+        seven_days_before = now.date() - timedelta(days=7)
         result = TemperatureHistory.objects.filter(
                 associated_sensor = sensor,
-                date_time__range=(seven_days_before,now_hour),
+                date_time__range=(seven_days_before,now),
             )
         return result
 
