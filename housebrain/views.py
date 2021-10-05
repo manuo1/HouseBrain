@@ -94,7 +94,8 @@ def temperature_history(sensor):
         if save.date_time.minute%60==0:
             week_day = week_day_list[settings.LANGUAGE_CODE][save.date_time.weekday()]
             data = {
-                "date_time" : f'{save.date_time:%d/%m %H:%M}',
+                "date" : f'{save.date_time:%d/%m}',
+                "time" : f'{save.date_time:%HH}',
                 "temperature" : format_temperature(save.temperature,1)
             }
             temperature_history[week_day].append(
