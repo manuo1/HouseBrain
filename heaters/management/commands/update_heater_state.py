@@ -17,6 +17,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """main controler."""
 
+        pin_states = self.all_heaters_states()
+
         if settings.UNPLUGGED_MODE:
             self.stdout.write("heater states in ---- UNPLUGGED_MODE ----")
 
