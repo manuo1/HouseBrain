@@ -34,10 +34,25 @@ class Command(BaseCommand):
             self.teleinfo = self.get_false_data_for_unplugged_mode()
             self.stdout.write("reading teleinfo in ---- UNPLUGGED_MODE ----")
         else :
+            import serial
+            serial_port = None
+            try:
+                serial_port = serial.Serial(
+                    port=SERIAL_PORT,
+                    baudrate = SERIAL_BAUDRATE,
+                    parity=serial.PARITY_NONE,
+                    stopbits=serial.STOPBITS_ONE,
+                    bytesize=serial.SEVENBITS,
+                    timeout=SERIAL_TIMEOUT
+                )
+            except serial.SerialException as e:
+                self.stdout.write(
+                    "could not open serial port '{}'\n -->{}".format(port, e)
+                )
+
             timeout_start = time.time()
             first_teleinfo_key  = ""
             teleinfo_is_complete = False
-            serial_port = self.get_serial_port()
             # if there is data in serial port
             if serial_port:
                 # as long as the teleinfo has not completed a complete loop
@@ -171,24 +186,3 @@ class Command(BaseCommand):
         calculated_checksum = chr(calculated_checksum + 32)
 
         return calculated_checksum == data["read_checksum"]
-
-
-
-    def get_serial_port(self):
-        """ Raspberry serial port config """
-        import serial
-        serial_port = None
-        try:
-            serial_port = serial.Serial(
-                port=SERIAL_PORT,
-                baudrate = SERIAL_BAUDRATE,
-                parity=serial.PARITY_NONE,
-                stopbits=serial.STOPBITS_ONE,
-                bytesize=serial.SEVENBITS,
-                timeout=SERIAL_TIMEOUT
-            )
-        except serial.SerialException as e:
-            self.stdout.write(
-                "could not open serial port '{}'\n -->{}".format(port, e)
-            )
-        return serial_port
