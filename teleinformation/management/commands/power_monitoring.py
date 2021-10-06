@@ -64,17 +64,17 @@ class Command(BaseCommand):
                                 first_teleinfo_key  = data["key"]
                             # and finaly store data in teleinfo dict
                             self.teleinfo[data["key"]] = data["value"]
+                        self.monitoring = self.build_monitoring_data()
                     except serial.SerialTimeoutException as e:
                         self.teleinfo =  { x:"" for x in self.teleinfo }
                         self.stdout.write(
                             "No character in the line \n -->{}".format(e)
                         )
-
         self.teleinfo["date_time"] = timezone.now()
         # save teleinfo every *TELEINFO_HISTORY_DELTA* minutes
         if self.it_s_time_to_save_teleinfo():
             teleinfo_manager.save_teleinfo(self.teleinfo)
-        self.monitoring = self.build_monitoring_data()
+
         # update power monitoring
         teleinfo_manager.update_power_monitoring(self.monitoring)
         # save new entry if remaining power is critical
