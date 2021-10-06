@@ -35,33 +35,44 @@ class Command(BaseCommand):
             self.stdout.write("reading teleinfo in ---- UNPLUGGED_MODE ----")
         else :
             timeout_start = time.time()
-            first_key_that_was_read  = ""
+            first_teleinfo_key  = ""
             teleinfo_is_complete = False
             serial_port = self.get_serial_port()
             # if there is data in serial port
-            if serial_port.readline():
+            if serial_port:
                 # as long as the teleinfo has not completed a complete loop
                 while not teleinfo_is_complete:
                     # break if timout
-                    if time.time() > (timeout_start + TELEINFO_TIMEOUT):
+                    if self.timeout(timeout_start):
+                        self.stdout.write(
+                            "impossible to get a complete teleinfo"
+                        )
+                        #reset teleinfo data
+                        self.teleinfo =  { x:"" for x in self.teleinfo }
                         break
-                    # for each line of the teleinfo frame
-                    line = str(serial_port.readline())
-                    data = self.get_data_in_line(line)
-                    # if the key corresponds to the one read first, the
-                    # | teleinfo has made a complete loop
-                    if data["key"] == first_key_that_was_read:
-                        teleinfo_is_complete = True
-                    # checks if the data is valid with the checksum
-                    if self.data_is_valid(data) and not teleinfo_is_complete:
-                        # store the first key read in frame
-                        if all(value == "" for value in self.teleinfo.values()):
-                            first_key_that_was_read  = data["key"]
-                        # and finaly store data in teleinfo dict
-                        self.teleinfo[data["key"]] = data["value"]
+                    try:
+                        line = str(serial_port.readline())
+                        data = self.get_data_in_line(line)
+                        # if the key corresponds to the one read first, the
+                        # | teleinfo has made a complete loop
+                        if data["key"] == first_teleinfo_key:
+                            teleinfo_is_complete = True
+                        # checks if the data is valid with the checksum
+                        if self.checksum_is_valid(data) and not teleinfo_is_complete:
+                            # store the first key read in frame
+                            if self.teleinfo_is_empty():
+                                first_teleinfo_key  = data["key"]
+                            # and finaly store data in teleinfo dict
+                            self.teleinfo[data["key"]] = data["value"]
+                    except serial.SerialTimeoutException as e:
+                        self.teleinfo =  { x:"" for x in self.teleinfo }
+                        self.stdout.write(
+                            "No character in the line \n -->{}".format(e)
+                        )
+
         self.teleinfo["date_time"] = timezone.now()
         # save teleinfo every *TELEINFO_HISTORY_DELTA* minutes
-        if self.teleinfo["date_time"].minute % TELEINFO_HISTORY_DELTA == 0:
+        if self.it_s_time_to_save_teleinfo():
             teleinfo_manager.save_teleinfo(self.teleinfo)
         self.monitoring = self.build_monitoring_data()
         # update power monitoring
@@ -69,8 +80,17 @@ class Command(BaseCommand):
         # save new entry if remaining power is critical
         if self.remaining_power_is_critical():
             teleinfo_manager.save_critical_remaining_power(self.monitoring)
-            heater_manager.turn_off_all_heaters()
+            management.call_command('turn_off_all_heaters')
             management.call_command('manage_heaters')
+
+    def it_s_time_to_save_teleinfo(self):
+        return self.teleinfo["date_time"].minute % TELEINFO_HISTORY_DELTA == 0
+
+    def teleinfo_is_empty(self):
+        return all(value == "" for value in self.teleinfo.values())
+
+    def timeout(self,timeout_start):
+        return time.time() > (timeout_start + TELEINFO_TIMEOUT)
 
     def remaining_power_is_critical(self):
         return self.monitoring["IINST"] >= self.monitoring["ISOUSC"]
@@ -119,11 +139,13 @@ class Command(BaseCommand):
                 #and if the line is the last of the frame another way...
                 if key == "MOTDETAT":
                     data["read_checksum"] = line[-14:][0]
+                #do not complete the full loop if the key was found
+                break
         return data
 
 
 
-    def data_is_valid(self, data):
+    def checksum_is_valid(self, data):
         """
         The "checksum" is calculated on the whole of the characters
         going from the beginning of the label field to the end of
@@ -155,12 +177,18 @@ class Command(BaseCommand):
     def get_serial_port(self):
         """ Raspberry serial port config """
         import serial
-        serial_port = serial.Serial(
-            port=SERIAL_PORT,
-            baudrate = SERIAL_BAUDRATE,
-            parity=serial.PARITY_NONE,
-            stopbits=serial.STOPBITS_ONE,
-            bytesize=serial.SEVENBITS,
-            timeout=SERIAL_TIMEOUT
-        )
+        serial_port = None
+        try:
+            serial_port = serial.Serial(
+                port=SERIAL_PORT,
+                baudrate = SERIAL_BAUDRATE,
+                parity=serial.PARITY_NONE,
+                stopbits=serial.STOPBITS_ONE,
+                bytesize=serial.SEVENBITS,
+                timeout=SERIAL_TIMEOUT
+            )
+        except serial.SerialException as e:
+            self.stdout.write(
+                "could not open serial port '{}'\n -->{}".format(port, e)
+            )
         return serial_port
