@@ -35,11 +35,15 @@
             <div class="collapse navbar-collapse" id="navbarText">
               <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 {% if user.is_authenticated %}
-                <li class="nav-item"><a class="nav-link active" href="{% url 'authentication:logout' %}">Déconnexion ({{user.username}})</a></li>
-                {% if user.is_superuser %}<li class="nav-item"><a class="nav-link active" href="{% url 'admin:index' %}">Administration de Django</a></li>{% endif %}
+                  <li class="nav-item"><a class="nav-link active" href="{% url 'authentication:logout' %}">Déconnexion ({{user.username}})</a></li>
+                  <li class="nav-item"><a class="nav-link active" href="{% url 'housebrain:heating_periods' %}">Périodes de chauffage</a></li>
+                  {% if user.is_superuser %}
+                    <li class="nav-item"><a class="nav-link active" href="{% url 'admin:index' %}">Django Admin</a></li>
+                  {% endif %}
                 {% else %}
-                <li class="nav-item"><a class="nav-link active" href="{% url 'authentication:login' %}">Connexion</a></li>
+                  <li class="nav-item"><a class="nav-link active" href="{% url 'authentication:login' %}">Connexion</a></li>
                 {% endif %}
+
               </ul>
               <span class="navbar-text">
                 {{ date_time }}

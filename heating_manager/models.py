@@ -14,6 +14,9 @@ from housebrain_config.settings.messages import (
 from rooms.models import Room
 
 class HeatingPeriodManager(models.Manager):
+    def room_heating_periods(self,room):
+        return HeatingPeriod.objects.filter(associated_room = room)
+
     def current_heating_period_setpoint_temperature(self,room):
         temperature = 0
         current_heating_period = self.current_heating_period(room)

@@ -26,3 +26,4 @@ application = get_wsgi_application()
 """ Stop all heaters until next manage_heaters """
 from django.core import management
 management.call_command('turn_off_all_heaters')
+management.call_command('delete_periodic_tasks')
