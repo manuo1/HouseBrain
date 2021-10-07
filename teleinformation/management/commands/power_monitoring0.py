@@ -32,8 +32,7 @@ class Command(BaseCommand):
         self.monitoring = {
             "IINST": ERROR_IINST,
             "ISOUSC": ERROR_ISOUSC,
-            "is_malfunctioning": True,
-            "ISOUC_is_exceeded": True
+            "is_malfunctioning": True
         }
 
         if settings.UNPLUGGED_MODE:
@@ -81,8 +80,12 @@ class Command(BaseCommand):
         # update power monitoring
         teleinfo_manager.update_power_monitoring(self.monitoring)
         # save new entry if remaining power is critical
-        if self.monitoring["ISOUC_is_exceeded"]:
+        if self.remaining_power_is_critical():
+            teleinfo_manager.save_a_new_power_monitoring(self.monitoring)
             heater_manager.turn_off_all_heaters()
+
+    def remaining_power_is_critical(self):
+        return self.monitoring["IINST"] >= self.monitoring["ISOUSC"]
 
     def build_monitoring_data(self):
         monitoring = self.monitoring
@@ -92,9 +95,6 @@ class Command(BaseCommand):
             monitoring["is_malfunctioning"] = False
         except (TypeError, ValueError):
             pass
-        monitoring["ISOUC_is_exceeded"] = (
-            monitoring["IINST"] >= monitoring["ISOUSC"]
-        )
         return monitoring
 
 

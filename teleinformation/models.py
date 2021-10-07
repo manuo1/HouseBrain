@@ -23,7 +23,11 @@ class TeleinfoManager(models.Manager):
         last = self.last_power_monitoring()
         new = PowerMonitoring(id=last.id, **new)
         new.save()
+        """
         if new.is_malfunctioning != last.is_malfunctioning:
+            self.save_a_new_power_monitoring(new)
+        """
+        if new.ISOUC_is_exceeded != last.ISOUC_is_exceeded:
             self.save_a_new_power_monitoring(new)
 
     def save_a_new_power_monitoring(self, new_monitoring):
@@ -48,22 +52,23 @@ class TeleinfoManager(models.Manager):
 class PowerMonitoring(models.Model):
 
     date_time = models.DateTimeField(auto_now=True)
-    # Intensité instantanée : IINST
-    # | ( 3 car. unité = ampères)
     IINST = models.SmallIntegerField(default=ERROR_IINST)
     ISOUSC = models.SmallIntegerField(default=ERROR_IINST)
     is_malfunctioning = models.BooleanField(default=False)
+    ISOUC_is_exceeded = models.BooleanField(default=False)
 
     def __str__(self):
-        if self.is_malfunctioning == False:
-            state = "OK"
-        else:
+        state = intensity = "OK"
+
+        if self.is_malfunctioning
             state = "! PB !"
+        if self.ISOUC_is_exceeded:
+            intensity = "! PB !"
+
         ret = (
             f'{self.date_time:%d/%m/%Y %H:%M:%S}'
             f' - {self.IINST}/{self.ISOUSC} A'
-            f' - {state}'
-
+            f' - Teleinfo = {state} - Intensity = {intensity}
         )
         return ret
 
