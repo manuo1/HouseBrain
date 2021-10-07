@@ -27,7 +27,7 @@ class TeleinfoManager(models.Manager):
         if new.is_malfunctioning != last.is_malfunctioning:
             self.save_a_new_power_monitoring(new)
         """
-        if monitoring.ISOUC_is_exceeded != monitoring.ISOUC_is_exceeded:
+        if monitoring.ISOUC_is_exceeded != last.ISOUC_is_exceeded:
             self.save_a_new_power_monitoring(new)
 
     def save_a_new_power_monitoring(self, new_monitoring):
