@@ -26,7 +26,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """main controler."""
-        time_start_power
+        start_prog_time = time.time()
         # get dictionary of all the fields in TeleinformationHistory model
         self.teleinfo = self.get_TeleinformationHistory_model_fields()
         self.monitoring = {"IINST": ERROR_IINST, "ISOUSC": ERROR_ISOUSC}
@@ -80,7 +80,8 @@ class Command(BaseCommand):
         if self.remaining_power_is_critical():
             teleinfo_manager.save_critical_remaining_power(self.monitoring)
             heater_manager.turn_off_all_heaters()
-            management.call_command('manage_heaters')
+            #management.call_command('manage_heaters')
+        self.stdout.write(f'execution power monitoring = {{time.time() - start_prog_time}}')
 
     def it_s_time_to_save_teleinfo_history(self):
         return self.teleinfo["date_time"].minute % TELEINFO_HISTORY_DELTA == 0
