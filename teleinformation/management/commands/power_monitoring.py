@@ -44,7 +44,6 @@ class Command(BaseCommand):
             if serial_port.readline():
                 # as long as the teleinfo has not completed a complete loop
                 while not teleinfo_is_complete:
-                    line = ""
                     # break while if timout
                     if self.timeout(timeout_start):
                         break
@@ -52,8 +51,7 @@ class Command(BaseCommand):
                             'timeout while reading the teleinfo\n'
                             'impossible to obtain a complete loop'
                         )
-                    line = str(serial_port.readline())
-                    data = self.get_data_in_line(line)
+                    data = self.get_data_in_line(serial_port.readline())
                     # if the key corresponds to the one read first, the
                     # | teleinfo has made a complete loop
                     if not data["key"] == first_key_in_teleinfo:
@@ -126,6 +124,7 @@ class Command(BaseCommand):
     def get_data_in_line(self, line):
         # check if a teleinfo key is present in the line
         data = {"key" : "", "value" : "", "read_checksum" : ""}
+        line = str(line)
         for key in self.teleinfo.keys():
             if key in line:
                 data["key"] = key
