@@ -184,5 +184,4 @@ class Command(BaseCommand):
         except serial.SerialException as e:
             self.stdout.write(f'"could not open serial port {port}\n-->{e}')
 
-
         return serial_port
