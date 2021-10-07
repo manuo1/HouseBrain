@@ -16,16 +16,17 @@ class TeleinfoManager(models.Manager):
                 id=new_teleinfo_history.id, **teleinfo)
             new_teleinfo_history.save()
 
-    def clear_all_teleinformation_history(self):
+    def delete_all_teleinformation_history(self):
         TeleinformationHistory.objects.all().delete()
 
-    def update_power_monitoring(self, new_monitoring):
-        last_monitoring = self.last_power_monitoring()
-        new_monitoring = PowerMonitoring(
-            id=last_monitoring.id, **new_monitoring)
-        new_monitoring.save()
+    def update_power_monitoring(self, new):
+        last = self.last_power_monitoring()
+        new = PowerMonitoring(id=last.id, **new)
+        new.save()
+        if new.is_malfunctioning != last.is_malfunctioning:
+            self.save_a_new_power_monitoring(new)
 
-    def save_critical_remaining_power(self, new_monitoring):
+    def save_a_new_power_monitoring(self, new_monitoring):
         new_monitoring = PowerMonitoring(**new_monitoring)
         new_monitoring.save()
 
@@ -54,7 +55,17 @@ class PowerMonitoring(models.Model):
     is_malfunctioning = models.BooleanField(default=False)
 
     def __str__(self):
-        return f'{self.date_time:%d/%m/%Y %H:%M} | {self.IINST}/{self.ISOUSC} A'
+        if self.is_malfunctioning == True:
+            state = "OK"
+        else:
+            state = "! PB !"
+        ret = (
+            f'{self.date_time:%d/%m/%Y %H:%M:%S}'
+            f' - {self.IINST}/{self.ISOUSC} A'
+            f' - {state}'
+
+        )
+        return ret
 
 
 class TeleinformationHistory(models.Model):

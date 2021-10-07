@@ -81,7 +81,7 @@ class Command(BaseCommand):
         teleinfo_manager.update_power_monitoring(self.monitoring)
         # save new entry if remaining power is critical
         if self.remaining_power_is_critical():
-            teleinfo_manager.save_critical_remaining_power(self.monitoring)
+            teleinfo_manager.save_a_new_power_monitoring(self.monitoring)
             heater_manager.turn_off_all_heaters()
 
     def remaining_power_is_critical(self):

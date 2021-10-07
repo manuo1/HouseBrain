@@ -12,4 +12,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """main controler."""
-        teleinfo_manager.clear_all_teleinformation_history()
+        teleinfo_manager.delete_all_teleinformation_history()
