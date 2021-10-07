@@ -17,10 +17,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """main controler."""
-        self.stdout.write(f'PeriodicTask : {PeriodicTask.objects.all()}')
-        self.stdout.write(f'IntervalSchedule : {IntervalSchedule.objects.all()}')
-        self.stdout.write(f'CrontabSchedule : {CrontabSchedule.objects.all()}')
-        self.stdout.write('deletion')
         PeriodicTask.objects.all().delete()
         IntervalSchedule.objects.all().delete()
         CrontabSchedule.objects.all().delete()

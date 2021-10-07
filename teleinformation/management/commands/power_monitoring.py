@@ -1,4 +1,5 @@
 import time
+import serial
 from django.conf import settings
 from django.utils import timezone
 from django.core import management
@@ -35,33 +36,34 @@ class Command(BaseCommand):
             self.stdout.write("reading teleinfo in ---- UNPLUGGED_MODE ----")
         else :
             timeout_start = time.time()
-            first_key_that_was_read  = ""
+            first_key_in_teleinfo  = ""
             teleinfo_is_complete = False
-            serial_port = self.get_serial_port()
+            serial_port = self.serial_port()
             # if there is data in serial port
             if serial_port.readline():
                 # as long as the teleinfo has not completed a complete loop
                 while not teleinfo_is_complete:
-                    # break if timout
-                    if time.time() > (timeout_start + TELEINFO_TIMEOUT):
+                    # break while if timout
+                    if self.timeout(timeout_start):
                         break
                     # for each line of the teleinfo frame
                     line = str(serial_port.readline())
                     data = self.get_data_in_line(line)
                     # if the key corresponds to the one read first, the
                     # | teleinfo has made a complete loop
-                    if data["key"] == first_key_that_was_read:
+                    if data["key"] == first_key_in_teleinfo:
                         teleinfo_is_complete = True
                     # checks if the data is valid with the checksum
                     if self.data_is_valid(data) and not teleinfo_is_complete:
                         # store the first key read in frame
-                        if all(value == "" for value in self.teleinfo.values()):
-                            first_key_that_was_read  = data["key"]
+                        if self.teleinfo_is_empty():
+                            first_key_in_teleinfo  = data["key"]
                         # and finaly store data in teleinfo dict
                         self.teleinfo[data["key"]] = data["value"]
+
         self.teleinfo["date_time"] = timezone.now()
         # save teleinfo every *TELEINFO_HISTORY_DELTA* minutes
-        if self.teleinfo["date_time"].minute % TELEINFO_HISTORY_DELTA == 0:
+        if self.it_s_time_to_save_teleinfo_history():
             teleinfo_manager.save_teleinfo(self.teleinfo)
         self.monitoring = self.build_monitoring_data()
         # update power monitoring
@@ -72,13 +74,25 @@ class Command(BaseCommand):
             heater_manager.turn_off_all_heaters()
             management.call_command('manage_heaters')
 
+    def it_s_time_to_save_teleinfo_history(self):
+        return self.teleinfo["date_time"].minute % TELEINFO_HISTORY_DELTA == 0
+
+    def timeout(self,timeout_start):
+        return time.time() > (timeout_start + TELEINFO_TIMEOUT)
+
+    def teleinfo_is_empty(self):
+        return all(value == "" for value in self.teleinfo.values())
+
     def remaining_power_is_critical(self):
         return self.monitoring["IINST"] >= self.monitoring["ISOUSC"]
 
     def build_monitoring_data(self):
-        monitoring = {}
-        monitoring["IINST"] = int(self.teleinfo["IINST"])
-        monitoring["ISOUSC"] = int(self.teleinfo["ISOUSC"])
+        monitoring = self.monitoring
+        try:
+            monitoring["IINST"] = int(self.teleinfo["IINST"])
+            monitoring["ISOUSC"] = int(self.teleinfo["ISOUSC"])
+        except (TypeError, ValueError):
+            pass
         return monitoring
 
 
@@ -119,6 +133,8 @@ class Command(BaseCommand):
                 #and if the line is the last of the frame another way...
                 if key == "MOTDETAT":
                     data["read_checksum"] = line[-14:][0]
+                #break the loop if the key was found
+                break
         return data
 
 
@@ -152,9 +168,8 @@ class Command(BaseCommand):
 
 
 
-    def get_serial_port(self):
+    def serial_port(self):
         """ Raspberry serial port config """
-        import serial
         serial_port = serial.Serial(
             port=SERIAL_PORT,
             baudrate = SERIAL_BAUDRATE,
