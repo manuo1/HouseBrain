@@ -67,7 +67,7 @@ class PowerMonitoring(models.Model):
         ret = (
             f'{self.date_time:%d/%m/%Y %H:%M:%S}'
             f' - {self.IINST}/{self.ISOUSC} A'
-            f' - Teleinfo = {state} - Intensity = {intensity}
+            f' - Teleinfo = {state} - Intensity = {intensity}'
         )
         return ret
 
