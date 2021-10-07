@@ -41,26 +41,30 @@ class Command(BaseCommand):
             teleinfo_is_complete = False
             serial_port = self.serial_port()
             # if there is data in serial port
-            if serial_port.readline():
+            if serial_port:
                 # as long as the teleinfo has not completed a complete loop
                 while not teleinfo_is_complete:
                     # break while if timout
                     if self.timeout(timeout_start):
                         break
-                    # for each line of the teleinfo frame
-                    line = str(serial_port.readline())
+                    try:
+                        line = str(serial_port.readline())
+                    except Exception as e:
+                        self.stdout.write(
+                            f'could not found data in line\n-->{e}'
+                        )
+                        break
                     data = self.get_data_in_line(line)
                     # if the key corresponds to the one read first, the
                     # | teleinfo has made a complete loop
-                    if data["key"] == first_key_in_teleinfo:
-                        teleinfo_is_complete = True
-                    # checks if the data is valid with the checksum
-                    if self.data_is_valid(data) and not teleinfo_is_complete:
-                        # store the first key read in frame
-                        if self.teleinfo_is_empty():
-                            first_key_in_teleinfo  = data["key"]
-                        # and finaly store data in teleinfo dict
-                        self.teleinfo[data["key"]] = data["value"]
+                    if not data["key"] == first_key_in_teleinfo:
+                        # checks if the data is valid with the checksum
+                        if self.data_is_valid(data):
+                            # store the first key read in frame
+                            if self.teleinfo_is_empty():
+                                first_key_in_teleinfo  = data["key"]
+                            # and finaly store data in teleinfo dict
+                            self.teleinfo[data["key"]] = data["value"]
 
         self.teleinfo["date_time"] = timezone.now()
         # save teleinfo every *TELEINFO_HISTORY_DELTA* minutes
@@ -182,6 +186,6 @@ class Command(BaseCommand):
                 timeout=SERIAL_TIMEOUT
             )
         except serial.SerialException as e:
-            self.stdout.write(f'"could not open serial port {port}\n-->{e}')
+            self.stdout.write(f'could not open serial port {port}\n-->{e}')
 
         return serial_port
