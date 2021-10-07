@@ -1,12 +1,9 @@
-from sensors.models import TemperatureSensorManager
 from django.core.management.base import BaseCommand
 from django_celery_beat.models import (
     PeriodicTask,
     IntervalSchedule,
     CrontabSchedule
 )
-
-temperature_sensor_manager = TemperatureSensorManager()
 
 class Command(BaseCommand):
     help = """

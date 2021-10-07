@@ -77,10 +77,17 @@ class HeatingPeriod(models.Model):
         null=True,
     )
     def __str__(self):
+        associated_heating_mode_name = "None"
+        if self.associated_heating_mode:
+            associated_heating_mode_name = self.associated_heating_mode.name
+        associated_room_name = "None"
+        if self.associated_room:
+            associated_room_name = self.associated_room.name
+
         ret = "{} | {} - {} ( {} -> {} ) {}°C".format(
-            self.associated_heating_mode.name,
+            associated_heating_mode_name,
             self.DayOfTheWeekChoices.choices[self.week_day][1] ,
-            self.associated_room.name,
+            associated_room_name,
             self.start_time,
             self.end_time,
             self.setpoint_temperature,
@@ -95,4 +102,7 @@ class CurrentHeatingMode(models.Model):
         null=True,
     )
     def __str__(self):
-        return f'Current : {self.heating_mode.name}'
+        name = "None"
+        if self.heating_mode:
+            name = self.heating_mode.name
+        return f'Current : {name}'
