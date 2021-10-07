@@ -44,9 +44,15 @@ class Command(BaseCommand):
             if serial_port:
                 # as long as the teleinfo has not completed a complete loop
                 while not teleinfo_is_complete:
+                    line = ""
                     # break while if timout
                     if self.timeout(timeout_start):
                         break
+                        self.stdout.write(
+                            'timeout while reading the teleinfo\n
+                            impossible to obtain a complete loop'
+                        )
+
                     try:
                         line = str(serial_port.readline())
                     except serial.serialutil.SerialException as e:
