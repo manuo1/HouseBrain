@@ -55,7 +55,7 @@ class PowerMonitoring(models.Model):
     is_malfunctioning = models.BooleanField(default=False)
 
     def __str__(self):
-        if self.is_malfunctioning == True:
+        if self.is_malfunctioning == False:
             state = "OK"
         else:
             state = "! PB !"
