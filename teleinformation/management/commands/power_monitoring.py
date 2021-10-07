@@ -1,3 +1,4 @@
+import serial
 import time
 from django.conf import settings
 from django.utils import timezone
@@ -158,7 +159,6 @@ class Command(BaseCommand):
 
     def get_serial_port(self):
         """ Raspberry serial port config """
-        import serial
         serial_port = serial.Serial(
             port=SERIAL_PORT,
             baudrate = SERIAL_BAUDRATE,
