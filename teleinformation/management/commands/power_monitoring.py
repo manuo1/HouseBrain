@@ -75,15 +75,17 @@ class Command(BaseCommand):
         if self.remaining_power_is_critical():
             teleinfo_manager.save_critical_remaining_power(self.monitoring)
             heater_manager.turn_off_all_heaters()
-            management.call_command('manage_heaters')
 
     def remaining_power_is_critical(self):
         return self.monitoring["IINST"] >= self.monitoring["ISOUSC"]
 
     def build_monitoring_data(self):
-        monitoring = {}
-        monitoring["IINST"] = int(self.teleinfo["IINST"])
-        monitoring["ISOUSC"] = int(self.teleinfo["ISOUSC"])
+        monitoring = self.monitoring
+        try:
+            monitoring["IINST"] = int(self.teleinfo["IINST"])
+            monitoring["ISOUSC"] = int(self.teleinfo["ISOUSC"])
+        except (TypeError, ValueError):
+            pass
         return monitoring
 
 
