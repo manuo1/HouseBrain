@@ -49,8 +49,8 @@ class Command(BaseCommand):
                     if self.timeout(timeout_start):
                         break
                         self.stdout.write(
-                            'timeout while reading the teleinfo\n
-                            impossible to obtain a complete loop'
+                            'timeout while reading the teleinfo\n'
+                            'impossible to obtain a complete loop'
                         )
 
                     try:
