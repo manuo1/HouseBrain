@@ -53,12 +53,7 @@ class Command(BaseCommand):
                             'impossible to obtain a complete loop'
                         )
 
-                    try:
-                        line = str(serial_port.readline())
-                    except serial.serialutil.SerialException as e:
-                        self.stdout.write(
-                            f'device returned no data\n-->{e}'
-                        )
+                    line = str(serial_port.readline())
                     data = self.get_data_in_line(line)
                     # if the key corresponds to the one read first, the
                     # | teleinfo has made a complete loop
