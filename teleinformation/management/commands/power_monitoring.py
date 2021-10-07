@@ -29,11 +29,15 @@ class Command(BaseCommand):
 
         # get dictionary of all the fields in TeleinformationHistory model
         self.teleinfo = self.get_TeleinformationHistory_model_fields()
-        self.monitoring = {"IINST": ERROR_IINST, "ISOUSC": ERROR_ISOUSC}
+        self.monitoring = {
+            "IINST": ERROR_IINST,
+            "ISOUSC": ERROR_ISOUSC,
+            "is_malfunctioning": True
+        }
 
         if settings.UNPLUGGED_MODE:
             self.teleinfo = self.get_false_data_for_unplugged_mode()
-            self.stdout.write("reading teleinfo in ---- UNPLUGGED_MODE ----")
+            self.stdout.write("---- UNPLUGGED_MODE ----")
         else :
             timeout_start = time.time()
             first_key_that_was_read  = ""
@@ -46,12 +50,15 @@ class Command(BaseCommand):
                     line = ""
                     # break if timout
                     if time.time() > (timeout_start + TELEINFO_TIMEOUT):
+                        #reset teleinfo data
+                        self.teleinfo = {key: "" for key in self.teleinfo}
                         break
+
                     # for each line of the teleinfo frame
                     try:
                         line = str(serial_port.readline())
                     except serial.serialutil.SerialException as e:
-                        self.stdout.write(f'# device returned no data\n-->{e}')
+                        #reset teleinfo data
                         self.teleinfo = {key: "" for key in self.teleinfo}
                     data = self.get_data_in_line(line)
                     # if the key corresponds to the one read first, the
@@ -85,6 +92,7 @@ class Command(BaseCommand):
         try:
             monitoring["IINST"] = int(self.teleinfo["IINST"])
             monitoring["ISOUSC"] = int(self.teleinfo["ISOUSC"])
+            monitoring["is_malfunctioning"] = False
         except (TypeError, ValueError):
             pass
         return monitoring

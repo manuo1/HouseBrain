@@ -51,6 +51,7 @@ class PowerMonitoring(models.Model):
     # | ( 3 car. unité = ampères)
     IINST = models.SmallIntegerField(default=ERROR_IINST)
     ISOUSC = models.SmallIntegerField(default=ERROR_IINST)
+    is_malfunctioning = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.date_time:%d/%m/%Y %H:%M} | {self.IINST}/{self.ISOUSC} A'
