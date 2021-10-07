@@ -47,7 +47,12 @@ class Command(BaseCommand):
                     # break while if timout
                     if self.timeout(timeout_start):
                         break
-                    line = str(serial_port.readline())
+                    try:
+                        line = str(serial_port.readline())
+                    except serial.serialutil.SerialException as e:
+                        self.stdout.write(
+                            f'device returned no data\n-->{e}'
+                        )
                     data = self.get_data_in_line(line)
                     # if the key corresponds to the one read first, the
                     # | teleinfo has made a complete loop
