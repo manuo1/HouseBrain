@@ -26,7 +26,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """main controler."""
-
+        time_start_power
         # get dictionary of all the fields in TeleinformationHistory model
         self.teleinfo = self.get_TeleinformationHistory_model_fields()
         self.monitoring = {"IINST": ERROR_IINST, "ISOUSC": ERROR_ISOUSC}
