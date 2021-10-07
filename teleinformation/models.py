@@ -59,8 +59,7 @@ class PowerMonitoring(models.Model):
 
     def __str__(self):
         state = intensity = "OK"
-
-        if self.is_malfunctioning
+        if self.is_malfunctioning:
             state = "! PB !"
         if self.ISOUC_is_exceeded:
             intensity = "! PB !"
