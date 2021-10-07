@@ -21,18 +21,18 @@ class TeleinfoManager(models.Manager):
 
     def update_power_monitoring(self, new):
         last = self.last_power_monitoring()
-        new = PowerMonitoring(id=last.id, **new)
-        new.save()
+        monitoring = PowerMonitoring(id=last.id, **new)
+        monitoring.save()
         """
         if new.is_malfunctioning != last.is_malfunctioning:
             self.save_a_new_power_monitoring(new)
         """
-        if new.ISOUC_is_exceeded != last.ISOUC_is_exceeded:
+        if monitoring.ISOUC_is_exceeded != monitoring.ISOUC_is_exceeded:
             self.save_a_new_power_monitoring(new)
 
     def save_a_new_power_monitoring(self, new_monitoring):
-        new_monitoring = PowerMonitoring(**new_monitoring)
-        new_monitoring.save()
+        monitoring = PowerMonitoring(**new_monitoring)
+        monitoring.save()
 
     def last_teleinfo_minute(self):
         last_minute_saved = 5
