@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load mathfilters %}
 {% block title %}House Brain{% endblock %}
 {% block main %}
 
@@ -8,19 +9,19 @@
 
       <!-- all rooms with temperature sensor only -->
 
-      {% for room in rooms_with_temperature_sensor_only %}
+      {% for room in rooms_without_heating %}
       <div class="accordion-item">
         <!-- visible part  -->
-        <h2 class="accordion-header" id="heading{{room.id}}">
-          <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{room.id}}" aria-expanded="false" aria-controls="collapse{{room.id}}">
+        <h2 class="accordion-header" id="heading{{room.room.id}}">
+          <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{room.room.id}}" aria-expanded="false" aria-controls="collapse{{room.room.id}}">
             <div class="container px-1">
 
               <div class="row gx-1 px-0">
                 <div class="col-8">
-                  <div class="border rounded-3 bg-light text-truncate py-1 px-1">{{room.name}}</div>
+                  <div class="border rounded-3 bg-light text-truncate py-1 px-1">{{room.room.name}}</div>
                 </div>
                 <div class="col-4">
-                 <div class="border rounded-3 bg-light text-center py-1">{{room.measured_temperature}}</div>
+                 <div class="border rounded-3 bg-light text-center py-1">{{room.sensor.last_measured_temperature|div:1000|floatformat:1}}</div>
                 </div>
               </div>
 
@@ -28,15 +29,15 @@
           </button>
         </h2>
         <!-- collapsible part  -->
-        <div id="collapse{{room.id}}" class="accordion-collapse collapse" aria-labelledby="heading{{room.id}}" data-bs-parent="#accordion">
+        <div id="collapse{{room.room.id}}" class="accordion-collapse collapse" aria-labelledby="heading{{room.room.id}}" data-bs-parent="#accordion">
           <div class="accordion-body">
 
           <table class="table table-sm">
               <thead class="thead-dark">
                 <tr>
                   <th scope="col" class="text-center"><sup>Heure</sup></th>
-                  {% for day, day_data in room.temperature_history.items %}
-                  <th scope="col" class="text-center"><sup>{{day|slice:":3" }} {{day_data.0.date}}</sup></th>
+                  {% for day in room.temperature_history %}
+                  <th scope="col" class="text-center"><sup>{{day.0.date_time|date:'D'}} {{day.0.date_time|date:'d/m'}}</sup></th>
                   {% endfor %}
                 </tr>
               </thead>
@@ -45,11 +46,11 @@
                     {% for hour in hours_list %}
                     <tr>
                       <td class="text-center">{{hour}}H</td>
-                      {% for day, day_data in room.temperature_history.items %}
+                      {% for day in room.temperature_history %}
                       <td class="text-center">
-                        {% for data in day_data %}
-                          {% if data.time == hour %}
-                            {{data.temperature}}
+                        {% for history in day %}
+                          {% if history.date_time.hour == hour %}
+                            {{history.temperature|div:1000|floatformat:1}}
                           {% endif %}
                         {% endfor %}
                       </td>
@@ -69,26 +70,26 @@
 
       {% for room in rooms_with_heating %}
       <div class="accordion-item">
-        <h2 class="accordion-header" id="heading{{room.id}}">
-          <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{room.id}}" aria-expanded="false" aria-controls="collapse{{room.id}}">
+        <h2 class="accordion-header" id="heading{{room.room.id}}">
+          <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{room.room.id}}" aria-expanded="false" aria-controls="collapse{{room.room.id}}">
             <div class="container px-1">
 
               <div class="row gx-1 px-0">
                 <div class="col-2">
-                 <div class="border rounded-3 text-center {{room.color}} py-1">{{room.heater_state}}</div>
+                 <div class="border rounded-3 text-center {{room.color}} py-1">{{room.heater.is_on}}</div>
                 </div>
                 <div class="col-6">
-                  <div class="border rounded-3 bg-light text-truncate py-1 px-1">{{room.name}}</div>
+                  <div class="border rounded-3 bg-light text-truncate py-1 px-1">{{room.room.name}}</div>
                 </div>
                 <div class="col-4">
-                 <div class="border rounded-3 bg-light text-center py-1">{{room.measured_temperature}} ({{room.setpoint_temperature}})</div>
+                 <div class="border rounded-3 bg-light text-center py-1">{{room.sensor.last_measured_temperature|div:1000|floatformat:1}} ({{room.room.setpoint_temperature|div:1000|floatformat:"0"}})</div>
                 </div>
               </div>
 
             </div>
           </button>
         </h2>
-        <div id="collapse{{room.id}}" class="accordion-collapse collapse" aria-labelledby="heading{{room.id}}" data-bs-parent="#accordion">
+        <div id="collapse{{room.room.id}}" class="accordion-collapse collapse" aria-labelledby="heading{{room.room.id}}" data-bs-parent="#accordion">
           <div class="accordion-body">
             next
           </div>

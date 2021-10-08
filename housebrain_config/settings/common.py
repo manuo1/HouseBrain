@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'heaters',
     'teleinformation',
     'heating_manager',
+    'mathfilters',
 ]
 
 MIDDLEWARE = [
