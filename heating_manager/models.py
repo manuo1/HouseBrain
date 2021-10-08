@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
+from housebrain_config.settings.constants import DEFAULT_TEMPERATURE
 from housebrain_config.settings.messages import (
     DAYOFTHEWEEK_MONDAY as monday,
     DAYOFTHEWEEK_TUESDAY as tuesday,
@@ -18,7 +19,7 @@ class HeatingPeriodManager(models.Manager):
         return HeatingPeriod.objects.filter(associated_room = room).order_by('week_day','start_time')
 
     def current_heating_period_setpoint_temperature(self,room):
-        temperature = 0
+        temperature = DEFAULT_TEMPERATURE
         current_heating_period = self.current_heating_period(room)
         if current_heating_period:
             temperature = current_heating_period[0].setpoint_temperature

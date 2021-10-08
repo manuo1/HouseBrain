@@ -3,19 +3,14 @@
 {% load mathfilters %}
 {% block title %}House Brain{% endblock %}
 {% block main %}
-
     <div class="accordion" id="accordion">
-
-
-      <!-- all rooms with temperature sensor only -->
-
+      <!-- all rooms without heating -->
       {% for room in rooms_without_heating %}
       <div class="accordion-item">
         <!-- visible part  -->
         <h2 class="accordion-header" id="heading{{room.room.id}}">
           <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{room.room.id}}" aria-expanded="false" aria-controls="collapse{{room.room.id}}">
             <div class="container px-1">
-
               <div class="row gx-1 px-0">
                 <div class="col-8">
                   <div class="border rounded-3 bg-light text-truncate py-1 px-1">{{room.room.name}}</div>
@@ -24,43 +19,45 @@
                  <div class="border rounded-3 bg-light text-center py-1">{{room.sensor.last_measured_temperature|div:1000|floatformat:1}}</div>
                 </div>
               </div>
-
             </div>
           </button>
         </h2>
         <!-- collapsible part  -->
         <div id="collapse{{room.room.id}}" class="accordion-collapse collapse" aria-labelledby="heading{{room.room.id}}" data-bs-parent="#accordion">
           <div class="accordion-body">
-
-          <table class="table table-sm">
-              <thead class="thead-dark">
-                <tr>
-                  <th scope="col" class="text-center"><sup>Heure</sup></th>
-                  {% for day in room.temperature_history %}
-                  <th scope="col" class="text-center"><sup>{{day.0.date_time|date:'D'}} {{day.0.date_time|date:'d/m'}}</sup></th>
-                  {% endfor %}
-                </tr>
-              </thead>
-
-              <tbody>
-                    {% for hour in hours_list %}
+            <!-- Table  -->
+            <table class="table table-sm table-striped">
+              <!-- Table Header  -->
+                <thead>
+                  <tr>
+                    <th scope="col" class="text-center text-white bg-secondary bg-gradient "><sup>Heure</sup></th>
+                    {% for day in room.temperature_history %}
+                    <th scope="col" class="text-center text-white bg-secondary bg-gradient"><sup>{{day.0.date_time|date:'D'}} {{day.0.date_time|date:'d/m'}}</sup></th>
+                    {% endfor %}
+                  </tr>
+                </thead>
+                <!-- Table Body  -->
+                <tbody>
+                  {% for hour in hours_list %}
                     <tr>
                       <td class="text-center">{{hour}}H</td>
                       {% for day in room.temperature_history %}
-                      <td class="text-center">
-                        {% for history in day %}
-                          {% if history.date_time.hour == hour %}
-                            {{history.temperature|div:1000|floatformat:1}}
-                          {% endif %}
-                        {% endfor %}
-                      </td>
+                        <td class="text-center">
+                          {% for history in day %}
+                            {% if history.date_time.hour == hour %}
+                              {% if history.temperature == 85000 %}
+                                 -
+                              {% else %}
+                                 {{history.temperature|div:1000|floatformat:1}}
+                              {% endif %}
+                            {% endif %}
+                          {% endfor %}
+                        </td>
                       {% endfor %}
                     </tr>
-                    {% endfor %}
-              </tbody>
-
-            </table>
-
+                  {% endfor %}
+                </tbody>
+              </table>
           </div>
         </div>
       </div>
@@ -70,25 +67,37 @@
 
       {% for room in rooms_with_heating %}
       <div class="accordion-item">
+        <!-- visible part  -->
         <h2 class="accordion-header" id="heading{{room.room.id}}">
           <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{room.room.id}}" aria-expanded="false" aria-controls="collapse{{room.room.id}}">
             <div class="container px-1">
-
               <div class="row gx-1 px-0">
                 <div class="col-2">
-                 <div class="border rounded-3 text-center {{room.color}} py-1">{{room.heater.is_on}}</div>
+                 <div class="border rounded-3 text-center py-1
+                   {% if room.heater.is_on %}
+                      bg-danger bg-gradient "> ON
+                   {% else %}
+                      bg-light "> OFF
+                   {% endif %}
+                 </div>
                 </div>
                 <div class="col-6">
                   <div class="border rounded-3 bg-light text-truncate py-1 px-1">{{room.room.name}}</div>
                 </div>
                 <div class="col-4">
-                 <div class="border rounded-3 bg-light text-center py-1">{{room.sensor.last_measured_temperature|div:1000|floatformat:1}} ({{room.room.setpoint_temperature|div:1000|floatformat:"0"}})</div>
+                 <div class="border rounded-3 bg-light text-center py-1">
+                   {% if room.sensor.last_measured_temperature == 85000 %}
+                      -
+                   {% else %}
+                      {{room.sensor.last_measured_temperature|div:1000|floatformat:1}}
+                   {% endif %}
+                   ({{room.room.setpoint_temperature|div:1000|floatformat:"0"}})</div>
                 </div>
               </div>
-
             </div>
           </button>
         </h2>
+        <!-- collapsible part  -->
         <div id="collapse{{room.room.id}}" class="accordion-collapse collapse" aria-labelledby="heading{{room.room.id}}" data-bs-parent="#accordion">
           <div class="accordion-body">
             next
@@ -96,9 +105,5 @@
         </div>
       </div>
       {% endfor %}
-
     </div>
-
-
-
 {% endblock %}

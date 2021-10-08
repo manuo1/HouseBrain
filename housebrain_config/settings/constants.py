@@ -17,6 +17,7 @@ DEBUG_TEMPERATURE = 54321
 ##############################################################################
 # Temperature sensors settings :
 ##############################################################################
+DEFAULT_TEMPERATURE = 5000
 ERROR_TEMPERATURE = 85000
 MAX_TEMPERATURE = 60000
 MIN_TEMPERATURE = -50000
