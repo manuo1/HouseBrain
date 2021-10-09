@@ -1,0 +1,29 @@
+{% load mathfilters %}
+<div class="accordion" id="accordion">
+  {% for room in rooms_without_heating %}
+    <div class="accordion-item">
+      <!-- visible part  -->
+      <h2 class="accordion-header" id="heading_{{room.room.id}}">
+        <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{{room.room.id}}" aria-expanded="false" aria-controls="collapse_{{room.room.id}}">
+          <div class="container px-1">
+            <div class="row gx-1 px-0">
+              <div class="col-8">
+                <div class="border rounded-3 bg-light text-truncate py-1 px-1">{{room.room.name}}</div>
+              </div>
+              <div class="col-4">
+               <div class="border rounded-3 bg-light text-center py-1">{{room.sensor.last_measured_temperature|div:1000|floatformat:1}}</div>
+              </div>
+            </div>
+          </div>
+        </button>
+      </h2>
+      <!-- collapsible part  -->
+      <div id="collapse_{{room.room.id}}" class="accordion-collapse collapse" aria-labelledby="heading_{{room.room.id}}" data-bs-parent="#accordion">
+        <div class="accordion-body">
+          <!-- Table  -->
+          {% include "parts/homepage/room_temperature_history_table.html" %}
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>

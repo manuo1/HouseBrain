@@ -1,0 +1,28 @@
+<div class="accordion" id="accordionHeatingModes">
+  {% for heating_mode in heating_modes %}
+    <div class="accordion-item">
+      <!-- visible part  -->
+      <h2 class="accordion-header" id="headingHeatingModeId{{heating_mode.id}}">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseHeatingModeId{{heating_mode.id}}" aria-expanded="false" aria-controls="collapseHeatingModeId{{heating_mode.id}}">
+          {{heating_mode.name}}
+        </button>
+      </h2>
+      <!-- collapsible part  -->
+      <div id="collapseHeatingModeId{{heating_mode.id}}" class="accordion-collapse collapse" aria-labelledby="headingHeatingModeId{{heating_mode.id}}" data-bs-parent="#accordionHeatingModes">
+        <div class="accordion-body">
+          <div class="container">
+            <div class="row row-cols-1">
+              <div class="col mb-2 inline text-end">
+                  <div class="d-grid gap-2 d-md-block">
+                    {% include "parts/heating_periods/modal/button-copy.html" %}
+                    {% include "parts/heating_periods/modal/button-delete.html" %}
+                  </div>
+              </div>
+              <div class="col">{% include "parts/heating_periods/rooms_accordion.html" %}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>

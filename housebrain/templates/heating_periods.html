@@ -3,34 +3,15 @@
 {% block title %}House Brain{% endblock %}
 {% block main %}
 
-<div class="accordion" id="accordionPanelsStayOpen">
-  <!-- all rooms with heating -->
+<br>
 
-  {% for room in rooms_heating_periods %}
-  <div class="accordion-item">
-    <h2 class="accordion-header" id="heading{{room.room.id}}">
-      <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{room.room.id}}" aria-expanded="false" aria-controls="collapse{{room.room.id}}">
-        <div class="container px-1">
-
-          <div class="row gx-1 px-0">
-            <div class="col-12">
-              <div class="border rounded-3 bg-light text-truncate py-1 px-1">{{room.room.name}}</div>
-            </div>
-          </div>
-
-        </div>
-      </button>
-    </h2>
-    <div id="collapse{{room.room.id}}" class="accordion-collapse collapse" aria-labelledby="heading{{room.room.id}}">
-      <div class="accordion-body">
-        {% for heating_period in room.heating_periods %}
-        {{heating_period}}<br>
-        {% endfor %}
-      </div>
+<div class="container">
+  <div class="row row-cols-1">
+    <div class="col mb-2 inline text-end">
+      {% include "parts/heating_periods/modal/button-add.html" %}
     </div>
+    <div class="col">{% include "parts/heating_periods/heating_mode_accordion.html" %}</div>
   </div>
-  {% endfor %}
-
 </div>
 
 {% endblock %}

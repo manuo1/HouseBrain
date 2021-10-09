@@ -18,6 +18,9 @@ class HeatingPeriodManager(models.Manager):
     def room_heating_periods(self,room):
         return HeatingPeriod.objects.filter(associated_room = room).order_by('week_day','start_time')
 
+    def all_heating_modes(self):
+        return HeatingMode.objects.all()
+
     def current_heating_period_setpoint_temperature(self,room):
         temperature = DEFAULT_TEMPERATURE
         current_heating_period = self.current_heating_period(room)

@@ -1,0 +1,18 @@
+{% load mathfilters %}
+{% for heating_period in room.heating_periods %}
+  <div class="container">
+    <div class="row row-cols-2">
+      <div class="col">
+        {{heating_period}} | {{ heating_period.week_day }} | {{ weekday }}<br>
+
+        {% for day in weekdays %}
+          {{weekdays.forloop.counter0}}
+        {% endfor %}
+      </div>
+      <div class="col mb-2 inline text-end">
+        {% include "parts/heating_periods/modal/button-add.html" %}
+        {% include "parts/heating_periods/modal/button-delete.html" %}
+      </div>
+    </div>
+  </div>
+{% endfor %}

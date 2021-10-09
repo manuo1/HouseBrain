@@ -2,19 +2,17 @@
 {% load static %}
 {% block title %}House Brain{% endblock %}
 {% block main %}
-    <div class="accordion" id="accordion">
-      <!-- Display teleinformation-->
 
+<br>
 
-      <!-- Display all rooms without heating names and current température + a collapsible table with 7 days temperature history-->
-      {% for room in rooms_without_heating %}
-        {% include "parts/rooms_without_heating_accordion-item.html" %}
-      {% endfor %}
+<!-- Display teleinformation-->
 
-      <!-- display all rooms with heating name heater state and couple current température / setpoint temperature -->
+<!-- Display all rooms without heating names and current température + a collapsible table with 7 days temperature history-->
+{% include "parts/homepage/room_without_heating_accordion.html" %}
 
-      {% for room in rooms_with_heating %}
-        {% include "parts/rooms_with_heating_accordion-item.html" %}
-      {% endfor %}
-    </div>
+<br>
+
+<!-- display all rooms with heating name heater state and couple current température / setpoint temperature -->
+{% include "parts/homepage/room_with_heating_accordion.html" %}
+
 {% endblock %}

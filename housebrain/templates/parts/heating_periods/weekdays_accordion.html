@@ -1,0 +1,18 @@
+<div class="accordion" id="accordionHeatingMode{{heating_mode.id}}Room{{room.room.id}}">
+  {% for weekday in weekdays %}
+    <div class="accordion-item">
+      <!-- visible part  -->
+      <h2 class="accordion-header" id="headingHeatingModeId{{heating_mode.id}}Room{{room.room.id}}WeekDay{{weekday}}">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseHeatingModeId{{heating_mode.id}}Room{{room.room.id}}WeekDay{{weekday}}" aria-expanded="false" aria-controls="collapseHeatingModeId{{heating_mode.id}}Room{{room.room.id}}WeekDay{{weekday}}">
+          {{weekday}}
+        </button>
+      </h2>
+      <!-- collapsible part  -->
+      <div id="collapseHeatingModeId{{heating_mode.id}}Room{{room.room.id}}WeekDay{{weekday}}" class="accordion-collapse collapse" aria-labelledby="headingHeatingModeId{{heating_mode.id}}Room{{room.room.id}}WeekDay{{weekday}}" data-bs-parent="#accordionHeatingMode{{heating_mode.id}}Room{{room.room.id}}">
+        <div class="accordion-body">
+          {% include "parts/heating_periods/heating_periods_list.html" %}
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>

@@ -1,7 +1,8 @@
+from datetime import timedelta
 from django.conf import settings
 from django.utils import timezone
 from django.shortcuts import render
-from housebrain_config.settings.constants import (ERROR_TEMPERATURE)
+from housebrain_config.settings.constants import (ERROR_TEMPERATURE, WEEKDAYS)
 from housebrain_config.settings.messages import (
     DAYOFTHEWEEK_LIST as week_day_list
 )
@@ -45,30 +46,35 @@ def homepage(request):
                             "temperature_history" : temperature_history,
                         }
                     )
-                    
+
     context = {
         'date_time': f'{timezone.now():%d/%m/%Y %H:%M}',
         'rooms_with_heating': rooms_with_heating,
         'rooms_without_heating': rooms_without_heating,
-        'hours_list' : list(range(24))
+        'hours_list' : list(range(24)),
+
     }
     return render(request, 'homepage.html', context)
 
 def heating_periods(request):
-    rooms_heating_periods = []
+    rooms_with_heating_periods = []
     for room in room_manager.all_rooms():
-        room_data = {"room":None, "heating_periods" : []}
         if room:
             heaters = heater_manager.room_heaters(room)
             if heaters:
-                room_data["room"] = room
                 heating_periods = heating_period_manager.room_heating_periods(room)
                 if heating_periods:
-                    room_data["heating_periods"] = list(heating_periods)
-                rooms_heating_periods.append(room_data)
+                    rooms_with_heating_periods.append(
+                        {
+                            "room" : room,
+                            "heating_periods" : heating_periods,
+                        }
+                    )
 
     context = {
         'date_time': f'{timezone.now():%d/%m/%Y %H:%M}',
-        'rooms_heating_periods' : rooms_heating_periods
+        'rooms' : rooms_with_heating_periods,
+        'heating_modes' : heating_period_manager.all_heating_modes(),
+        'weekdays' : WEEKDAYS,
     }
     return render(request, 'heating_periods.html', context)

@@ -1,3 +1,13 @@
+from django.conf import settings
+from housebrain_config.settings.messages import (
+    DAYOFTHEWEEK_MONDAY,
+    DAYOFTHEWEEK_TUESDAY,
+    DAYOFTHEWEEK_WEDNESDAY,
+    DAYOFTHEWEEK_THURSDAY,
+    DAYOFTHEWEEK_FRIDAY,
+    DAYOFTHEWEEK_SATURDAY,
+    DAYOFTHEWEEK_SUNDAY,
+)
 
 ##############################################################################
 #false data for the debug mode (no sensor connected):
@@ -71,3 +81,17 @@ HEATER_VOLTAGE = 220
 #| in position "on when off": turns on the heating when the output is deactivated
 
 HEATERS_PILOTING_MODE = "on when off"
+
+##############################################################################
+# LANGUAGE
+##############################################################################
+
+WEEKDAYS = [
+    DAYOFTHEWEEK_MONDAY[settings.LANGUAGE_CODE],
+    DAYOFTHEWEEK_TUESDAY[settings.LANGUAGE_CODE],
+    DAYOFTHEWEEK_WEDNESDAY[settings.LANGUAGE_CODE],
+    DAYOFTHEWEEK_THURSDAY[settings.LANGUAGE_CODE],
+    DAYOFTHEWEEK_FRIDAY[settings.LANGUAGE_CODE],
+    DAYOFTHEWEEK_SATURDAY[settings.LANGUAGE_CODE],
+    DAYOFTHEWEEK_SUNDAY[settings.LANGUAGE_CODE],
+]
