@@ -88,10 +88,10 @@ class HeatingPeriod(models.Model):
         if self.associated_room:
             associated_room_name = self.associated_room.name
 
-        ret = "{} | {} - {} ( {} -> {} ) {}°C".format(
+        ret = "{} | {} | {} ( {} -> {} ) {}°C".format(
             associated_heating_mode_name,
-            self.DayOfTheWeekChoices.choices[self.week_day][1] ,
             associated_room_name,
+            self.DayOfTheWeekChoices.choices[self.week_day][1],
             self.start_time,
             self.end_time,
             self.setpoint_temperature,

@@ -1,18 +1,32 @@
 {% load mathfilters %}
 {% for heating_period in room.heating_periods %}
-  <div class="container">
-    <div class="row row-cols-2">
-      <div class="col">
-        {{heating_period}} | {{ heating_period.week_day }} | {{ weekday }}<br>
+  {% for day in weekdays %}
+    {% if weekday == day %}
+      {% if forloop.counter0 == heating_period.week_day %}
+        <div class="container">
+          <div class="row row-cols-2">
+            <div class="col">
+              {{ heating_period }}
+            </div>
+            <div class="col mb-2 inline text-end">
+              {% include "parts/heating_periods/modal/button-add.html" %}
+              {% include "parts/heating_periods/modal/button-copy.html" %}
+              {% include "parts/heating_periods/modal/button-delete.html" %}
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <div class="container">
+          <div class="row row-cols-2">
+            <div class="col">
 
-        {% for day in weekdays %}
-          {{weekdays.forloop.counter0}}
-        {% endfor %}
-      </div>
-      <div class="col mb-2 inline text-end">
-        {% include "parts/heating_periods/modal/button-add.html" %}
-        {% include "parts/heating_periods/modal/button-delete.html" %}
-      </div>
-    </div>
-  </div>
+            </div>
+            <div class="col mb-2 inline text-end">
+              {% include "parts/heating_periods/modal/button-add.html" %}
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% endif %}
+  {% endfor %}
 {% endfor %}

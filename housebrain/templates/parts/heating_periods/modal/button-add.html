@@ -1,18 +1,28 @@
 <!-- Button trigger modal -->
-<button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addModal" title="Add New Heating Mode">
+<button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#add_{{heating_mode.id}}_{{room.room.id}}_{{weekday}}_{{heating_period.id}}_Modal" title="Add New">
   <i class="bi bi-plus-square"></i>
 </button>
 
 <!-- Modal -->
-<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+<div class="modal fade" id="add_{{heating_mode.id}}_{{room.room.id}}_{{weekday}}_{{heating_period.id}}_Modal" tabindex="-1" aria-labelledby="add_{{heating_mode.id}}_{{room.room.id}}_{{weekday}}_{{heating_period.id}}_ModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="addModalLabel">Créer un mode de chauffage</h5>
+        <h5 class="modal-title" id="add_{{heating_mode.id}}_{{room.room.id}}_{{weekday}}_{{heating_period.id}}_ModalLabel">Nouveau {{heating_mode.name}} {{room.room.name}} {{weekday}} {{heating_period}}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        ...
+        heating_mode<br>
+        {{heating_mode.name}} | ({{heating_mode.id}}) <br>
+        <hr>
+        room.room.name<br>
+        {{room.room.name}} | ({{room.room.id}}) <br>
+        <hr>
+        weekday<br>
+        {{weekday}} <br>
+        <hr>
+        heating_period<br>
+        {{heating_period}} | ({{heating_period.id}})
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

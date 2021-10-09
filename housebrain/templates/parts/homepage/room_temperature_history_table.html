@@ -4,8 +4,8 @@
     <thead>
       <tr>
         <th scope="col" class="text-center text-white bg-secondary bg-gradient "></th>
-        {% for day in room.temperature_history %}
-        <th scope="col" class="text-center text-white bg-secondary bg-gradient"><sup>{{day.0.date_time|date:'D'}} {{day.0.date_time|date:'d/m'}}</sup></th>
+        {% for weekday, historys in room.temperature_history.items %}
+        <th scope="col" class="text-center text-white bg-secondary bg-gradient"><sup>{{weekday|date:'D'}} {{weekday|date:'d/m'}}</sup></th>
         {% endfor %}
       </tr>
     </thead>
@@ -14,9 +14,9 @@
       {% for hour in hours_list %}
         <tr>
           <td class="text-center">{{hour}}H</td>
-          {% for day in room.temperature_history %}
+          {% for weekday, historys in room.temperature_history.items %}
             <td class="text-center">
-              {% for history in day %}
+              {% for history in historys %}
                 {% if history.date_time.hour == hour %}
                   {% if history.temperature == 85000 %}
                      -
