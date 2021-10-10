@@ -16,9 +16,7 @@ from rooms.models import Room
 class TemperatureSensorManager(models.Manager):
 
     def seven_days_sensor_temperature_history(self,sensor):
-        data = [[],[],[],[],[],[],[]] # 7 day of the week
         now = timezone.now()
-        seven_days_before = now.date() - timedelta(days=6)
         weekdays = {
             (now.date() - timedelta(days=6)) : [],
             (now.date() - timedelta(days=5)) : [],
@@ -28,6 +26,7 @@ class TemperatureSensorManager(models.Manager):
             (now.date() - timedelta(days=1)) : [],
             now.date() : [],
         }
+        seven_days_before = list(weekdays.keys())[0]
         temperature_history = TemperatureHistory.objects.filter(
                 associated_sensor = sensor,
                 date_time__range=(seven_days_before,now),
@@ -35,7 +34,6 @@ class TemperatureSensorManager(models.Manager):
             ).order_by('date_time')
         for history in temperature_history:
             weekdays[history.date_time.date()].append(history)
-            data[history.date_time.weekday()].append(history)
         return weekdays
 
     def room_sensor(self, room):
