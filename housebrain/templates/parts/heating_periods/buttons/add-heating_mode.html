@@ -1,0 +1,33 @@
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addHeatingRoom_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_Modal" title = "Ajouter un mode de Chauffage">
+  <i class="bi bi-plus-square"></i>
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="addHeatingRoom_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_Modal" tabindex="-1" aria-labelledby="addHeatingRoom_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addHeatingRoom_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalLabel">Ajouter un mode de Chauffage</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        heating_mode<br>
+        {{heating_mode.name}} | ({{heating_mode.id}}) <br>
+        <hr>
+        weekday<br>
+        {{weekday}} <br>
+        <hr>
+        room.name<br>
+        {{room.name}} | ({{room.id}}) <br>
+        <hr>
+        heating_period<br>
+        {{heating_period}} | ({{heating_period.id}})
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-primary">Copier</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,13 @@
+{% load mathfilters %}
+
+<div class="container">
+  <div class="row">
+    {% for heating_period in heating_periods%}
+    <div class="col bg-danger text-center rounded-3" id="HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}" title="{{heating_period.start_time}} - {{heating_period.end_time}}">
+      <sup>{{heating_period.start_time}}</sup>
+      {{heating_period.setpoint_temperature|div:1000|floatformat:0}}°
+      <sup>{{heating_period.end_time}}</sup>
+    </div>
+    {% endfor %}
+  </div>
+</div>

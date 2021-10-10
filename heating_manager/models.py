@@ -15,8 +15,14 @@ from housebrain_config.settings.messages import (
 from rooms.models import Room
 
 class HeatingPeriodManager(models.Manager):
-    def room_heating_periods(self,room):
-        return HeatingPeriod.objects.filter(associated_room = room).order_by('week_day','start_time')
+
+    def room_weekday_heating_periods(self,heating_mode , weekday, room):
+        room_weekday_heating_periods = HeatingPeriod.objects.filter(
+                associated_room = room,
+                week_day = weekday,
+                associated_heating_mode = heating_mode,
+                ).order_by('week_day','start_time')
+        return list(room_weekday_heating_periods)
 
     def all_heating_modes(self):
         return HeatingMode.objects.all()
@@ -67,7 +73,7 @@ class HeatingPeriod(models.Model):
         )
     start_time = models.TimeField()
     end_time = models.TimeField()
-    setpoint_temperature = models.IntegerField(default=5)
+    setpoint_temperature = models.IntegerField(default=5000)
     associated_room = models.ForeignKey(
         Room,
         on_delete=models.SET_NULL,
