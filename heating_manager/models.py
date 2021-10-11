@@ -1,20 +1,84 @@
+from datetime import datetime
 from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
-from housebrain_config.settings.constants import DEFAULT_TEMPERATURE
-from housebrain_config.settings.messages import (
-    DAYOFTHEWEEK_MONDAY as monday,
-    DAYOFTHEWEEK_TUESDAY as tuesday,
-    DAYOFTHEWEEK_WEDNESDAY as wednesday,
-    DAYOFTHEWEEK_THURSDAY as thursday,
-    DAYOFTHEWEEK_FRIDAY as friday,
-    DAYOFTHEWEEK_SATURDAY as saturday,
-    DAYOFTHEWEEK_SUNDAY as sunday,
+from housebrain_config.settings.constants import (
+    DEFAULT_TEMPERATURE, WEEKDAYS
 )
 from rooms.models import Room
 
 class HeatingPeriodManager(models.Manager):
+
+    def add_heating_period(self, new_heating_period):
+        n_week_day = self.int_weekday(new_heating_period['str_weekday'])
+        n_start_time = new_heating_period['start_time']
+        n_end_time = new_heating_period['end_time']
+        n_setpoint_temperature = new_heating_period['setpoint_temperature']
+        n_associated_room = self.room(new_heating_period['room_id'])
+        n_associated_heating_mode = self.heating_mode(new_heating_period['heating_mode_id'])
+
+        new_heating_period = HeatingPeriod(
+                week_day = n_week_day,
+                start_time = n_start_time,
+                end_time = n_end_time,
+                setpoint_temperature = n_setpoint_temperature,
+                associated_room = n_associated_room,
+                associated_heating_mode = n_associated_heating_mode,
+            )
+        new_heating_period.save()
+
+
+
+
+
+    def reset_room(self, heating_mode_id, str_weekday, room_id):
+        heating_periods = self.all_heating_periodes(heating_mode_id, str_weekday, room_id)
+        #delete existing heating_periods
+        if heating_periods:
+            for heating_period in heating_periods:
+                heating_period.delete()
+        # add a standart heating_periods
+        new_heating_period = HeatingPeriod(
+                week_day = self.int_weekday(str_weekday),
+                start_time = datetime.strptime("00:00:00", '%H:%M:%S'),
+                end_time = datetime.strptime("23:59:00", '%H:%M:%S'),
+                setpoint_temperature = DEFAULT_TEMPERATURE,
+                associated_room = self.room(room_id),
+                associated_heating_mode = self.heating_mode(heating_mode_id),
+            )
+        new_heating_period.save()
+
+    def delete_heating_period(self,heating_period_id):
+        heating_period = self.heating_period(heating_period_id)
+        if heating_period:
+            heating_period.delete()
+
+    def heating_period(self,heating_period_id):
+        heating_period = HeatingPeriod.objects.filter( id = heating_period_id )
+        if not heating_period:
+            heating_period = [None]
+        return heating_period[0]
+
+
+    def heating_mode(self, heating_mode_id):
+        heating_mode = HeatingMode.objects.filter( id = heating_mode_id )
+        if not heating_mode:
+            heating_mode = [None]
+        return heating_mode[0]
+
+    def room(self, room_id):
+        room = Room.objects.filter( id = room_id )
+        if not room:
+            room = [None]
+        return room[0]
+
+    def int_weekday(self, str_weekday):
+        int_weekday = None
+        for int_wd,str_wd in enumerate(WEEKDAYS):
+            if str_wd == str_weekday:
+                int_weekday = int_wd
+        return int_weekday
 
     def room_weekday_heating_periods(self,heating_mode , weekday, room):
         room_weekday_heating_periods = HeatingPeriod.objects.filter(
@@ -26,6 +90,15 @@ class HeatingPeriodManager(models.Manager):
 
     def all_heating_modes(self):
         return HeatingMode.objects.all()
+
+    def all_heating_periodes(self, heating_mode_id, str_weekday, room_id):
+        int_weekday = self.int_weekday(str_weekday)
+        heating_periods = HeatingPeriod.objects.filter(
+                associated_room__id = room_id,
+                week_day = int_weekday,
+                associated_heating_mode__id = heating_mode_id,
+                )
+        return heating_periods
 
     def current_heating_period_setpoint_temperature(self,room):
         temperature = DEFAULT_TEMPERATURE
@@ -59,13 +132,13 @@ class HeatingMode(models.Model):
 class HeatingPeriod(models.Model):
 
     class DayOfTheWeekChoices(models.IntegerChoices):
-        MONDAY = 0, monday[settings.LANGUAGE_CODE]
-        TUESDAY = 1, tuesday[settings.LANGUAGE_CODE]
-        WEDNESDAY = 2, wednesday[settings.LANGUAGE_CODE]
-        THURSDAY = 3, thursday[settings.LANGUAGE_CODE]
-        FRIDAY = 4, friday[settings.LANGUAGE_CODE]
-        SATURDAY = 5, saturday[settings.LANGUAGE_CODE]
-        SUNDAY = 6, sunday[settings.LANGUAGE_CODE]
+        MONDAY = 0, WEEKDAYS[0]
+        TUESDAY = 1, WEEKDAYS[1]
+        WEDNESDAY = 2, WEEKDAYS[2]
+        THURSDAY = 3, WEEKDAYS[3]
+        FRIDAY = 4, WEEKDAYS[4]
+        SATURDAY = 5, WEEKDAYS[5]
+        SUNDAY = 6, WEEKDAYS[6]
 
     week_day = models.IntegerField(
         default=DayOfTheWeekChoices.MONDAY,
@@ -73,7 +146,7 @@ class HeatingPeriod(models.Model):
         )
     start_time = models.TimeField()
     end_time = models.TimeField()
-    setpoint_temperature = models.IntegerField(default=5000)
+    setpoint_temperature = models.IntegerField(default=0)
     associated_room = models.ForeignKey(
         Room,
         on_delete=models.SET_NULL,

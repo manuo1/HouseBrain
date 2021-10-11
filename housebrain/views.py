@@ -5,9 +5,7 @@ from django.shortcuts import render
 from housebrain_config.settings.constants import (
     ERROR_TEMPERATURE, WEEKDAYS
 )
-from housebrain_config.settings.messages import (
-    DAYOFTHEWEEK_LIST as week_day_list
-)
+from .forms import ( HeatingPeriodCreateForm, CopyRoomForm, CopyWeekdayForm )
 from sensors.models import TemperatureSensorManager
 from heaters.models import HeaterManager
 from rooms.models import RoomManager
@@ -40,7 +38,8 @@ def homepage(request):
                         }
                     )
                 else:
-                    temperature_history = t_sensor_manager.seven_days_sensor_temperature_history(sensor)
+                    temperature_history = (t_sensor_manager.
+                            seven_days_sensor_temperature_history(sensor))
                     rooms_without_heating.append(
                         {
                             "room" : room,
@@ -59,6 +58,55 @@ def homepage(request):
     return render(request, 'homepage.html', context)
 
 def heating_periods(request):
+
+    if request.method == 'POST':
+
+        reset_room = request.POST.get('reset_room')
+        delete_heating_period = request.POST.get('delete_heating_period')
+        add_heating_period = request.POST.get('add_heating_period')
+        copy_room = request.POST.get('copy_room')
+
+        if reset_room:
+            reset_room = eval(reset_room)
+            heating_period_manager.reset_room(
+                reset_room["heating_mode"],
+                reset_room["weekday"],
+                reset_room["room"]
+            )
+        if delete_heating_period:
+            delete_heating_period = eval(delete_heating_period)
+            heating_period_manager.delete_heating_period(
+                delete_heating_period["heating_period"]
+            )
+
+        if add_heating_period:
+            add_heating_period = eval(add_heating_period)
+            new_heating_period_form = HeatingPeriodCreateForm(request.POST)
+            if new_heating_period_form.is_valid():
+                new_heating_period = {
+                    'start_time': new_heating_period_form.cleaned_data.get(
+                            'start_time'
+                        ),
+                    'end_time': new_heating_period_form.cleaned_data.get(
+                            'end_time'
+                        ),
+                    'setpoint_temperature': (
+                        new_heating_period_form.cleaned_data.get(
+                            'setpoint_temperature'
+                        )*1000),
+                    'str_weekday': add_heating_period['weekday'],
+                    'room_id': add_heating_period['room'],
+                    'heating_mode_id': add_heating_period['heating_mode'],
+                }
+                heating_period_manager.add_heating_period(new_heating_period)
+
+        if copy_room:
+            copy_room = eval(copy_room)
+            copy_room_form = CopyRoomForm(request.POST)
+            if copy_room_form.is_valid():
+                new_room = copy_room_form.cleaned_data.get('room')
+                
+
     heating_modes = {}
     modes = heating_period_manager.all_heating_modes()
     rooms = room_manager.all_rooms()
@@ -73,10 +121,21 @@ def heating_periods(request):
                     if heaters:
                         heating_modes[mode][str_weekday].update(
                             {
-                                room : heating_period_manager.room_weekday_heating_periods(mode, int_weekday, room)
+                                room : heating_period_manager.
+                                    room_weekday_heating_periods(
+                                        mode, int_weekday, room
+                                    )
                             }
                         )
+
+    create_heating_period_form = HeatingPeriodCreateForm()
+    copy_room_form = CopyRoomForm()
+    copy_weekday_form = CopyWeekdayForm()
+
     context = {
+        'copy_weekday_form' : copy_weekday_form,
+        'copy_room_form' : copy_room_form,
+        'create_heating_period_form': create_heating_period_form,
         'date_time': f'{timezone.now():%d/%m/%Y %H:%M}',
         'heating_modes' : heating_modes,
     }

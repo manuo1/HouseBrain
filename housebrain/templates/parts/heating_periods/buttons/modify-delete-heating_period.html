@@ -1,0 +1,75 @@
+{% load mathfilters %}
+<!-- Modal 2 -->
+<div class="modal fade" id="modifyDeleteHeatingPeriod_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalToggle" aria-hidden="true" aria-labelledby="modifyDeleteHeatingPeriod_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalToggleLabel" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <!-- Title Modal 1 -->
+        <h5 class="modal-title" id="modifyDeleteHeatingPeriod_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalToggleLabel">
+          Modal 1
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <!-- Body Modal 1 -->
+      <div class="modal-body">
+        start_time : {{create_heating_period_form.start_time}}<br>
+        end_time : {{create_heating_period_form.end_time}}<br>
+        setpoint_temperature : {{create_heating_period_form.setpoint_temperature}}<br>
+        <br>
+        heating_mode<br>
+        {{heating_mode.name}} | ({{heating_mode.id}}) <br>
+        <hr>
+        weekday<br>
+        {{weekday}} <br>
+        <hr>
+        room.name<br>
+        {{room.name}} | ({{room.id}}) <br>
+        <hr>
+        heating_period<br>
+        {{heating_period}} | ({{heating_period.id}})
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">
+          Annuler
+        </button>
+        <button class="btn btn-danger" data-bs-target="#modifyDeleteHeatingPeriod_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalToggle2" data-bs-toggle="modal" data-bs-dismiss="modal">
+          Suprimer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal 2 -->
+<div class="modal fade" id="modifyDeleteHeatingPeriod_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalToggle2" aria-hidden="true" aria-labelledby="modifyDeleteHeatingPeriod_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalToggleLabel2" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <!-- Title Modal 2 -->
+        <h5 class="modal-title" id="modifyDeleteHeatingPeriod_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalToggleLabel2">
+          <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 3rem;"></i>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <!-- Body Modal 1 -->
+      <div class="modal-body">
+        Voulez vous vraiment suprimer ?
+      </div>
+      <div class="modal-footer">
+        <form action="{% url 'housebrain:heating_periods' %}" method="post">
+          {% csrf_token %}
+          <button class="btn btn-secondary" data-bs-target="#modifyDeleteHeatingPeriod_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalToggle" data-bs-toggle="modal" data-bs-dismiss="modal">
+            Annuler
+          </button>
+          <button type="submit" value="{'heating_mode':{{heating_mode.id}},'weekday':'{{weekday}}','room':{{room.id}},'heating_period':{{heating_period.id}}}" name="delete_heating_period" class="btn btn-danger">
+            Suprimer
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Button trigger modal 1 -->
+<a class="btn btn-danger btn-sm" data-bs-toggle="modal" href="#modifyDeleteHeatingPeriod_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalToggle" role="button" title = "{{heating_period.start_time}}-{{heating_period.end_time}}&#10;Cliquer pour Mofifier ou Suprimer">
+  <sup>{{heating_period.start_time}}</sup>{{heating_period.setpoint_temperature|div:1000|floatformat:0}}°<sup>{{heating_period.end_time}}</sup>
+</a>

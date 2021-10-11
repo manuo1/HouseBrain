@@ -1,13 +1,22 @@
+<div class="container">
+  <div class="row">
+    <div class="col mb-2 inline text-end">
+      {% include "parts/heating_periods/buttons/copy-room.html" %}
+    </div>
+  </div>
+</div>
+
 {% for room, heating_periods in rooms.items %}
 <div class="container" id="HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}">
   <div class="row justify-content-start my-1">
     <div class="col-2">
       {{room.name}}
     </div>
-    <div class="col-9 px-0">
+    <div class="col-8 px-0">
       {% include "parts/heating_periods/heating_periods_cols.html" %}
     </div>
-    <div class="col-1 text-center">
+    <div class="col-2 text-center">
+      {% include "parts/heating_periods/buttons/add-heating_period.html" %}
       {% include "parts/heating_periods/buttons/copy-room.html" %}
       {% include "parts/heating_periods/buttons/reset-room.html" %}
     </div>

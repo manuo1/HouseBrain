@@ -1,5 +1,5 @@
 <!-- Button trigger modal -->
-<button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#copyRoom_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_Modal" title = "Copier la pièce {{room.name}}">
+<button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#copyRoom_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_Modal" title = "Copier la pièce">
   <i class="bi bi-back"></i>
 </button>
 
@@ -7,27 +7,27 @@
 <div class="modal fade" id="copyRoom_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_Modal" tabindex="-1" aria-labelledby="copyRoom_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
+      <!-- Modal header -->
       <div class="modal-header">
-        <h5 class="modal-title" id="copyRoom_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalLabel">Copier la pièce {{room.name}}</h5>
+        <h5 class="modal-title" id="copyRoom_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalLabel">
+            Copier toutes les périodes de chauffage du jour
+        </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        heating_mode<br>
-        {{heating_mode.name}} | ({{heating_mode.id}}) <br>
-        <hr>
-        weekday<br>
-        {{weekday}} <br>
-        <hr>
-        room.name<br>
-        {{room.name}} | ({{room.id}}) <br>
-        <hr>
-        heating_period<br>
-        {{heating_period}} | ({{heating_period.id}})
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-        <button type="button" class="btn btn-primary">Copier</button>
-      </div>
+      <!-- Modal body & Form -->
+      <form action="{% url 'housebrain:heating_periods' %}" method="post">
+      {% csrf_token %}
+        <div class="modal-body">
+
+          {{ copy_room_form }}
+
+        </div>
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" value="{'heating_mode':{{heating_mode.id}},'weekday':'{{weekday}}'}" name="copy_room" class="btn btn-success">Copier</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

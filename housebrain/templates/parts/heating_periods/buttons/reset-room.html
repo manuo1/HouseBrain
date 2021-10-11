@@ -1,3 +1,5 @@
+
+
 <!-- Button trigger modal -->
 <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#resetRoom_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_Modal" title = "Réinitialiser la pièce {{room.name}}">
   <i class="bi bi-exclamation-square"></i>
@@ -7,27 +9,31 @@
 <div class="modal fade" id="resetRoom_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_Modal" tabindex="-1" aria-labelledby="resetRoom_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
+      <!-- Modal header -->
       <div class="modal-header">
-        <h5 class="modal-title" id="resetRoom_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalLabel">Réinitialiser la pièce {{room.name}}</h5>
+        <h5 class="modal-title" id="resetRoom_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalLabel">
+            <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 3rem;"></i>
+        </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        heating_mode<br>
-        {{heating_mode.name}} | ({{heating_mode.id}}) <br>
-        <hr>
-        weekday<br>
-        {{weekday}} <br>
-        <hr>
-        room.name<br>
-        {{room.name}} | ({{room.id}}) <br>
-        <hr>
-        heating_period<br>
-        {{heating_period}} | ({{heating_period.id}})
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-        <button type="button" class="btn btn-primary">Copier</button>
-      </div>
+      <!-- Modal body & Form -->
+      <form action="{% url 'housebrain:heating_periods' %}" method="post">
+      {% csrf_token %}
+        <div class="modal-body">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item bg-danger"><strong>Attention vous allez réinitialiser:</strong></li>
+            <li class="list-group-item">La pièce <strong>{{room.name}}</strong></li>
+            <li class="list-group-item">Du jour de la semaine <strong>{{weekday}}</strong></li>
+            <li class="list-group-item">Du mode de chauffage <strong>{{heating_mode.name}}</strong></li>
+          </ul>
+
+        </div>
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" value="{'heating_mode':{{heating_mode.id}},'weekday':'{{weekday}}','room':{{room.id}},'heating_period':{{heating_period.id}}}" name="reset_room" class="btn btn-danger">Réinitialiser</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
