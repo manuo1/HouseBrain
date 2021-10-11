@@ -12,6 +12,12 @@ from housebrain_config.settings.messages import (
 
 class RoomManager(models.Manager):
 
+    def room(self, room_id):
+        room = Room.objects.filter( id = room_id )
+        if not room:
+            room = [None]
+        return room[0]
+
     def all_rooms(self):
         return Room.objects.all().order_by('heating_priority', 'name')
 

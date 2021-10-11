@@ -101,11 +101,11 @@ def heating_periods(request):
                 heating_period_manager.add_heating_period(new_heating_period)
 
         if copy_room:
-            copy_room = eval(copy_room)
-            copy_room_form = CopyRoomForm(request.POST)
-            if copy_room_form.is_valid():
-                new_room = copy_room_form.cleaned_data.get('room')
-                
+            copied_room = eval(copy_room)
+            pasted_room_form = CopyRoomForm(request.POST)
+            if pasted_room_form.is_valid():
+                pasted_room = pasted_room_form.cleaned_data.get('room')
+                heating_period_manager.copy_room(copied_room, pasted_room)
 
     heating_modes = {}
     modes = heating_period_manager.all_heating_modes()

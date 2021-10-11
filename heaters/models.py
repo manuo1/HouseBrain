@@ -1,7 +1,9 @@
 from django.core import management
 from django.db import models
 from django.db.models.signals import post_save
-from rooms.models import Room
+from rooms.models import ( Room, RoomManager )
+
+room_manager = RoomManager()
 
 class HeaterManager(models.Manager):
 
@@ -24,7 +26,6 @@ class HeaterManager(models.Manager):
         if Heater.objects.exists():
             for heater in self.all_heaters():
                 self.turn_off(heater)
-
 
 class Heater(models.Model):
 

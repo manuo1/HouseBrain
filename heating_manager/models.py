@@ -28,12 +28,30 @@ class HeatingPeriodManager(models.Manager):
             )
         new_heating_period.save()
 
+    def copy_room(self, copied_room, pasted_room):
+        # delete pasted_room heating_periods
 
 
+        HeatingPeriod.objects.filter(
+            associated_room = pasted_room[0],
+            associated_heating_mode = self.heating_mode(copied_room['heating_mode']),
+            week_day = self.int_weekday(copied_room['weekday'])
+        ).delete()
+
+        # duplicate copied_room heating_periods in pasted_room
+        copied_room_heating_periods = HeatingPeriod.objects.filter(
+                associated_room = self.room(copied_room['room']),
+                associated_heating_mode = self.heating_mode(copied_room['heating_mode']),
+                week_day = self.int_weekday(copied_room['weekday'])
+            )
+        for heating_period in copied_room_heating_periods:
+            heating_period.id = None
+            heating_period.associated_room = pasted_room[0]
+            heating_period.save()
 
 
     def reset_room(self, heating_mode_id, str_weekday, room_id):
-        heating_periods = self.all_heating_periodes(heating_mode_id, str_weekday, room_id)
+        heating_periods = self.all_heating_periods(heating_mode_id, str_weekday, room_id)
         #delete existing heating_periods
         if heating_periods:
             for heating_period in heating_periods:
@@ -91,7 +109,7 @@ class HeatingPeriodManager(models.Manager):
     def all_heating_modes(self):
         return HeatingMode.objects.all()
 
-    def all_heating_periodes(self, heating_mode_id, str_weekday, room_id):
+    def all_heating_periods(self, heating_mode_id, str_weekday, room_id):
         int_weekday = self.int_weekday(str_weekday)
         heating_periods = HeatingPeriod.objects.filter(
                 associated_room__id = room_id,
