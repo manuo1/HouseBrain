@@ -70,6 +70,6 @@
 </div>
 
 <!-- Button trigger modal 1 -->
-<a class="btn btn-danger btn-sm mx-0" data-bs-toggle="modal" href="#modifyDeleteHeatingPeriod_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalToggle" role="button" title = "{{heating_period.start_time}}-{{heating_period.end_time}}&#10;Cliquer pour Mofifier ou Suprimer">
+<a class="btn btn-{% if heating_period.setpoint_temperature < 18000 %}primary{% elif heating_period.setpoint_temperature < 20000 %}info{% elif heating_period.setpoint_temperature < 22000 %}success{% else %}danger{% endif %} btn-sm mx-0" data-bs-toggle="modal" href="#modifyDeleteHeatingPeriod_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalToggle" role="button" title = "{{heating_period.start_time}}-{{heating_period.end_time}}&#10;Cliquer pour Mofifier ou Suprimer">
   <sup>{{heating_period.start_time}}</sup>{{heating_period.setpoint_temperature|div:1000|floatformat:0}}°<sup>{{heating_period.end_time}}</sup>
 </a>

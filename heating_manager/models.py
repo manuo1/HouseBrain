@@ -212,7 +212,7 @@ class HeatingPeriod(models.Model):
         minutes_differences = (
             (self.end_time.hour*60 + self.end_time.minute)
             - (self.start_time.hour*60 + self.start_time.minute))
-        self.day_percentage = int((minutes_differences*100)/1440)
+        self.day_percentage = int((minutes_differences*100)/1439)
         super().save(*args, **kwargs)
 
 
