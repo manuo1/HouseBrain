@@ -65,6 +65,7 @@ def heating_periods(request):
         delete_heating_period = request.POST.get('delete_heating_period')
         add_heating_period = request.POST.get('add_heating_period')
         copy_room = request.POST.get('copy_room')
+        copy_weekday = request.POST.get('copy_weekday')
 
         if reset_room:
             reset_room = eval(reset_room)
@@ -101,11 +102,18 @@ def heating_periods(request):
                 heating_period_manager.add_heating_period(new_heating_period)
 
         if copy_room:
-            copied_room = eval(copy_room)
+            copied_room_data = eval(copy_room)
             pasted_room_form = CopyRoomForm(request.POST)
             if pasted_room_form.is_valid():
-                pasted_room = pasted_room_form.cleaned_data.get('room')
-                heating_period_manager.copy_room(copied_room, pasted_room)
+                pasted_rooms = pasted_room_form.cleaned_data.get('room')
+                heating_period_manager.copy_room(copied_room_data, pasted_rooms)
+
+        if copy_weekday:
+            copied_weekday_data = eval(copy_weekday)
+            pasted_weekday_form = CopyWeekdayForm(request.POST)
+            if pasted_weekday_form.is_valid():
+                pasted_weekdays = pasted_weekday_form.cleaned_data.get('weekday')
+                heating_period_manager.copy_weekday(copied_weekday_data, pasted_weekdays)
 
     heating_modes = {}
     modes = heating_period_manager.all_heating_modes()

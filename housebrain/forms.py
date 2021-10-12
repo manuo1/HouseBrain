@@ -1,6 +1,13 @@
 from django import forms
 from heating_manager.models import HeatingPeriod
 from rooms.models import Room
+from housebrain_config.settings.constants import (
+    WEEKDAYS
+)
+WEEKDAYS_CHOICES = [ (day, day) for day in WEEKDAYS ]
+
+
+
 
 class RoomMultipleChoiceField(forms.ModelMultipleChoiceField):
     def label_from_instance(self, obj):
@@ -21,7 +28,13 @@ class HeatingPeriodCreateForm(forms.ModelForm):
         }
 
 class CopyRoomForm(forms.Form):
-    room = RoomMultipleChoiceField(queryset=Room.objects.all())
+    room = RoomMultipleChoiceField(
+            queryset=Room.objects.all(),
+            widget=forms.CheckboxSelectMultiple,
+        )
 
 class CopyWeekdayForm(forms.Form):
-    weekday = forms.CharField(max_length=10)
+    weekday = forms.MultipleChoiceField(
+            choices = WEEKDAYS_CHOICES,
+            widget=forms.CheckboxSelectMultiple,
+            )

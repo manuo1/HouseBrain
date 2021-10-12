@@ -9,13 +9,13 @@
 {% for room, heating_periods in rooms.items %}
 <div class="container" id="HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}">
   <div class="row justify-content-start my-1">
-    <div class="col-2">
+    <div class="col-lg-2 text-center  text-lg-start">
       {{room.name}}
     </div>
-    <div class="col-8 px-0">
+    <div class="col-lg-8 px-0">
       {% include "parts/heating_periods/heating_periods_cols.html" %}
     </div>
-    <div class="col-2 text-center">
+    <div class="col-lg-2 text-center mt-2 mt-lg-0">
       {% include "parts/heating_periods/buttons/add-heating_period.html" %}
       {% include "parts/heating_periods/buttons/copy-room.html" %}
       {% include "parts/heating_periods/buttons/reset-room.html" %}
