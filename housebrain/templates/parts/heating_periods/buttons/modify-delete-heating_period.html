@@ -2,7 +2,7 @@
 <!-- Modal 2 -->
 <div class="modal fade" id="modifyDeleteHeatingPeriod_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalToggle" aria-hidden="true" aria-labelledby="modifyDeleteHeatingPeriod_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalToggleLabel" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
+    <div class="modal-content text-dark">
       <div class="modal-header">
         <!-- Title Modal 1 -->
         <h5 class="modal-title" id="modifyDeleteHeatingPeriod_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalToggleLabel">
@@ -42,7 +42,7 @@
 <!-- Modal 2 -->
 <div class="modal fade" id="modifyDeleteHeatingPeriod_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalToggle2" aria-hidden="true" aria-labelledby="modifyDeleteHeatingPeriod_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalToggleLabel2" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
+    <div class="modal-content text-dark">
       <div class="modal-header">
         <!-- Title Modal 2 -->
         <h5 class="modal-title" id="modifyDeleteHeatingPeriod_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalToggleLabel2">
@@ -70,6 +70,6 @@
 </div>
 
 <!-- Button trigger modal 1 -->
-<a class="btn btn-danger btn-sm" data-bs-toggle="modal" href="#modifyDeleteHeatingPeriod_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalToggle" role="button" title = "{{heating_period.start_time}}-{{heating_period.end_time}}&#10;Cliquer pour Mofifier ou Suprimer">
+<a class="btn btn-danger btn-sm mx-0" data-bs-toggle="modal" href="#modifyDeleteHeatingPeriod_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalToggle" role="button" title = "{{heating_period.start_time}}-{{heating_period.end_time}}&#10;Cliquer pour Mofifier ou Suprimer">
   <sup>{{heating_period.start_time}}</sup>{{heating_period.setpoint_temperature|div:1000|floatformat:0}}°<sup>{{heating_period.end_time}}</sup>
 </a>

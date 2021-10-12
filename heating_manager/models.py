@@ -76,7 +76,7 @@ class HeatingPeriodManager(models.Manager):
 
 
     def reset_room(self, heating_mode_id, str_weekday, room_id):
-        heating_periods = self.all_heating_periods(
+        heating_periods = self.all_heating_periods_with_params(
                 heating_mode_id, str_weekday, room_id
             )
         #delete existing heating_periods
@@ -136,7 +136,10 @@ class HeatingPeriodManager(models.Manager):
     def all_heating_modes(self):
         return HeatingMode.objects.all()
 
-    def all_heating_periods(self, heating_mode_id, str_weekday, room_id):
+    def all_heating_periods(self):
+        return HeatingPeriod.objects.select_related().all()
+
+    def all_heating_periods_with_params(self, heating_mode_id, str_weekday, room_id):
         int_weekday = self.int_weekday(str_weekday)
         heating_periods = HeatingPeriod.objects.filter(
                 associated_room__id = room_id,
@@ -191,6 +194,7 @@ class HeatingPeriod(models.Model):
         )
     start_time = models.TimeField()
     end_time = models.TimeField()
+    day_percentage = models.IntegerField(default=0)
     setpoint_temperature = models.IntegerField(default=0)
     associated_room = models.ForeignKey(
         Room,
@@ -204,6 +208,14 @@ class HeatingPeriod(models.Model):
         blank=True,
         null=True,
     )
+    def save(self, *args, **kwargs):
+        minutes_differences = (
+            (self.end_time.hour*60 + self.end_time.minute)
+            - (self.start_time.hour*60 + self.start_time.minute))
+        self.day_percentage = int((minutes_differences*100)/1440)
+        super().save(*args, **kwargs)
+
+
     def __str__(self):
         associated_heating_mode_name = "None"
         if self.associated_heating_mode:

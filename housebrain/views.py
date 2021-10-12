@@ -117,24 +117,21 @@ def heating_periods(request):
 
     heating_modes = {}
     modes = heating_period_manager.all_heating_modes()
-    rooms = room_manager.all_rooms()
+    rooms = heater_manager.rooms_with_heater()
     if modes and rooms:
         for mode in modes:
             heating_modes.update({ mode: {}})
             for int_weekday, str_weekday in enumerate(WEEKDAYS):
                 heating_modes[mode].update({str_weekday : {}})
                 for room in rooms:
-                    # add only rooms with heating
-                    heaters = heater_manager.room_heaters(room)
-                    if heaters:
-                        heating_modes[mode][str_weekday].update(
-                            {
-                                room : heating_period_manager.
-                                    room_weekday_heating_periods(
-                                        mode, int_weekday, room
-                                    )
-                            }
-                        )
+                    heating_modes[mode][str_weekday].update(
+                        {
+                            room : heating_period_manager.
+                                room_weekday_heating_periods(
+                                    mode, int_weekday, room
+                                )
+                        }
+                    )
 
     create_heating_period_form = HeatingPeriodCreateForm()
     copy_room_form = CopyRoomForm()

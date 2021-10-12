@@ -7,6 +7,16 @@ room_manager = RoomManager()
 
 class HeaterManager(models.Manager):
 
+    def rooms_with_heater(self):
+        rooms_with_heater = []
+        for heater in Heater.objects.select_related().all().order_by(
+                "associated_room__heating_priority"
+            ):
+            room = heater.associated_room
+            if room not in rooms_with_heater:
+                rooms_with_heater.append(room)
+        return rooms_with_heater
+
     def room_heaters(self, room):
         return Heater.objects.filter(associated_room=room.id)
 

@@ -1,9 +1,7 @@
-<div class="container">
-  <div class="row">
-    {% for heating_period in heating_periods%}
-      <div class="col d-grid gap-2 mx-0">
-        {% include "parts/heating_periods/buttons/modify-delete-heating_period.html" %}
-      </div>
-    {% endfor %}
-  </div>
+<div class="progress" style="height: 2.5em;"">
+  {% for heating_period in heating_periods%}
+    <div class="progress-bar" role="progressbar" style="width: {{heating_period.day_percentage}}%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+      {% include "parts/heating_periods/buttons/modify-delete-heating_period.html" %}
+    </div>
+  {% endfor %}
 </div>
