@@ -55,7 +55,7 @@
         Voulez vous vraiment suprimer ?
       </div>
       <div class="modal-footer">
-        <form action="{% url 'housebrain:heating_periods' %}" method="post">
+        <form action="{% url 'housebrain:heating_periods' heating_mode.id %}?page={{ weekdays_pages.number }}" method="post">
           {% csrf_token %}
           <button class="btn btn-secondary" data-bs-target="#modifyDeleteHeatingPeriod_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalToggle" data-bs-toggle="modal" data-bs-dismiss="modal">
             Annuler

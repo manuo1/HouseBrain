@@ -4,14 +4,31 @@
 {% block main %}
 
 <br>
-
+<!-- pagination  -->
+<nav aria-label="Page navigation">
+  <ul class="pagination justify-content-center">
+    <!-- weekdays  -->
+    {% for str_day in str_weekdays %}
+        <li class="page-item {% if forloop.counter == weekdays_pages.number %} disabled {% endif %}"><a class="page-link {% if forloop.counter == weekdays_pages.number %} text-light bg-dark {% endif %} " href="?page={{ forloop.counter }}">{{str_day}}</a></li>
+    {% endfor %}
+    </ul>
+</nav>
 <div class="container">
   <div class="row row-cols-1">
     <div class="col mb-2 inline text-end">
-      {% include "parts/heating_periods/buttons/add-heating_mode.html" %}
+      Bouton copie semaine
     </div>
-    <div class="col">{% include "parts/heating_periods/heating_mode_accordion.html" %}</div>
+    <div class="col">
+      {% if weekdays_pages %}
+        {% for heating_modes in weekdays_pages.object_list %}
+          {% for heating_mode, weekdays in heating_modes.items %}
+            {% for weekday, rooms in weekdays.items %}
+              {% include "parts/heating_periods/rooms_rows.html" %}
+            {% endfor %}
+          {% endfor %}
+        {% endfor %}
+      {% endif %}
+    </div>
   </div>
 </div>
-
 {% endblock %}

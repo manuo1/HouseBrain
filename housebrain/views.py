@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from datetime import timedelta
 from django.conf import settings
 from django.utils import timezone
@@ -49,15 +50,116 @@ def homepage(request):
                     )
 
     context = {
+        'dropdown_menu_heating_modes' : heating_period_manager.all_heating_modes(),
         'date_time': f'{timezone.now():%d/%m/%Y %H:%M}',
         'rooms_with_heating': rooms_with_heating,
         'rooms_without_heating': rooms_without_heating,
         'hours_list' : list(range(24)),
+        'str_weekdays' : WEEKDAYS,
 
     }
     return render(request, 'homepage.html', context)
 
-def heating_periods(request):
+def heating_periods(request, heating_mode_id):
+    if request.method == 'POST':
+
+        reset_room = request.POST.get('reset_room')
+        delete_heating_period = request.POST.get('delete_heating_period')
+        add_heating_period = request.POST.get('add_heating_period')
+        copy_room = request.POST.get('copy_room')
+        copy_weekday = request.POST.get('copy_weekday')
+
+        if reset_room:
+            reset_room = eval(reset_room)
+            heating_period_manager.reset_room(
+                reset_room["heating_mode"],
+                reset_room["weekday"],
+                reset_room["room"]
+            )
+        if delete_heating_period:
+            delete_heating_period = eval(delete_heating_period)
+            heating_period_manager.delete_heating_period(
+                delete_heating_period["heating_period"]
+            )
+
+        if add_heating_period:
+            add_heating_period = eval(add_heating_period)
+            new_heating_period_form = HeatingPeriodCreateForm(request.POST)
+            if new_heating_period_form.is_valid():
+                new_heating_period = {
+                    'start_time': new_heating_period_form.cleaned_data.get(
+                            'start_time'
+                        ),
+                    'end_time': new_heating_period_form.cleaned_data.get(
+                            'end_time'
+                        ),
+                    'setpoint_temperature': (
+                        new_heating_period_form.cleaned_data.get(
+                            'setpoint_temperature'
+                        )*1000),
+                    'str_weekday': add_heating_period['weekday'],
+                    'room_id': add_heating_period['room'],
+                    'heating_mode_id': add_heating_period['heating_mode'],
+                }
+                heating_period_manager.add_heating_period(new_heating_period)
+
+        if copy_room:
+            copied_room_data = eval(copy_room)
+            pasted_room_form = CopyRoomForm(request.POST)
+            if pasted_room_form.is_valid():
+                pasted_rooms = pasted_room_form.cleaned_data.get('room')
+                heating_period_manager.copy_room(copied_room_data, pasted_rooms)
+
+        if copy_weekday:
+            copied_weekday_data = eval(copy_weekday)
+            pasted_weekday_form = CopyWeekdayForm(request.POST)
+            if pasted_weekday_form.is_valid():
+                pasted_weekdays = pasted_weekday_form.cleaned_data.get('weekday')
+                heating_period_manager.copy_weekday(copied_weekday_data, pasted_weekdays)
+
+    """ get mode heating_periodes"""
+    heating_modes = {}
+    mode = heating_period_manager.heating_mode(heating_mode_id)
+    rooms = heater_manager.rooms_with_heater()
+    page_list = []
+    if mode and rooms:
+        for int_weekday, str_weekday in enumerate(WEEKDAYS):
+            rooms_heating_periods = {}
+            for room in rooms:
+                rooms_heating_periods.update(
+                    {
+                        room : heating_period_manager.
+                            room_weekday_heating_periods(
+                                mode, int_weekday, room
+                            )
+                    }
+                )
+            page_list.append( { mode : {str_weekday :rooms_heating_periods}} )
+
+    """ add paginator """
+    paginator = Paginator(page_list, 1)  # Show 1 day per page.
+    page_number = request.GET.get('page')
+    weekday_rooms_heating_periods = paginator.get_page(page_number)
+
+    """ forms """
+    create_heating_period_form = HeatingPeriodCreateForm()
+    copy_room_form = CopyRoomForm()
+    copy_weekday_form = CopyWeekdayForm()
+
+    context = {
+        'dropdown_menu_heating_modes' : heating_period_manager.all_heating_modes(),
+        'date_time': f'{timezone.now():%d/%m/%Y %H:%M}',
+        'weekdays_pages': weekday_rooms_heating_periods,
+        'str_weekdays' : WEEKDAYS,
+        'copy_weekday_form' : copy_weekday_form,
+        'copy_room_form' : copy_room_form,
+        'create_heating_period_form': create_heating_period_form,
+
+    }
+    return render(request, 'heating_periods.html', context)
+
+
+def heating_periods_old(request):
 
     if request.method == 'POST':
 
@@ -138,10 +240,11 @@ def heating_periods(request):
     copy_weekday_form = CopyWeekdayForm()
 
     context = {
+        'dropdown_menu_heating_modes' : modes,
         'copy_weekday_form' : copy_weekday_form,
         'copy_room_form' : copy_room_form,
         'create_heating_period_form': create_heating_period_form,
         'date_time': f'{timezone.now():%d/%m/%Y %H:%M}',
         'heating_modes' : heating_modes,
     }
-    return render(request, 'heating_periods.html', context)
+    return render(request, 'heating_periods/{{heating_mode.id}}/{{weekday}}.html', context)

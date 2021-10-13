@@ -15,7 +15,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <!-- Modal body & Form -->
-      <form action="{% url 'housebrain:heating_periods' %}" method="post">
+      <form action="{% url 'housebrain:heating_periods' heating_mode.id %}?page={{ weekdays_pages.number }}" method="post">
       {% csrf_token %}
         <div class="modal-body">
           Attention toutes les aniennes périodes de chauffage de la pièce de destination seront suprimées<br>
