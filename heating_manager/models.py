@@ -214,6 +214,9 @@ class HeatingPeriod(models.Model):
         minutes_differences = (
             (self.end_time.hour*60 + self.end_time.minute)
             - (self.start_time.hour*60 + self.start_time.minute))
+        """for beter display add one minute to make 23:59 like 24:00"""
+        if self.end_time == 23 and self.end_time == 59:
+            minutes_differences += 1
         self.day_percentage = int((minutes_differences*100)/1439)
         super().save(*args, **kwargs)
 
