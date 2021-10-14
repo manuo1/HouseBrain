@@ -15,9 +15,15 @@
       {% csrf_token %}
         <div class="modal-body">
           <!-- Modify Heating period parts -->
-          start_time : {{modify_heating_period_form.start_time}}<br>
-          end_time : {{modify_heating_period_form.end_time}}<br>
-          setpoint_temperature : {{modify_heating_period_form.setpoint_temperature}}<br>
+
+
+          start_time : <input class="form-control" type="time" name="start_time" value="{{heating_period.start_time}}" required id="id_start_time"><br>
+          end_time : <input class="form-control" type="time" name="end_time" value="{{heating_period.end_time}}" required id="id_end_time"><br>
+          setpoint_temperature : <input class="form-control" type="number" name="setpoint_temperature" value="{{heating_period.setpoint_temperature|div:1000|floatformat:0}}" required id="id_setpoint_temperature"><br>
+
+
+
+
           <button type="submit" value="{'heating_mode':{{heating_mode.id}},'weekday':'{{weekday}}','room':{{room.id}},'heating_period':{{heating_period.id}}}" name="modify_heating_period" class="btn btn-danger">
             Modifier
           </button>

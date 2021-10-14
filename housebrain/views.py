@@ -169,7 +169,9 @@ def heating_periods(request, heating_mode_id):
 
     """ forms """
     create_heating_period_form = HeatingPeriodCreateForm()
-    modify_heating_period_form = HeatingPeriodModifyForm()
+    modify_heating_period_form = HeatingPeriodModifyForm(
+        initial={'start_time': '{{heating_period.start_time}}'}
+    )
     copy_room_form = CopyRoomForm()
     copy_weekday_form = CopyWeekdayForm()
 
