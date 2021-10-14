@@ -172,7 +172,6 @@ class HeatingPeriodManager(models.Manager):
         )
         return heating_period
 
-
 class HeatingMode(models.Model):
     name = models.CharField(max_length=100)
 
@@ -214,10 +213,13 @@ class HeatingPeriod(models.Model):
         minutes_differences = (
             (self.end_time.hour*60 + self.end_time.minute)
             - (self.start_time.hour*60 + self.start_time.minute))
-        """for beter display add one minute to make 23:59 like 24:00"""
+        """for beter display add one minute to change 23:59 like 24:00"""
         if self.end_time == 23 and self.end_time == 59:
             minutes_differences += 1
         self.day_percentage = int((minutes_differences*100)/1439)
+        """ even displays periods less than 1% """
+        if self.day_percentage < 1:
+            self.day_percentage = 1
         super().save(*args, **kwargs)
 
 
