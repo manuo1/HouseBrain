@@ -63,9 +63,10 @@ class Command(BaseCommand):
                             else:
                                 temperature = ERROR_TEMPERATURE
                                 sensor_manager.add_an_error(sensor)
+                            if temperature != ERROR_TEMPERATURE:
+                                sensor_manager.reset_consecutive_errors(sensor)
                 except FileNotFoundError:
                     temperature = ERROR_TEMPERATURE
                     sensor_manager.add_an_error(sensor)
-        if temperature != ERROR_TEMPERATURE:
-            sensor_manager.reset_consecutive_errors(sensor)
+
         return temperature
