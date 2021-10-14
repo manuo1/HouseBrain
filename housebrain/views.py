@@ -6,7 +6,12 @@ from django.shortcuts import render
 from housebrain_config.settings.constants import (
     ERROR_TEMPERATURE, WEEKDAYS
 )
-from .forms import ( HeatingPeriodCreateForm, CopyRoomForm, CopyWeekdayForm )
+from .forms import (
+    HeatingPeriodCreateForm,
+    CopyRoomForm,
+    CopyWeekdayForm,
+    HeatingPeriodModifyForm,
+ )
 from sensors.models import TemperatureSensorManager
 from heaters.models import HeaterManager
 from rooms.models import RoomManager
@@ -68,6 +73,26 @@ def heating_periods(request, heating_mode_id):
         add_heating_period = request.POST.get('add_heating_period')
         copy_room = request.POST.get('copy_room')
         copy_weekday = request.POST.get('copy_weekday')
+        modify_heating_period = request.POST.get('modify_heating_period')
+
+        if modify_heating_period:
+            modified_heating_period_data = eval(modify_heating_period)
+            modify_heating_period_form = HeatingPeriodModifyForm(request.POST)
+            if modify_heating_period_form.is_valid():
+                modified_heating_period = {
+                    'start_time': modify_heating_period_form.cleaned_data.get(
+                            'start_time'
+                        ),
+                    'end_time': modify_heating_period_form.cleaned_data.get(
+                            'end_time'
+                        ),
+                    'setpoint_temperature': (
+                        modify_heating_period_form.cleaned_data.get(
+                            'setpoint_temperature'
+                        )*1000),
+                    'heating_period_id': modified_heating_period_data['heating_period'],
+                }
+                heating_period_manager.modify_heating_period(modified_heating_period)
 
         if reset_room:
             reset_room = eval(reset_room)
@@ -143,6 +168,7 @@ def heating_periods(request, heating_mode_id):
 
     """ forms """
     create_heating_period_form = HeatingPeriodCreateForm()
+    modify_heating_period_form = HeatingPeriodModifyForm()
     copy_room_form = CopyRoomForm()
     copy_weekday_form = CopyWeekdayForm()
 
@@ -154,97 +180,7 @@ def heating_periods(request, heating_mode_id):
         'copy_weekday_form' : copy_weekday_form,
         'copy_room_form' : copy_room_form,
         'create_heating_period_form': create_heating_period_form,
+        'modify_heating_period_form': modify_heating_period_form,
 
     }
     return render(request, 'heating_periods.html', context)
-
-
-def heating_periods_old(request):
-
-    if request.method == 'POST':
-
-        reset_room = request.POST.get('reset_room')
-        delete_heating_period = request.POST.get('delete_heating_period')
-        add_heating_period = request.POST.get('add_heating_period')
-        copy_room = request.POST.get('copy_room')
-        copy_weekday = request.POST.get('copy_weekday')
-
-        if reset_room:
-            reset_room = eval(reset_room)
-            heating_period_manager.reset_room(
-                reset_room["heating_mode"],
-                reset_room["weekday"],
-                reset_room["room"]
-            )
-        if delete_heating_period:
-            delete_heating_period = eval(delete_heating_period)
-            heating_period_manager.delete_heating_period(
-                delete_heating_period["heating_period"]
-            )
-
-        if add_heating_period:
-            add_heating_period = eval(add_heating_period)
-            new_heating_period_form = HeatingPeriodCreateForm(request.POST)
-            if new_heating_period_form.is_valid():
-                new_heating_period = {
-                    'start_time': new_heating_period_form.cleaned_data.get(
-                            'start_time'
-                        ),
-                    'end_time': new_heating_period_form.cleaned_data.get(
-                            'end_time'
-                        ),
-                    'setpoint_temperature': (
-                        new_heating_period_form.cleaned_data.get(
-                            'setpoint_temperature'
-                        )*1000),
-                    'str_weekday': add_heating_period['weekday'],
-                    'room_id': add_heating_period['room'],
-                    'heating_mode_id': add_heating_period['heating_mode'],
-                }
-                heating_period_manager.add_heating_period(new_heating_period)
-
-        if copy_room:
-            copied_room_data = eval(copy_room)
-            pasted_room_form = CopyRoomForm(request.POST)
-            if pasted_room_form.is_valid():
-                pasted_rooms = pasted_room_form.cleaned_data.get('room')
-                heating_period_manager.copy_room(copied_room_data, pasted_rooms)
-
-        if copy_weekday:
-            copied_weekday_data = eval(copy_weekday)
-            pasted_weekday_form = CopyWeekdayForm(request.POST)
-            if pasted_weekday_form.is_valid():
-                pasted_weekdays = pasted_weekday_form.cleaned_data.get('weekday')
-                heating_period_manager.copy_weekday(copied_weekday_data, pasted_weekdays)
-
-    heating_modes = {}
-    modes = heating_period_manager.all_heating_modes()
-    rooms = heater_manager.rooms_with_heater()
-    if modes and rooms:
-        for mode in modes:
-            heating_modes.update({ mode: {}})
-            for int_weekday, str_weekday in enumerate(WEEKDAYS):
-                heating_modes[mode].update({str_weekday : {}})
-                for room in rooms:
-                    heating_modes[mode][str_weekday].update(
-                        {
-                            room : heating_period_manager.
-                                room_weekday_heating_periods(
-                                    mode, int_weekday, room
-                                )
-                        }
-                    )
-
-    create_heating_period_form = HeatingPeriodCreateForm()
-    copy_room_form = CopyRoomForm()
-    copy_weekday_form = CopyWeekdayForm()
-
-    context = {
-        'dropdown_menu_heating_modes' : modes,
-        'copy_weekday_form' : copy_weekday_form,
-        'copy_room_form' : copy_room_form,
-        'create_heating_period_form': create_heating_period_form,
-        'date_time': f'{timezone.now():%d/%m/%Y %H:%M}',
-        'heating_modes' : heating_modes,
-    }
-    return render(request, 'heating_periods/{{heating_mode.id}}/{{weekday}}.html', context)

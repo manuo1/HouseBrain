@@ -11,23 +11,22 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <!-- Body Modal 1 -->
-      <div class="modal-body">
-        start_time : {{create_heating_period_form.start_time}}<br>
-        end_time : {{create_heating_period_form.end_time}}<br>
-        setpoint_temperature : {{create_heating_period_form.setpoint_temperature}}<br>
-        <br>
-        heating_mode<br>
-        {{heating_mode.name}} | ({{heating_mode.id}}) <br>
-        <hr>
-        weekday<br>
-        {{weekday}} <br>
-        <hr>
-        room.name<br>
-        {{room.name}} | ({{room.id}}) <br>
-        <hr>
-        heating_period<br>
-        {{heating_period}} | ({{heating_period.id}})
-      </div>
+      <form action="{% url 'housebrain:heating_periods' heating_mode.id %}?page={{ weekdays_pages.number }}" method="post">
+      {% csrf_token %}
+        <div class="modal-body">
+
+          start_time : {{modify_heating_period_form.start_time}}<br>
+          end_time : {{modify_heating_period_form.end_time}}<br>
+          setpoint_temperature : {{modify_heating_period_form.setpoint_temperature}}<br>
+          <button type="submit" value="{'heating_mode':{{heating_mode.id}},'weekday':'{{weekday}}','room':{{room.id}},'heating_period':{{heating_period.id}}}" name="modify_heating_period" class="btn btn-danger">
+            Modifier
+          </button>
+
+
+        </div>
+      </form>
+
+
       <div class="modal-footer">
         <button class="btn btn-secondary" data-bs-dismiss="modal">
           Annuler

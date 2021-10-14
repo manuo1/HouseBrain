@@ -18,9 +18,8 @@
       <form action="{% url 'housebrain:heating_periods' heating_mode.id %}?page={{ weekdays_pages.number }}" method="post">
       {% csrf_token %}
         <div class="modal-body">
-          Attention toutes les aniennes périodes de chauffage du jour de destination seront suprimées<br>
+          Attention toutes les aniennes périodes de chauffage des jours de destination seront suprimées<br>
           {{ copy_weekday_form }}
-
         </div>
         <!-- Modal footer -->
         <div class="modal-footer">

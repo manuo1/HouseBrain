@@ -10,6 +10,19 @@ from rooms.models import Room
 
 class HeatingPeriodManager(models.Manager):
 
+
+    def modify_heating_period(self, modified_heating_period):
+        heating_period = self.heating_period(
+                modified_heating_period['heating_period_id']
+            )
+        if heating_period:
+            heating_period.start_time = modified_heating_period['start_time']
+            heating_period.end_time = modified_heating_period['end_time']
+            heating_period.setpoint_temperature = modified_heating_period[
+                    'setpoint_temperature'
+                ]
+            heating_period.save()
+
     def add_heating_period(self, new_heating_period):
         new_heating_period = HeatingPeriod(
                 week_day = self.int_weekday(new_heating_period['str_weekday']),
