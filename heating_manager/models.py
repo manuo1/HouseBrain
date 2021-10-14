@@ -10,7 +10,6 @@ from rooms.models import Room
 
 class HeatingPeriodManager(models.Manager):
 
-
     def modify_heating_period(self, modified_heating_period):
         heating_period = self.heating_period(
                 modified_heating_period['heating_period_id']
@@ -195,7 +194,7 @@ class HeatingPeriod(models.Model):
         )
     start_time = models.TimeField()
     end_time = models.TimeField()
-    day_percentage = models.IntegerField(default=0)
+    day_percentage = models.FloatField(default=0)
     setpoint_temperature = models.IntegerField(default=0)
     associated_room = models.ForeignKey(
         Room,
@@ -216,7 +215,7 @@ class HeatingPeriod(models.Model):
         """for beter display add one minute to change 23:59 like 24:00"""
         if self.end_time == 23 and self.end_time == 59:
             minutes_differences += 1
-        self.day_percentage = int((minutes_differences*100)/1439)
+        self.day_percentage = (minutes_differences*100)/1439
         """ even displays periods less than 1% """
         if self.day_percentage < 1:
             self.day_percentage = 1
