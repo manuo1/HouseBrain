@@ -36,6 +36,7 @@ class Command(BaseCommand):
         return timezone.now().minute % TEMPERATURE_HISTORY_DELTA == 0
 
     def read_temperature(self, sensor):
+        temperature = ERROR_TEMPERATURE
         if settings.UNPLUGGED_MODE:
             temperature = DEBUG_TEMPERATURE
             self.stdout.write("reading temp in ---- UNPLUGGED_MODE ----")
@@ -57,6 +58,7 @@ class Command(BaseCommand):
                                 temperature = lines[1].split()[-1][2:]
                                 try:
                                     temperature = int(temperature)
+
                                 except ValueError:
                                     temperature = ERROR_TEMPERATURE
                                     sensor_manager.add_an_error(sensor)
