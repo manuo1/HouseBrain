@@ -58,7 +58,6 @@ class Command(BaseCommand):
                                 temperature = lines[1].split()[-1][2:]
                                 try:
                                     temperature = int(temperature)
-
                                 except ValueError:
                                     temperature = ERROR_TEMPERATURE
                                     sensor_manager.add_an_error(sensor)
