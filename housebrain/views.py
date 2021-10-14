@@ -68,15 +68,12 @@ def homepage(request):
 def heating_periods(request, heating_mode_id):
     if request.method == 'POST':
 
-        for submit_button_name in [
-            'add_heating_period',
-            'copy_room',
-            'copy_weekday',
-            'delete_heating_period',
-            'modify_heating_period',
-            'reset_room',
-        ]:
-            locals()[submit_button_name] = request.POST.get(submit_button_name)
+        add_heating_period = request.POST.get('add_heating_period')
+        copy_room = request.POST.get('copy_room')
+        copy_weekday = request.POST.get('copy_weekday')
+        delete_heating_period = request.POST.get('delete_heating_period')
+        modify_heating_period = request.POST.get('modify_heating_period')
+        reset_room = request.POST.get('reset_room')
 
         if modify_heating_period:
             # modify_heating_period if formated in html like a dictionary
