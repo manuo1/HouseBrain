@@ -175,11 +175,14 @@ def heating_periods(request, heating_mode_id):
     copy_room_form = CopyRoomForm()
     copy_weekday_form = CopyWeekdayForm()
 
+    rooms_with_heating_names = [ room.name for room in heater_manager.rooms_with_heater() ]
+
     context = {
         'dropdown_menu_heating_modes' : heating_period_manager.all_heating_modes(),
         'date_time': f'{timezone.now():%d/%m/%Y %H:%M}',
         'weekdays_pages': weekday_rooms_heating_periods,
         'str_weekdays' : WEEKDAYS,
+        'rooms_with_heating_names' : rooms_with_heating_names,
         'copy_weekday_form' : copy_weekday_form,
         'copy_room_form' : copy_room_form,
         'create_heating_period_form': create_heating_period_form,

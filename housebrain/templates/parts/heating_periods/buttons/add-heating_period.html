@@ -19,9 +19,9 @@
       {% csrf_token %}
         <div class="modal-body">
 
-          start_time : {{create_heating_period_form.start_time}}<br>
-          end_time : {{create_heating_period_form.end_time}}<br>
-          setpoint_temperature : {{create_heating_period_form.setpoint_temperature}}<br>
+          {{create_heating_period_form.start_time.label}} : {{create_heating_period_form.start_time}}<br>
+          {{create_heating_period_form.end_time.label}} : {{create_heating_period_form.end_time}}<br>
+          {{create_heating_period_form.setpoint_temperature.label}} : {{create_heating_period_form.setpoint_temperature}}<br>
 
         </div>
         <!-- Modal footer -->

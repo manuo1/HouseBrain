@@ -10,7 +10,7 @@
       <!-- Modal header -->
       <div class="modal-header">
         <h5 class="modal-title" id="copyRoom_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalLabel">
-            Copier toutes les périodes de chauffage de la pièce
+            Copier {{room.name}}
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -18,9 +18,17 @@
       <form action="{% url 'housebrain:heating_periods' heating_mode.id %}?page={{ weekdays_pages.number }}" method="post">
       {% csrf_token %}
         <div class="modal-body">
-          Attention toutes les aniennes périodes de chauffage de la pièce de destination seront suprimées<br>
-          {{ copy_room_form }}
-
+          <p class = "text-danger" >Attention toutes les anciennes périodes de chauffage de la pièce de destination seront supprimées</p>
+          <ul class="list-group">
+            <li class="list-group-item bg-secondary text-white">{{room.name}}</li>
+            {% for room_checkbox in copy_room_form.room %}
+              {% if room_checkbox.data.label in rooms_with_heating_names %}
+                {% if not room_checkbox.data.label == room.name %}
+                  <li class="list-group-item">{{room_checkbox}}</li>
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+          </ul>
         </div>
         <!-- Modal footer -->
         <div class="modal-footer">

@@ -20,8 +20,14 @@ class HeatingPeriodCreateForm(forms.ModelForm):
             'setpoint_temperature': 'Température de consigne',
         }
         widgets = {
-                    'start_time': forms.TimeInput(attrs={'type': 'time'}),
-                    'end_time': forms.TimeInput(attrs={'type': 'time'}),
+                    'start_time': forms.TimeInput(attrs={
+                            'type': 'time',
+                            'class': 'form-control text-center',
+                        }),
+                    'end_time': forms.TimeInput(attrs={
+                            'type': 'time',
+                            'class': 'form-control text-center',
+                        }),
         }
 
 class HeatingPeriodModifyForm(forms.ModelForm):
@@ -34,19 +40,24 @@ class HeatingPeriodModifyForm(forms.ModelForm):
             'setpoint_temperature': 'Température de consigne',
         }
         widgets = {
-                    'start_time': forms.TimeInput(attrs={'type': 'time'}),
-                    'end_time': forms.TimeInput(attrs={'type': 'time'}),
+                    'start_time': forms.TimeInput(attrs={
+                            'type': 'time',
+                            'class': 'form-control text-center',
+                        }),
+                    'end_time': forms.TimeInput(attrs={
+                            'type': 'time',
+                            'class': 'form-control text-center',
+                        }),
         }
-
 
 class CopyRoomForm(forms.Form):
     room = RoomMultipleChoiceField(
             queryset=Room.objects.all(),
-            widget=forms.CheckboxSelectMultiple,
+            widget= forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
         )
 
 class CopyWeekdayForm(forms.Form):
     weekday = forms.MultipleChoiceField(
             choices = WEEKDAYS_CHOICES,
-            widget=forms.CheckboxSelectMultiple,
+            widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
             )
