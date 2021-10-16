@@ -1,7 +1,8 @@
 {% load mathfilters %}
+{% load initial_value %}
 <!-- Modal 2 -->
 <div class="modal fade" id="modifyDeleteHeatingPeriod_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalToggle" aria-hidden="true" aria-labelledby="modifyDeleteHeatingPeriod_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalToggleLabel" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
     <div class="modal-content text-dark">
       <div class="modal-header">
         <!-- Title Modal 1 -->
@@ -15,15 +16,10 @@
       {% csrf_token %}
         <div class="modal-body">
           <!-- Modify Heating period parts -->
-
-
-          start_time : <input class="form-control" type="time" name="start_time" value="{{heating_period.start_time}}" required id="id_start_time"><br>
-          end_time : <input class="form-control" type="time" name="end_time" value="{{heating_period.end_time}}" required id="id_end_time"><br>
-          setpoint_temperature : <input class="form-control" type="number" name="setpoint_temperature" value="{{heating_period.setpoint_temperature|div:1000|floatformat:0}}" required id="id_setpoint_temperature"><br>
-
-
-
-
+          {{modify_heating_period_form.start_time.label}} : {{ modify_heating_period_form.start_time|initial_value_HM:heating_period.start_time  }}
+          {{modify_heating_period_form.end_time.label}} : {{ modify_heating_period_form.end_time|initial_value_HM:heating_period.end_time  }}
+          {{modify_heating_period_form.setpoint_temperature.label}} <br> {{ modify_heating_period_form.setpoint_temperature|initial_value_temperature:heating_period.setpoint_temperature  }}
+          <br>
           <button type="submit" value="{'heating_mode':{{heating_mode.id}},'weekday':'{{weekday}}','room':{{room.id}},'heating_period':{{heating_period.id}}}" name="modify_heating_period" class="btn btn-danger">
             Modifier
           </button>
@@ -45,7 +41,7 @@
 </div>
 <!-- Modal 2 -->
 <div class="modal fade" id="modifyDeleteHeatingPeriod_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalToggle2" aria-hidden="true" aria-labelledby="modifyDeleteHeatingPeriod_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalToggleLabel2" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
     <div class="modal-content text-dark">
       <div class="modal-header">
         <!-- Title Modal 2 -->

@@ -1,3 +1,4 @@
+{% load initial_value %}
 <!-- Button trigger modal -->
 <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#addHeatingPeriod_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_Modal" title = "Ajouter une periode de chauffage">
   <i class="bi bi-plus-square"></i>
@@ -5,7 +6,7 @@
 
 <!-- Modal -->
 <div class="modal fade" id="addHeatingPeriod_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_Modal" tabindex="-1" aria-labelledby="addHeatingPeriod_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <!-- Modal header -->
       <div class="modal-header">

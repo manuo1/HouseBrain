@@ -169,13 +169,17 @@ def heating_periods(request, heating_mode_id):
 
     """ forms """
     create_heating_period_form = HeatingPeriodCreateForm()
-    modify_heating_period_form = HeatingPeriodModifyForm(
-        initial={'start_time': '{{heating_period.start_time}}'}
-    )
+    modify_heating_period_form = HeatingPeriodModifyForm()
+    # Remove initial field for setpoint_temperature to allow modification
+    #| of the initial value from the attrs of the model
+    modify_heating_period_form.fields['setpoint_temperature'].initial = None
+
     copy_room_form = CopyRoomForm()
     copy_weekday_form = CopyWeekdayForm()
 
-    rooms_with_heating_names = [ room.name for room in heater_manager.rooms_with_heater() ]
+    rooms_with_heating_names = [
+        room.name for room in heater_manager.rooms_with_heater()
+    ]
 
     context = {
         'dropdown_menu_heating_modes' : heating_period_manager.all_heating_modes(),
@@ -189,4 +193,5 @@ def heating_periods(request, heating_mode_id):
         'modify_heating_period_form': modify_heating_period_form,
 
     }
+
     return render(request, 'heating_periods.html', context)

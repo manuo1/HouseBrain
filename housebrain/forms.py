@@ -28,6 +28,10 @@ class HeatingPeriodCreateForm(forms.ModelForm):
                             'type': 'time',
                             'class': 'form-control text-center',
                         }),
+                    'setpoint_temperature': forms.NumberInput(attrs={
+                            'class': 'form-control text-center',
+                        }),
+
         }
 
 class HeatingPeriodModifyForm(forms.ModelForm):
@@ -48,7 +52,13 @@ class HeatingPeriodModifyForm(forms.ModelForm):
                             'type': 'time',
                             'class': 'form-control text-center',
                         }),
+                    'setpoint_temperature': forms.NumberInput(attrs={
+                            'class': 'form-control text-center',
+                            'min':'5',
+                            'max':'25',
+                        }),
         }
+
 
 class CopyRoomForm(forms.Form):
     room = RoomMultipleChoiceField(
