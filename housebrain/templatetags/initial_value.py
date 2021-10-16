@@ -4,9 +4,9 @@ from datetime import datetime
 register = template.Library()
 
 @register.filter(name='initial_value_HM')
-def initial_value_HM (field, arg):
-    return field.as_widget(attrs={'value': arg.strftime("%H:%M")})
+def initial_value_HM (form_field, arg):
+    return form_field.as_widget(attrs={'value': arg.strftime("%H:%M")})
 
 @register.filter(name='initial_value_temperature')
-def initial_value_temperature (field, arg):
-    return field.as_widget(attrs={'value': round(arg/1000)})
+def initial_value_temperature (form_field, arg):
+    return form_field.as_widget(attrs={'value': round(arg/1000)})

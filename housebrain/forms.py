@@ -23,13 +23,16 @@ class HeatingPeriodCreateForm(forms.ModelForm):
                     'start_time': forms.TimeInput(attrs={
                             'type': 'time',
                             'class': 'form-control text-center',
+                            'value': '00:00',
                         }),
                     'end_time': forms.TimeInput(attrs={
                             'type': 'time',
                             'class': 'form-control text-center',
+                            'value': '00:00',
                         }),
                     'setpoint_temperature': forms.NumberInput(attrs={
                             'class': 'form-control text-center',
+                            'value': '20',
                         }),
 
         }

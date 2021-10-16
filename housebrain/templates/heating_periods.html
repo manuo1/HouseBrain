@@ -15,7 +15,7 @@
 </nav>
 <div class="container">
   <div class="row row-cols-1">
-    <div class="col" style ="background-image: url({% static 'assets/img/heating_periods_table_bg.png' %});">
+    <div class="col">
       {% if weekdays_pages %}
         {% for heating_modes in weekdays_pages.object_list %}
           {% for heating_mode, weekdays in heating_modes.items %}
