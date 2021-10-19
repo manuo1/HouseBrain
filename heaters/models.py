@@ -5,13 +5,14 @@ from rooms.models import ( Room, RoomManager )
 
 room_manager = RoomManager()
 
+
 class HeaterManager(models.Manager):
 
     def rooms_with_heater(self):
         rooms_with_heater = []
         for heater in Heater.objects.select_related().all().order_by(
                 "associated_room__heating_priority"
-            ):
+        ):
             room = heater.associated_room
             if room not in rooms_with_heater:
                 rooms_with_heater.append(room)
@@ -37,8 +38,8 @@ class HeaterManager(models.Manager):
             for heater in self.all_heaters():
                 self.turn_off(heater)
 
-class Heater(models.Model):
 
+class Heater(models.Model):
     class ControlPinChoices(models.IntegerChoices):
         PIN_00 = 0, 'Pin 0'
         PIN_01 = 1, 'Pin 1'
@@ -57,8 +58,6 @@ class Heater(models.Model):
         PIN_14 = 14, 'Pin 14'
         PIN_15 = 15, 'Pin 15'
 
-
-
     name = models.CharField(max_length=100)
     watts = models.IntegerField()
     control_pin = models.IntegerField(
@@ -66,14 +65,14 @@ class Heater(models.Model):
         blank=True,
         null=True,
         choices=ControlPinChoices.choices
-        )
+    )
     is_on = models.BooleanField(default=False)
     associated_room = models.ForeignKey(
         Room,
         on_delete=models.SET_NULL,
-         blank=True,
-         null=True,
-        )
+        blank=True,
+        null=True,
+    )
 
     def __str__(self):
         state = "OFF"
@@ -82,12 +81,17 @@ class Heater(models.Model):
 
         return f'{self.name} : {state} ( Pin : {self.control_pin})'
 
+
 """
     django.db.models.signals.post_save
     Use Django signals sent at the end of a model’s save() method.
-    Every change on Heater objects will run update_heater_state commande
+    Every change on Heater objects will run update_heater_state command
     to update the real state of the heaters
 """
+
+
 def update_real_heater_state(sender, instance, created, **kwargs):
     management.call_command('update_heater_state')
+
+
 post_save.connect(update_real_heater_state, sender=Heater)

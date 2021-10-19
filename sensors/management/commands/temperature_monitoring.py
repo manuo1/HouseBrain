@@ -1,9 +1,6 @@
 from django.conf import settings
 from django.utils import timezone
 from housebrain_config.settings.constants import (
-    MAX_TEMPERATURE as max_temp,
-    MIN_TEMPERATURE as min_temp,
-    MAX_DELTA_TEMPERATURE as max_delta,
     DEBUG_TEMPERATURE,
     ERROR_TEMPERATURE,
     TEMPERATURE_FILE,
@@ -36,38 +33,31 @@ class Command(BaseCommand):
         return timezone.now().minute % TEMPERATURE_HISTORY_DELTA == 0
 
     def read_temperature(self, sensor):
-        temperature = ERROR_TEMPERATURE
         if settings.UNPLUGGED_MODE:
             temperature = DEBUG_TEMPERATURE
             self.stdout.write("reading temp in ---- UNPLUGGED_MODE ----")
         else :
-            if sensor.is_malfunctioning:
-                temperature = ERROR_TEMPERATURE
-            else:
+            temperature = None
+            try:
+                with open (
+                    sensor.sensor_folder_path + TEMPERATURE_FILE
+                ) as file:
+                    temperature = file.readline()
+            except FileNotFoundError:
+                pass
+            except Exception as e:
+                self.stdout.write(f'error during reading temperature :\n{e}')
+
+            if temperature:
                 try:
-                    with open (
-                        sensor.sensor_folder_path + TEMPERATURE_FILE
-                    ) as file:
-                        lines = file.readlines()
-                        if len(lines) >= 2:
-                            line_1_split = lines[0].split()
-                            crc="NO"
-                            if line_1_split:
-                                crc=line_1_split[-1]
-                            if crc == "YES":
-                                temperature = lines[1].split()[-1][2:]
-                                try:
-                                    temperature = int(temperature)
-                                except ValueError:
-                                    temperature = ERROR_TEMPERATURE
-                                    sensor_manager.add_an_error(sensor)
-                            else:
-                                temperature = ERROR_TEMPERATURE
-                                sensor_manager.add_an_error(sensor)
-                except FileNotFoundError:
-                    temperature = ERROR_TEMPERATURE
-                    sensor_manager.add_an_error(sensor)
-        if temperature != ERROR_TEMPERATURE:
-            sensor_manager.reset_consecutive_errors(sensor)
+                    temperature = int(temperature)
+                except ValueError:
+                     temperature = None
+
+            if temperature:
+                sensor_manager.reset_consecutive_errors(sensor)
+            else:
+                temperature = ERROR_TEMPERATURE
+                sensor_manager.add_an_error(sensor)
 
         return temperature

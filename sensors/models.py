@@ -79,8 +79,7 @@ class TemperatureSensorManager(models.Manager):
     def add_an_error(self,sensor):
         sensor.consecutive_errors +=1
         sensor.cumulative_errors +=1
-        if sensor.consecutive_errors >= max_errors:
-            sensor.is_malfunctioning = True
+        sensor.is_malfunctioning = True
         sensor.save()
 
     def reset_consecutive_errors(self, sensor):
