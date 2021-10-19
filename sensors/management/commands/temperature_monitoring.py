@@ -54,7 +54,7 @@ class Command(BaseCommand):
                 except ValueError:
                      temperature = None
 
-            if temperature:
+            if temperature and not temperature == 0:
                 sensor_manager.reset_consecutive_errors(sensor)
             else:
                 temperature = ERROR_TEMPERATURE
