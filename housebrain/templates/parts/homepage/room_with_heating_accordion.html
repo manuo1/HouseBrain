@@ -26,7 +26,8 @@
                  {% else %}
                     {{room.sensor.last_measured_temperature|div:1000|floatformat:1}}
                  {% endif %}
-                 ({{room.room.setpoint_temperature|div:1000|floatformat:"0"}})</div>
+                 ({{room.room.setpoint_temperature|div:1000|floatformat:"0"}})
+               </div>
               </div>
             </div>
           </div>

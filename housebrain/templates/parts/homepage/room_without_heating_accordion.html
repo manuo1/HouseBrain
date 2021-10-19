@@ -11,7 +11,13 @@
                 <div class="border rounded-3 bg-light text-truncate py-1 px-1">{{room.room.name}}</div>
               </div>
               <div class="col-4">
-               <div class="border rounded-3 bg-light text-center py-1">{{room.sensor.last_measured_temperature|div:1000|floatformat:1}}</div>
+                <div class="border rounded-3 bg-light text-center py-1">
+                  {% if room.sensor.last_measured_temperature == 85000 %}
+                     -
+                  {% else %}
+                     {{room.sensor.last_measured_temperature|div:1000|floatformat:1}}
+                  {% endif %}
+               </div>
               </div>
             </div>
           </div>
