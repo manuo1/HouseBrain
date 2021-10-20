@@ -25,7 +25,7 @@ class Command(BaseCommand):
 
         if self.run_task_at_minutes([0,30]):
             # save teleinfo
-            teleinfo_manager.save_teleinfo(self.teleinfo)
+            #teleinfo_manager.save_teleinfo(self.teleinfo)
             # save tempertaures history
             sensor_manager.save_temperature_history()
 

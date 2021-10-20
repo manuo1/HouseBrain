@@ -72,6 +72,9 @@ class Command(BaseCommand):
                         # and finaly store data in teleinfo dict
                         self.teleinfo[data["key"]] = data["value"]
         self.teleinfo["date_time"] = timezone.now()
+        # save teleinfo every *TELEINFO_HISTORY_DELTA* minutes
+        if self.teleinfo["date_time"].minute % TELEINFO_HISTORY_DELTA == 0:
+            teleinfo_manager.save_teleinfo(self.teleinfo)
         self.monitoring = self.build_monitoring_data()
         # update power monitoring
         teleinfo_manager.update_power_monitoring(self.monitoring)
