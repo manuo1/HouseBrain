@@ -75,19 +75,6 @@ class TemperatureSensorManager(models.Manager):
             associated_sensor=sensor).order_by('-date_time')
         return sensor_temperatures_list
 
-    def add_an_error(self,sensor):
-        sensor.consecutive_errors +=1
-        sensor.cumulative_errors +=1
-        sensor.is_malfunctioning = True
-        sensor.save()
-
-    def reset_consecutive_errors(self, sensor):
-        if sensor.consecutive_errors != 0:
-            sensor.consecutive_errors = 0
-            if sensor.is_malfunctioning:
-                sensor.is_malfunctioning = False
-            sensor.save()
-
     def clear_all_temperature_history(self):
         TemperatureHistory.objects.all().delete()
 
