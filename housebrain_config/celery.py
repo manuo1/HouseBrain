@@ -32,6 +32,10 @@ app.conf.beat_schedule = {
         'task': 'housebrain.tasks.periodic_task_manager',
         'schedule': crontab(minute='*'),
     },
+        'Save temperatures every 5 minutes': {
+        'task': 'sensors.tasks.read_and_save_temperatures',
+        'schedule': crontab(minute='*/5'),
+    },
     'Check remaining power every 5 seconds': {
         'task': 'teleinformation.tasks.check_remaining_power',
         'schedule': 5,
