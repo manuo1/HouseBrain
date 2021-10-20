@@ -3,6 +3,7 @@ from django.db import models, IntegrityError
 from django.utils import timezone
 from datetime import datetime, timedelta
 from housebrain_config.settings.constants import (
+    ERROR_TEMPERATURE
 )
 from housebrain_config.settings.messages import (
     NO_ASSOCIATED_ROOM,
