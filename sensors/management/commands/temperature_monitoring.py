@@ -15,17 +15,25 @@ class Command(BaseCommand):
     help = """
     will save in database all temperature sensors current temperatures
     """
-    def add_arguments(self, temperature_monitoring):
-        pass
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--readonly',
+            action='store_true',
+            help='display temperatures in the console without saving'
+        )
 
     def handle(self, *args, **options):
         """main controler."""
+        if settings.UNPLUGGED_MODE:
+            self.stdout.write("---- UNPLUGGED_MODE ----")
         for sensor in sensor_manager.all_sensors():
-            sensor_manager.save_temperature(
-                self.read_temperature(sensor),
-                sensor
+            temperature = self.read_temperature(sensor)
+            if options['readonly']:
+                self.stdout.write(
+                    f'{sensor.sensor_folder_path} : {temperature}'
                 )
-
+            else:
+                sensor_manager.save_temperature(temperature, sensor)
         if self.it_s_time_to_save_temperature_history():
             sensor_manager.save_temperature_history()
 
@@ -35,29 +43,33 @@ class Command(BaseCommand):
     def read_temperature(self, sensor):
         if settings.UNPLUGGED_MODE:
             temperature = DEBUG_TEMPERATURE
-            self.stdout.write("reading temp in ---- UNPLUGGED_MODE ----")
         else :
-            temperature = None
-            try:
-                with open (
-                    sensor.sensor_folder_path + TEMPERATURE_FILE
-                ) as file:
-                    temperature = file.readline()
-            except FileNotFoundError:
-                pass
-            except Exception as e:
-                self.stdout.write(f'error during reading temperature :\n{e}')
-
+            temperature = self.read_sensor_file(sensor)
             if temperature:
-                try:
-                    temperature = int(temperature)
-                except ValueError:
-                     temperature = None
+                temperature = self.str_to_int(temperature)
 
             if temperature and not temperature == 0:
                 sensor_manager.reset_consecutive_errors(sensor)
             else:
                 temperature = ERROR_TEMPERATURE
                 sensor_manager.add_an_error(sensor)
+        return temperature
 
+    def str_to_int(self,str):
+        try:
+            return int(temperature)
+        except ValueError:
+             return None
+
+    def read_sensor_file(self,sensor):
+        temperature = None
+        try:
+            with open (
+                sensor.sensor_folder_path + TEMPERATURE_FILE
+            ) as file:
+                temperature = file.readline()
+        except FileNotFoundError:
+            pass
+        except Exception as e:
+            self.stdout.write(f'error during reading temperature :\n{e}')
         return temperature

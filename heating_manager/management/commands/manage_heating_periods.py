@@ -13,8 +13,6 @@ class Command(BaseCommand):
     will change the state of the heater of each room
     according the temperatures and remaining intensity
     """
-    def add_arguments(self, manage_heating_periods):
-        pass
 
     def handle(self, *args, **options):
         for room in room_manager.all_rooms():
@@ -22,4 +20,3 @@ class Command(BaseCommand):
                 room,
                 heating_period_manager.current_heating_period_setpoint_temperature(room)
             )
-        management.call_command('manage_heaters')

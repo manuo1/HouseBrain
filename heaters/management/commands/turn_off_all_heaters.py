@@ -7,8 +7,5 @@ class Command(BaseCommand):
     help = """
     will turn off all heaters
     """
-    def add_arguments(self, turn_off_all_heaters):
-        pass
-
     def handle(self, *args, **options):
         heater_manager.turn_off_all_heaters()

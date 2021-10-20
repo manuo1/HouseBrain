@@ -21,8 +21,6 @@ class Command(BaseCommand):
     help = """
     will save in database Teleinformation
     """
-    def add_arguments(self, power_monitoring):
-        pass
 
     def handle(self, *args, **options):
         """main controler."""

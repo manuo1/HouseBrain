@@ -20,8 +20,6 @@ class Command(BaseCommand):
     help = """
     will delette all data in database
     """
-    def add_arguments(self, delete_database):
-        pass
 
     def handle(self, *args, **options):
         """main controler."""

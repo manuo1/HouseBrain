@@ -25,22 +25,15 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 # Load task modules from all registered Django apps.
 app.autodiscover_tasks()
 
-# app.conf.beat_schedule will create base celery tasks and setttings
-# | you can change tasks settings from django admin at :
-# | your_server/admin/django_celery_beat/periodictask/
+# app.conf.beat_schedule create celery tasks and setttings
 
 app.conf.beat_schedule = {
-    'Save temperatures every 5 minutes': {
-        'task': 'sensors.tasks.read_and_save_temperatures',
-        'schedule': crontab(minute='*/5'),
-    },
-    'Manage heating_periods & heaters 1 minute after saving temperatures': {
-        'task': 'heating_manager.tasks.manage_heating_periods',
-        'schedule': crontab(minute='1,6,11,16,21,26,31,36,41,46,51,56'),
+    'periodic tasks manager': {
+        'task': 'housebrain.tasks.periodic_task_manager',
+        'schedule': crontab(minute='*'),
     },
     'Check remaining power every 5 seconds': {
         'task': 'teleinformation.tasks.check_remaining_power',
         'schedule': 5,
     },
-
 }

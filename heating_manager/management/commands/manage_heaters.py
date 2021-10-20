@@ -22,8 +22,6 @@ class Command(BaseCommand):
     will change the state of the heater of each room
     according the temperatures and remaining intensity
     """
-    def add_arguments(self, manage_heaters):
-        pass
 
     def handle(self, *args, **options):
         """main controler."""

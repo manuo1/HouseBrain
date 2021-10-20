@@ -11,8 +11,6 @@ class Command(BaseCommand):
     help = """
     will manage the real state of heaters
     """
-    def add_arguments(self, update_heater_state):
-        pass
 
     def handle(self, *args, **options):
         """main controler."""

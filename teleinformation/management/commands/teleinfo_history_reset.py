@@ -7,8 +7,6 @@ class Command(BaseCommand):
     help = """
     will delette all Teleinformation history
     """
-    def add_arguments(self, teleinfo_history_reset):
-        pass
 
     def handle(self, *args, **options):
         """main controler."""

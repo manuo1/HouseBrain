@@ -6,5 +6,4 @@ from django.core import management
 @shared_task
 def check_remaining_power():
     """ run the manage.py command : power_monitoring """
-    # periodiode is configured in django admin
     management.call_command('power_monitoring')

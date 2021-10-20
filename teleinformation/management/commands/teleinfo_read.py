@@ -14,8 +14,6 @@ class Command(BaseCommand):
     help = """
     will display in consol Teleinformation
     """
-    def add_arguments(self, teleinfo_read):
-        pass
 
     def handle(self, *args, **options):
         """main controler."""

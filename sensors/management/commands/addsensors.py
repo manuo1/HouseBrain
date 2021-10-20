@@ -17,9 +17,6 @@ class Command(BaseCommand):
     Search and add sensors to the database.
     """
 
-    def add_arguments(self, addsensors):
-        pass
-
     def handle(self, *args, **options):
         """main controler."""
         temperature_sensor_manager.add_sensors(self.all_temperature_sensors())

@@ -43,7 +43,9 @@ TEMPERATURE_SENSORS_FAMILY_CODES = [10, 28]
 ##############################################################################
 # Raspberry one wire devices folder paths:
 ##############################################################################
-
+# one wire device folder is in a segment of the kernel read-write transient
+# storage aka random access memory, it's not a real location, it's a pretend
+# filesystem created by the kernel sysfs driver. It's effectively "ramdisk"
 W1_DIRECTORY_PATH = "/sys/bus/w1/devices"
 TEMPERATURE_FILE = "/temperature"
 

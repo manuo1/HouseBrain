@@ -9,8 +9,6 @@ class Command(BaseCommand):
     help = """
     will delette all periodic tasks, crontab and interval
     """
-    def add_arguments(self, delete_periodic_tasks):
-        pass
 
     def handle(self, *args, **options):
         """main controler."""
