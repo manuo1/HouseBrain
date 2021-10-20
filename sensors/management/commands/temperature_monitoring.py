@@ -34,11 +34,6 @@ class Command(BaseCommand):
                 )
             else:
                 sensor_manager.save_temperature(temperature, sensor)
-        if self.it_s_time_to_save_temperature_history():
-            sensor_manager.save_temperature_history()
-
-    def it_s_time_to_save_temperature_history(self):
-        return timezone.now().minute % TEMPERATURE_HISTORY_DELTA == 0
 
     def read_temperature(self, sensor):
         if settings.UNPLUGGED_MODE:

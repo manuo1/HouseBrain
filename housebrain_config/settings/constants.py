@@ -10,7 +10,7 @@ from housebrain_config.settings.messages import (
 )
 
 ##############################################################################
-#false data for the debug mode (no sensor connected):
+#false data for the debug mode (if no sensor connected):
 ##############################################################################
 DEBUG_SENSOR_FOLDER_PATHS = [
     '/sys/bus/w1/devices/28-000005c7cc82',
@@ -29,12 +29,6 @@ DEBUG_TEMPERATURE = 54321
 ##############################################################################
 DEFAULT_TEMPERATURE = 5000
 ERROR_TEMPERATURE = 85000
-MAX_TEMPERATURE = 60000
-MIN_TEMPERATURE = -50000
-MAX_DELTA_TEMPERATURE = 4
-# Maximum consecutive reading errors before defining the sensor defective
-MAX_SENSOR_READING_ERRORS = 10
-TEMPERATURE_HISTORY_DELTA = 30 # save temperature history every X minutes
 #Each  DS18*20  contains  a  unique  ROM  code  that  is  64-bits  long.
 #| The  first  8  bits  are  a  1-Wire  family code
 #| DS18B20 code is 28, DS18S20 code is 10
@@ -64,7 +58,6 @@ DEBUG_IINST = 999
 ERROR_ISOUSC = 1
 DEBUG_ISOUSC = 1
 TELEINFO_TIMEOUT = 4 # [seconds]
-TELEINFO_HISTORY_DELTA = 30 # save teleinformation history every X minutes
 
 ##############################################################################
 # Heating manager

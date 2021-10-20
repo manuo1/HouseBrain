@@ -3,8 +3,6 @@ from django.db import models, IntegrityError
 from django.utils import timezone
 from datetime import datetime, timedelta
 from housebrain_config.settings.constants import (
-    ERROR_TEMPERATURE as error_temp,
-    MAX_SENSOR_READING_ERRORS as max_errors,
 )
 from housebrain_config.settings.messages import (
     NO_ASSOCIATED_ROOM,
@@ -110,8 +108,12 @@ class TemperatureSensor(models.Model):
         null=True,
     )
     date_time_update = models.DateTimeField(auto_now=True)
-    last_measured_temperature = models.IntegerField(default=error_temp)
-    previous_measured_temperature = models.IntegerField(default=error_temp)
+    last_measured_temperature = models.IntegerField(
+        default=ERROR_TEMPERATURE
+    )
+    previous_measured_temperature = models.IntegerField(
+        default=ERROR_TEMPERATURE
+    )
     consecutive_errors = models.IntegerField(default=0)
     cumulative_errors = models.IntegerField(default=0)
     is_malfunctioning = models.BooleanField(default=False)
