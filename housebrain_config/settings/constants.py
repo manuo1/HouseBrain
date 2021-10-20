@@ -29,6 +29,7 @@ DEBUG_TEMPERATURE = 54321
 ##############################################################################
 DEFAULT_TEMPERATURE = 5000
 ERROR_TEMPERATURE = 85000
+SENSOR_READING_MAX_ATTEMPTS = 4
 #Each  DS18*20  contains  a  unique  ROM  code  that  is  64-bits  long.
 #| The  first  8  bits  are  a  1-Wire  family code
 #| DS18B20 code is 28, DS18S20 code is 10

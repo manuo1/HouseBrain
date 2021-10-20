@@ -11,6 +11,7 @@ from .forms import (
     CopyRoomForm,
     CopyWeekdayForm,
     HeatingPeriodModifyForm,
+    ManualTemperatureForm
  )
 from sensors.models import TemperatureSensorManager
 from heaters.models import HeaterManager
@@ -23,6 +24,30 @@ t_sensor_manager = TemperatureSensorManager()
 heating_period_manager = HeatingPeriodManager()
 
 def homepage(request):
+    if request.method == 'POST':
+        set_manual_temperature = request.POST.get('set_manual_temperature')
+
+        if set_manual_temperature:
+            room_id = int(set_manual_temperature)
+            manual_temperature_form = ManualTemperatureForm(request.POST)
+            if manual_temperature_form.is_valid():
+                manual_mode_data = {
+                    'manual_mode_start':
+                        manual_temperature_form.cleaned_data.get(
+                            'manual_mode_start'
+                        ),
+                    'manual_mode_end':
+                        manual_temperature_form.cleaned_data.get(
+                            'manual_mode_end'
+                        ),
+                    'manual_setpoint_temperature':
+                        manual_temperature_form.cleaned_data.get(
+                            'manual_setpoint_temperature'
+                        ),
+                }
+                room_manager.set_manual_temperature(
+                    room_id, manual_mode_data
+                )
 
     rooms_with_heating = []
     rooms_without_heating = []
@@ -53,8 +78,16 @@ def homepage(request):
                             "temperature_history" : temperature_history,
                         }
                     )
+    """ forms """
+    manual_temperature_form = ManualTemperatureForm()
+    # Remove initial field for setpoint_temperature to allow modification
+    #| of the initial value from the attrs of the model
+    manual_temperature_form.fields[
+            'manual_setpoint_temperature'
+        ].initial = None
 
     context = {
+        'manual_temperature_form' : manual_temperature_form,
         'dropdown_menu_heating_modes' : heating_period_manager.all_heating_modes(),
         'date_time': f'{timezone.now():%d/%m/%Y %H:%M}',
         'rooms_with_heating': rooms_with_heating,

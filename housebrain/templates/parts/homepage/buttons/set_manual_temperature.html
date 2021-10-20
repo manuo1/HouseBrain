@@ -1,0 +1,35 @@
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#setManualTemperature_R{{room.room.id}}_Modal" title = "Température manuelle">
+  <i class="bi bi-pencil-square"></i>
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="setManualTemperature_R{{room.room.id}}_Modal" tabindex="-1" aria-labelledby="setManualTemperature_R{{room.room.id}}_ModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <!-- Modal header -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="setManualTemperature_R{{room.room.id}}_ModalLabel">
+            Forcer la température
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <!-- Modal body & Form -->
+      <form action="{% url 'housebrain:homepage' %}" method="post">
+      {% csrf_token %}
+        <div class="modal-body">
+
+          {{manual_temperature_form.manual_mode_start.label}} : {{manual_temperature_form.manual_mode_start}}<br>
+          {{manual_temperature_form.manual_mode_end.label}} : {{manual_temperature_form.manual_mode_end}}<br>
+          {{manual_temperature_form.manual_setpoint_temperature.label}} : {{manual_temperature_form.manual_setpoint_temperature}}<br>
+
+        </div>
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" value="{{room.room.id}}" name="set_manual_temperature" class="btn btn-success">Valider</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -25,40 +25,29 @@ class RoomManager(models.Manager):
         room.setpoint_temperature = temperature
         room.save()
 
-class Room(models.Model):
+    def set_manual_temperature(self, room_id, manual_mode_data):
+        room = self.room(room_id)
+        room.manual_mode_start = manual_mode_data['manual_mode_start']
+        room.manual_mode_end = manual_mode_data['manual_mode_end']
+        room.manual_setpoint_temperature = manual_mode_data[
+                'manual_setpoint_temperature'
+            ]*1000
+        room.save()
 
-    class HeatingModeChoices(models.IntegerChoices):
-        AUTO = 0, auto[settings.LANGUAGE_CODE]
-        MANUAL = 1, manual[settings.LANGUAGE_CODE]
+class Room(models.Model):
 
     name = models.CharField(max_length=100)
     heating_priority = models.IntegerField(default=100)
-    heating_mode = models.IntegerField(
-        default=HeatingModeChoices.AUTO,
-        choices=HeatingModeChoices.choices
-        )
+    manual_mode_start = models.DateTimeField(null=True, blank=True)
+    manual_mode_end = models.DateTimeField(null=True, blank=True)
+    manual_setpoint_temperature = models.IntegerField(default=5000)
     setpoint_temperature = models.IntegerField(default=5000)
 
     def __str__(self):
-        ret = "{} | {} : {} | {} : {} | mode : {}".format(
-            self.name ,
-            HEATING_PRIORITY[settings.LANGUAGE_CODE],
-            str(self.heating_priority),
-            SETPOINT_TEMPERATURE[settings.LANGUAGE_CODE],
-            str(self.setpoint_temperature),
-            str(self.HeatingModeChoices.choices[self.heating_mode][1])
+        return (
+            f'{self.name} | '
+            f'{HEATING_PRIORITY[settings.LANGUAGE_CODE]} : '
+            f'{str(self.heating_priority)} | '
+            f'{SETPOINT_TEMPERATURE[settings.LANGUAGE_CODE]} : '
+            f'{str(self.setpoint_temperature)}'
         )
-        return ret
-
-"""
-    django.db.models.signals.post_save
-    Use Django signals sent at the end of a model’s save() method.
-    Every change on Room objects will run manage_heaters commande
-    to update room heaters state
-"""
-#removed since manage_heating_periods was created
-"""
-def update_room_heaters_state(sender, instance, created, **kwargs):
-    management.call_command('manage_heaters')
-post_save.connect(update_room_heaters_state, sender=Room)
-"""
