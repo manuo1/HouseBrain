@@ -4,7 +4,6 @@ from housebrain_config.settings.constants import (
     DEBUG_TEMPERATURE,
     ERROR_TEMPERATURE,
     TEMPERATURE_FILE,
-    TEMPERATURE_HISTORY_DELTA,
 )
 from sensors.models import TemperatureSensorManager
 from django.core.management.base import BaseCommand
