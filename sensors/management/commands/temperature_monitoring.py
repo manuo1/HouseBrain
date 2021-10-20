@@ -49,9 +49,9 @@ class Command(BaseCommand):
                 sensor_manager.add_an_error(sensor)
         return temperature
 
-    def str_to_int(self,str):
+    def str_to_int(self,str_temperature):
         try:
-            return int(temperature)
+            return int(str_temperature)
         except ValueError:
              return None
 
