@@ -58,7 +58,7 @@ DEBUG_IINST = 999
 ERROR_ISOUSC = 1
 DEBUG_ISOUSC = 1
 TELEINFO_TIMEOUT = 4 # [seconds]
-
+TELEINFO_HISTORY_DELTA = 30
 ##############################################################################
 # Heating manager
 ##############################################################################

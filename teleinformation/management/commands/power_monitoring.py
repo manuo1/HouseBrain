@@ -8,7 +8,7 @@ from django.core.management.base import BaseCommand
 from housebrain_config.settings.constants import (
     SERIAL_PORT, SERIAL_BAUDRATE, SERIAL_TIMEOUT,
     ERROR_IINST, DEBUG_IINST, ERROR_ISOUSC, DEBUG_ISOUSC,
-    TELEINFO_TIMEOUT,
+    TELEINFO_TIMEOUT, TELEINFO_HISTORY_DELTA
 )
 from teleinformation.models import TeleinformationHistory
 from teleinformation.models import TeleinfoManager
