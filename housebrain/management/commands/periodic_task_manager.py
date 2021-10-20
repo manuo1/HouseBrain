@@ -14,13 +14,10 @@ class Command(BaseCommand):
     read_and_save_temperatures
     """
 
-    hour_now = timezone.now().hour
-    minute_now = timezone.now().minute
-
-
     def handle(self, *args, **options):
         """main controler."""
         if self.run_task_at_minutes([1,6,11,16,21,26,31,36,41,46,51,56]):
+
             # applies setpoint temperatures to each room according
             #| to their heating period
             management.call_command('manage_heating_periods')
@@ -35,7 +32,7 @@ class Command(BaseCommand):
             pass
 
     def run_task_once_a_day(self):
-        return ( self.hour_now == 0 and self.minute_now == 3 )
+        return ( timezone.now().hour == 0 and timezone.now().minute == 3 )
 
     def run_task_at_minutes(self, minutes):
-        return self.minute_now in minutes
+        return timezone.now().minute in minutes
