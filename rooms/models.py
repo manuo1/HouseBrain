@@ -41,6 +41,13 @@ class RoomManager(models.Manager):
         room.manual_setpoint_temperature = 20000
         room.save()
 
+    def delete_manual_temperature_with_id(self, room_id):
+        room = self.room(room_id)
+        room.manual_mode_start = None
+        room.manual_mode_end = None
+        room.manual_setpoint_temperature = 20000
+        room.save()
+
 class Room(models.Model):
 
     name = models.CharField(max_length=100)

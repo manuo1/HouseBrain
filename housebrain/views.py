@@ -26,6 +26,12 @@ heating_period_manager = HeatingPeriodManager()
 def homepage(request):
     if request.method == 'POST':
         set_manual_temperature = request.POST.get('set_manual_temperature')
+        delete_manual_temperature = request.POST.get('delete_manual_temperature')
+
+
+        if delete_manual_temperature:
+            room_id = int(delete_manual_temperature)
+            room_manager.delete_manual_temperature_with_id(room_id)
 
         if set_manual_temperature:
             room_id = int(set_manual_temperature)

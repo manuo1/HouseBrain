@@ -97,7 +97,7 @@ class ManualTemperatureForm(forms.ModelForm):
                             'class': 'form-control text-center',
                             'required': 'required',
                             'value': (
-                                timezone.now().isoformat()
+                                timezone.now().strftime("%Y-%m-%dT%H:%M")
                             ),
                         }),
 
@@ -106,7 +106,7 @@ class ManualTemperatureForm(forms.ModelForm):
                             'class': 'form-control text-center',
                             'required': 'required',
                             'value': (
-                                (timezone.now() + timedelta(hours=1)).isoformat()
+                                (timezone.now() + timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M")
                             ),
                         }),
                     'manual_setpoint_temperature': forms.NumberInput(attrs={
