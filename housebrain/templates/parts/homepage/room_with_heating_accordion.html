@@ -17,7 +17,9 @@
                </div>
               </div>
               <div class="col-6">
-                <div class="border rounded-3 bg-light text-truncate py-1 px-1">{{room.room.name}}</div>
+                <div class="border rounded-3 bg-light text-truncate py-1 px-1">
+                  {{room.room.name}} {% if room.room.manual_mode_start %}<i class="bi bi-hand-index-thumb-fill"></i>{% endif%}
+                </div>
               </div>
               <div class="col-4">
                <div class="border rounded-3 bg-light text-center py-1">
@@ -37,19 +39,15 @@
       <div id="collapse_{{room.room.id}}" class="accordion-collapse collapse" aria-labelledby="heading_{{room.room.id}}" data-bs-parent="#accordion">
         <div class="accordion-body">
           <div class="row">
-            <div class="col-sm-12 col-lg-2">
+            <div class="col-sm-12 col-lg-2 text-center">
               {% include "parts/homepage/buttons/set_manual_temperature.html" %}
             </div>
             <div class="col-sm-12 col-lg-10">
               {% if room.room.manual_mode_start %}
-                Température manuelle définie
+                Température manuelle
                 du <strong>{{ room.room.manual_mode_start|date:"j/n" }} {{ room.room.manual_mode_start|time:"H:i" }}</strong>
                 au <strong>{{ room.room.manual_mode_end|date:"j/n" }} {{ room.room.manual_mode_end|time:"H:i" }}</strong>
                 à <strong>{{room.room.manual_setpoint_temperature|div:1000|floatformat:1}}°</strong>
-
-
-
-
               {% endif%}
             </div>
           </div>
