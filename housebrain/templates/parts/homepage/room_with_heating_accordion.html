@@ -40,14 +40,19 @@
         <div class="accordion-body">
           <div class="row">
             <div class="col-sm-12 col-lg-2 text-center">
-              {% if room.room.manual_mode_start %}
-                <form action="{% url 'housebrain:homepage' %}" method="post">
-                  {% csrf_token %}
-                  <button type="submit" value="{{room.room.id}}" name="delete_manual_temperature" class="btn btn-outline-secondary btn-sm" title = "Suprimer Température manuelle" ><i class="bi bi-trash"></i></button>
-                </form>
-              {% else %}
-                {% include "parts/homepage/buttons/set_manual_temperature.html" %}
-              {% endif%}
+              {% if user.is_authenticated %}
+                {% if room.room.manual_mode_start %}
+                  <form action="{% url 'housebrain:homepage' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" value="{{room.room.id}}" name="delete_manual_temperature" class="btn btn-outline-secondary btn-sm" title = "Suprimer Température manuelle" ><i class="bi bi-trash"></i></button>
+                  </form>
+                {% else %}
+                  {% include "parts/homepage/buttons/set_manual_temperature.html" %}
+                {% endif%}
+
+                {% else %}
+                  <a class="nav-link active" href="{% url 'authentication:login' %}">Connectez vous pour atteindre ces fonctionnalitées</a>
+                {% endif%}
           </div>
             <div class="col-sm-12 col-lg-10 text-sm-center text-lg-start">
               {% if room.room.manual_mode_start %}

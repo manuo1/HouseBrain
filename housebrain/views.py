@@ -25,7 +25,7 @@ t_sensor_manager = TemperatureSensorManager()
 heating_period_manager = HeatingPeriodManager()
 
 def homepage(request):
-    if request.method == 'POST':
+    if request.method == 'POST' and request.user.is_authenticated:
         set_manual_temperature = request.POST.get('set_manual_temperature')
         delete_manual_temperature = request.POST.get('delete_manual_temperature')
 
@@ -108,7 +108,7 @@ def homepage(request):
     return render(request, 'homepage.html', context)
 
 def heating_periods(request, heating_mode_id):
-    if request.method == 'POST':
+    if request.method == 'POST' and request.user.is_authenticated:
 
         add_heating_period = request.POST.get('add_heating_period')
         copy_room = request.POST.get('copy_room')
