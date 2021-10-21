@@ -17,7 +17,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """main controler."""
         if self.run_task_at_minutes([1,6,11,16,21,26,31,36,41,46,51,56]):
-
             # applies setpoint temperatures to each room according
             #| to their heating period
             management.call_command('manage_heating_periods')

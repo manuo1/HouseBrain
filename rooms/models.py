@@ -22,8 +22,9 @@ class RoomManager(models.Manager):
         return Room.objects.all().order_by('heating_priority', 'name')
 
     def change_setpoint_temperature(self, room, temperature):
-        room.setpoint_temperature = temperature
-        room.save()
+        if room.setpoint_temperature != temperature:
+            room.setpoint_temperature = temperature
+            room.save()
 
     def set_manual_temperature(self, room_id, manual_mode_data):
         room = self.room(room_id)
@@ -34,13 +35,19 @@ class RoomManager(models.Manager):
             ]*1000
         room.save()
 
+    def delete_manual_temperature(self, room):
+        room.manual_mode_start = None
+        room.manual_mode_end = None
+        room.manual_setpoint_temperature = 20000
+        room.save()
+
 class Room(models.Model):
 
     name = models.CharField(max_length=100)
     heating_priority = models.IntegerField(default=100)
     manual_mode_start = models.DateTimeField(null=True, blank=True)
     manual_mode_end = models.DateTimeField(null=True, blank=True)
-    manual_setpoint_temperature = models.IntegerField(default=5000)
+    manual_setpoint_temperature = models.IntegerField(default=20000)
     setpoint_temperature = models.IntegerField(default=5000)
 
     def __str__(self):
