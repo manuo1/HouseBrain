@@ -1,6 +1,7 @@
 from django.core.paginator import Paginator
 from datetime import timedelta
 from django.conf import settings
+from django.core import management
 from django.utils import timezone
 from django.shortcuts import render
 from housebrain_config.settings.constants import (
@@ -32,6 +33,8 @@ def homepage(request):
         if delete_manual_temperature:
             room_id = int(delete_manual_temperature)
             room_manager.delete_manual_temperature_with_id(room_id)
+            management.call_command('manage_heating_periods')
+            management.call_command('manage_heaters')
 
         if set_manual_temperature:
             room_id = int(set_manual_temperature)
