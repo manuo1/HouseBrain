@@ -1,7 +1,13 @@
+from calendar import monthrange
 from datetime import timedelta
 from django.db import models
 from django.utils import timezone
-from housebrain_config.settings.constants import (ERROR_IINST)
+from housebrain_config.settings.constants import (
+    ERROR_IINST,
+    PRICE_PER_KILOWATT_HOUR_HP as price_hp,
+    PRICE_PER_KILOWATT_HOUR_HC as price_hc,
+    MONTHLY_SUBSCRIPTION_PRICE as subscription_price,
+)
 
 """
 /!\ Teleinformation comes from the French electric network, docstrings
@@ -77,9 +83,17 @@ class TeleinfoManager(models.Manager):
                 start_hp = self.str_to_int(daily_teleinfo[0].HCHP)
                 end_hp = self.str_to_int(daily_teleinfo[-1].HCHP)
                 if all([values != 0 for values in [start_hc,end_hc,start_hp,end_hp]]):
+                    hc = end_hc - start_hc
+                    hp = end_hp - start_hp
+                    percentage_hc = int((hc/(hc+hp))*100)
+                    days_in_month = monthrange(date.year, date.month)[1]
+                    print(type(days_in_month))
+                    price = hc/1000*price_hc + hp/1000*price_hp + subscription_price/days_in_month
                     daily_consumption["values"] = {
-                            "HC": (end_hc - start_hc),
-                            "HP": (end_hp - start_hp),
+                            "HC": hc,
+                            "HP": hp,
+                            "HP-HC": f'{percentage_hc}% - {100-percentage_hc}%',
+                            "€" : f'{round(price,2):.2f}€',
                     }
 
         return daily_consumption

@@ -92,7 +92,6 @@ def homepage(request):
                         }
                     )
     """ consumptions history """
-    print(teleinfo_manager.daily_consumption(timezone.now().date()))
     consumptions = []
     for day in list(range(8)):
         consumptions.append(

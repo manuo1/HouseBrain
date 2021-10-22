@@ -96,3 +96,10 @@ WEEKDAYS = [
     DAYOFTHEWEEK_SATURDAY[settings.LANGUAGE_CODE],
     DAYOFTHEWEEK_SUNDAY[settings.LANGUAGE_CODE],
 ]
+
+##############################################################################
+# EDF
+##############################################################################
+PRICE_PER_KILOWATT_HOUR_HP = 0.1821
+PRICE_PER_KILOWATT_HOUR_HC = 0.1360
+MONTHLY_SUBSCRIPTION_PRICE = 15.42
