@@ -12,7 +12,12 @@
 
 <br>
 
-<!-- display all rooms with heating name heater state and couple current température / setpoint temperature -->
+<!-- display electric consumption + collapsible part with history -->
+{% include "parts/homepage/consumptions.html" %}
+
+<br>
+
+<!-- display all rooms with heating name heater state and couple current temperature / setpoint temperature + collapsible part with features-->
 {% include "parts/homepage/room_with_heating_accordion.html" %}
 
 {% endblock %}

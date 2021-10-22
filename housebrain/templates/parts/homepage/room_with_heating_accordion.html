@@ -39,6 +39,14 @@
       <div id="collapse_{{room.room.id}}" class="accordion-collapse collapse" aria-labelledby="heading_{{room.room.id}}" data-bs-parent="#accordion">
         <div class="accordion-body">
           <div class="row">
+            <div class="col-sm-12 col-lg-10 text-sm-center text-lg-start">
+              {% if room.room.manual_mode_start %}
+                Température manuelle<br class='d-lg-none'>
+                du <strong>{{ room.room.manual_mode_start|date:"j/n" }} {{ room.room.manual_mode_start|time:"H:i" }}</strong>
+                au <strong>{{ room.room.manual_mode_end|date:"j/n" }} {{ room.room.manual_mode_end|time:"H:i" }}</strong><br class='d-lg-none'>
+                à <strong>{{room.room.manual_setpoint_temperature|div:1000|floatformat:1}}°</strong>
+              {% endif%}
+            </div>
             <div class="col-sm-12 col-lg-2 text-center">
               {% if user.is_authenticated %}
                 {% if room.room.manual_mode_start %}
@@ -53,14 +61,6 @@
                 {% else %}
                   <a class="nav-link active" href="{% url 'authentication:login' %}">Connectez vous pour atteindre ces fonctionnalitées</a>
                 {% endif%}
-          </div>
-            <div class="col-sm-12 col-lg-10 text-sm-center text-lg-start">
-              {% if room.room.manual_mode_start %}
-                Température manuelle<br class='d-lg-none'>
-                du <strong>{{ room.room.manual_mode_start|date:"j/n" }} {{ room.room.manual_mode_start|time:"H:i" }}</strong>
-                au <strong>{{ room.room.manual_mode_end|date:"j/n" }} {{ room.room.manual_mode_end|time:"H:i" }}</strong><br class='d-lg-none'>
-                à <strong>{{room.room.manual_setpoint_temperature|div:1000|floatformat:1}}°</strong>
-              {% endif%}
             </div>
           </div>
         </div>

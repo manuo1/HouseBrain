@@ -54,10 +54,14 @@ class Command(BaseCommand):
         usable_intensity = self.usable_intensity_measurement()
         # add the intensity of the heaters already on to know the total
         #   intensity available if all the heaters were off
-        usable_intensity += self.intensity_of_heaters_already_on(rooms_requiring_heating)
+        usable_intensity += self.intensity_of_heaters_already_on(
+                rooms_requiring_heating
+            )
         # check which rooms need to be heated can be heated with the available
         #|  intensity
-        rooms_that_can_be_heated = self.rooms_that_can_be_heated(rooms_requiring_heating, usable_intensity)
+        rooms_that_can_be_heated = self.rooms_that_can_be_heated(
+                rooms_requiring_heating, usable_intensity
+            )
         for room in rooms_that_can_be_heated:
             self.turn_on_the_room_heaters(room)
 

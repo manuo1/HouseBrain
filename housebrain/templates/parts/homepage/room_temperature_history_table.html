@@ -5,7 +5,7 @@
       <tr>
         <th scope="col" class="text-center text-white bg-secondary bg-gradient "></th>
         {% for weekday, historys in room.temperature_history.items %}
-        <th scope="col" class="text-center text-white bg-secondary bg-gradient"><sup>{{weekday|date:'D'}} {{weekday|date:'d/m'}}</sup></th>
+        <th scope="col" class="text-center text-white bg-secondary bg-gradient"><sup>{{weekday|date:'D d/m'}}</sup></th>
         {% endfor %}
       </tr>
     </thead>

@@ -18,23 +18,25 @@ from sensors.models import TemperatureSensorManager
 from heaters.models import HeaterManager
 from rooms.models import RoomManager
 from heating_manager.models import HeatingPeriodManager
+from teleinformation.models import TeleinfoManager
 
 room_manager = RoomManager()
 heater_manager = HeaterManager()
 t_sensor_manager = TemperatureSensorManager()
 heating_period_manager = HeatingPeriodManager()
+teleinfo_manager = TeleinfoManager()
 
 def homepage(request):
     if request.method == 'POST' and request.user.is_authenticated:
         set_manual_temperature = request.POST.get('set_manual_temperature')
-        delete_manual_temperature = request.POST.get('delete_manual_temperature')
+        delete_manual_temperature = request.POST.get(
+                'delete_manual_temperature'
+            )
 
 
         if delete_manual_temperature:
             room_id = int(delete_manual_temperature)
             room_manager.delete_manual_temperature_with_id(room_id)
-            management.call_command('manage_heating_periods')
-            management.call_command('manage_heaters')
 
         if set_manual_temperature:
             room_id = int(set_manual_temperature)
@@ -57,6 +59,8 @@ def homepage(request):
                 room_manager.set_manual_temperature(
                     room_id, manual_mode_data
                 )
+                management.call_command('manage_heating_periods')
+                management.call_command('manage_heaters')
 
     rooms_with_heating = []
     rooms_without_heating = []
@@ -87,6 +91,15 @@ def homepage(request):
                             "temperature_history" : temperature_history,
                         }
                     )
+    """ consumptions history """
+    print(teleinfo_manager.daily_consumption(timezone.now().date()))
+    consumptions = []
+    for day in list(range(8)):
+        consumptions.append(
+                teleinfo_manager.daily_consumption(
+                    (timezone.now().date() - timedelta(days=day))
+            )
+        )
     """ forms """
     manual_temperature_form = ManualTemperatureForm()
     # Remove initial field for setpoint_temperature to allow modification
@@ -96,9 +109,12 @@ def homepage(request):
         ].initial = None
 
     context = {
+        'consumptions' : consumptions,
         'manual_temperature_form' : manual_temperature_form,
-        'dropdown_menu_heating_modes' : heating_period_manager.all_heating_modes(),
-        'date_time': f'{timezone.now():%d/%m/%Y %H:%M}',
+        'dropdown_menu_heating_modes' : (
+            heating_period_manager.all_heating_modes()
+        ),
+        'date': timezone.now().date(),
         'rooms_with_heating': rooms_with_heating,
         'rooms_without_heating': rooms_without_heating,
         'hours_list' : list(range(24)),
@@ -226,7 +242,6 @@ def heating_periods(request, heating_mode_id):
 
     context = {
         'dropdown_menu_heating_modes' : heating_period_manager.all_heating_modes(),
-        'date_time': f'{timezone.now():%d/%m/%Y %H:%M}',
         'weekdays_pages': weekday_rooms_heating_periods,
         'str_weekdays' : WEEKDAYS,
         'rooms_with_heating_names' : rooms_with_heating_names,

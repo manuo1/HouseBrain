@@ -1,3 +1,4 @@
+from datetime import timedelta
 from django.db import models
 from django.utils import timezone
 from housebrain_config.settings.constants import (ERROR_IINST)
@@ -37,7 +38,9 @@ class TeleinfoManager(models.Manager):
     def last_teleinfo_minute(self):
         last_minute_saved = 5
         if TeleinformationHistory.objects.exists():
-            last_teleinfo_history = TeleinformationHistory.objects.latest('date_time')
+            last_teleinfo_history = TeleinformationHistory.objects.latest(
+                    'date_time'
+                )
             last_minute_saved = last_teleinfo_history.date_time.minute
         return last_minute_saved
 
@@ -48,6 +51,51 @@ class TeleinfoManager(models.Manager):
             power_monitoring = PowerMonitoring()
             power_monitoring.save()
         return power_monitoring
+
+    def daily_consumption(self, date):
+        daily_consumption = {}
+        daily_teleinfo = list(TeleinformationHistory.objects.filter(
+            date_time__date = date,
+        ).order_by('date_time'))
+        next_date = date + timedelta(days=1)
+        midnight_teleinfo_of_the_next_day = TeleinformationHistory.objects.filter(
+            date_time__date = next_date,
+            date_time__hour = 0,
+            date_time__minute = 0,
+        )
+        if daily_teleinfo:
+            if midnight_teleinfo_of_the_next_day:
+                daily_teleinfo.append(midnight_teleinfo_of_the_next_day[0])
+            if self.all_optarif(daily_teleinfo, "HC.." ):
+                daily_consumption = {
+                    "OPTARIF": "HC..",
+                    "date": date,
+                    "values" : {},
+                }
+                start_hc = self.str_to_int(daily_teleinfo[0].HCHC)
+                end_hc = self.str_to_int(daily_teleinfo[-1].HCHC)
+                start_hp = self.str_to_int(daily_teleinfo[0].HCHP)
+                end_hp = self.str_to_int(daily_teleinfo[-1].HCHP)
+                if all([values != 0 for values in [start_hc,end_hc,start_hp,end_hp]]):
+                    daily_consumption["values"] = {
+                            "HC": (end_hc - start_hc),
+                            "HP": (end_hp - start_hp),
+                    }
+
+        return daily_consumption
+
+
+    def str_to_int(self,str):
+        try:
+            return int(str)
+        except (TypeError, ValueError):
+            return 0
+
+
+    def all_optarif(self, set, value):
+        return all([teleinfo.OPTARIF == value for teleinfo in set])
+
+
 
 class PowerMonitoring(models.Model):
 
