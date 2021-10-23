@@ -152,6 +152,18 @@ class HeatingPeriodManager(models.Manager):
         )
         return heating_period
 
+class RoomHeatingModel(models.Model):
+    name = models.CharField(max_length=100)
+
+class ModelHeatingPeriods(models.Model):
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    setpoint_temperature = models.IntegerField(default=0)
+    associated_room_heating_model = models.ForeignKey(
+        RoomHeatingModel,
+        on_delete=models.CASCADE,
+    )
+
 class HeatingMode(models.Model):
     name = models.CharField(max_length=100)
 
