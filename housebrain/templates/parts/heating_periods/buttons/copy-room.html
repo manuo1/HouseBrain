@@ -1,41 +1,36 @@
-<!-- Button trigger modal -->
-<button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#copyRoom_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_Modal" title = "Copier la pièce">
+<!-- Button trigger offcanvas -->
+<button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#copyRoom_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_offcanvasRight" aria-controls="offcanvasRight">
   <i class="bi bi-back"></i>
 </button>
 
-<!-- Modal -->
-<div class="modal fade" id="copyRoom_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_Modal" tabindex="-1" aria-labelledby="copyRoom_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content">
-      <!-- Modal header -->
-      <div class="modal-header">
-        <h5 class="modal-title" id="copyRoom_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_ModalLabel">
-            Copier {{room.name}}
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <!-- Modal body & Form -->
-      <form action="{% url 'housebrain:heating_periods' heating_mode.id %}?page={{ weekdays_pages.number }}" method="post">
-      {% csrf_token %}
-        <div class="modal-body">
-          <p class = "text-danger" >Attention toutes les anciennes périodes de chauffage de la pièce de destination seront supprimées</p>
-          <ul class="list-group">
-            <li class="list-group-item bg-secondary text-white">{{room.name}}</li>
-            {% for room_checkbox in copy_room_form.room %}
-              {% if room_checkbox.data.label in rooms_with_heating_names %}
-                {% if not room_checkbox.data.label == room.name %}
-                  <li class="list-group-item">{{room_checkbox}}</li>
-                {% endif %}
-              {% endif %}
-            {% endfor %}
-          </ul>
-        </div>
-        <!-- Modal footer -->
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-          <button type="submit" value="{'heating_mode':{{heating_mode.id}},'weekday':'{{weekday}}','room':{{room.id}} }" name="copy_room" class="btn btn-success">Copier</button>
-        </div>
-      </form>
-    </div>
+<div class="offcanvas offcanvas-end" tabindex="-1" id="copyRoom_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_offcanvasRight" aria-labelledby="copyRoom_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_offcanvasRightLabel">
+  <!-- Offcanvas header -->
+  <div class="offcanvas-header">
+    <h5 id="copyRoom_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_offcanvasRightLabel">
+      Copier {{room.name}}
+    </h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
+  <!-- Offcanvas body -->
+  <form action="{% url 'housebrain:heating_periods' heating_mode.id %}?page={{ weekdays_pages.number }}" method="post">
+  {% csrf_token %}
+  <div class="offcanvas-body">
+    <p class = "text-danger" >Attention toutes les anciennes périodes de chauffage de la pièce de destination seront supprimées</p>
+    <ul class="list-group">
+      <li class="list-group-item bg-secondary text-white">{{room.name}}</li>
+      {% for room_checkbox in copy_room_form.room %}
+        {% if room_checkbox.data.label in rooms_with_heating_names %}
+          {% if not room_checkbox.data.label == room.name %}
+            <li class="list-group-item">{{room_checkbox}}</li>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    </ul>
+  </div>
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas" aria-label="Close">Annuler</button>
+    <button type="submit" value="{'heating_mode':{{heating_mode.id}},'weekday':'{{weekday}}','room':{{room.id}} }" name="copy_room" class="btn btn-success">Copier</button>
+  </div>
+  </form>
 </div>
