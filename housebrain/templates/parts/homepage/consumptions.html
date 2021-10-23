@@ -7,7 +7,9 @@
             <div class="row gx-1 px-0">
               <div class="col-8">
                 {% if consumptions %}
-                {{consumptions}}
+                {% for name, value in consumptions.0.values.items %}
+                  {{name}} : {{value}}
+                {% endfor %}
                 {% endif %}
               </div>
               <div class="col-4">

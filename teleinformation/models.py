@@ -94,8 +94,9 @@ class TeleinfoManager(models.Manager):
                             + subscription_price/days_in_month
                     )
                     daily_consumption["values"] = {
-                            "HC": hc,
-                            "HP": hp,
+                            "HC": f'{round(hc/1000,1):.1f} kWh',
+                            "HP": f'{round(hp/1000,1):.1f} kWh',
+                            "HP + HC" : f'{round((hc+hp)/1000,1):.1f} kWh',
                             "HP-HC": f'{percentage_hc}% - {100-percentage_hc}%',
                             "€" : f'{round(price,2):.2f}€',
                     }
