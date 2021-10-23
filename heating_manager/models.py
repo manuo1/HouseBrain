@@ -77,25 +77,6 @@ class HeatingPeriodManager(models.Manager):
                 heating_period.associated_room = pasted_room
                 heating_period.save()
 
-    def reset_room(self, heating_mode_id, str_weekday, room_id):
-        heating_periods = self.all_heating_periods_with_params(
-                heating_mode_id, str_weekday, room_id
-            )
-        #delete existing heating_periods
-        if heating_periods:
-            for heating_period in heating_periods:
-                heating_period.delete()
-        # add a default heating_periods
-        default_heating_period = HeatingPeriod(
-                week_day = self.int_weekday(str_weekday),
-                start_time = datetime.strptime("00:00:00", '%H:%M:%S'),
-                end_time = datetime.strptime("23:59:00", '%H:%M:%S'),
-                setpoint_temperature = DEFAULT_TEMPERATURE,
-                associated_room = self.room(room_id),
-                associated_heating_mode = self.heating_mode(heating_mode_id),
-            )
-        default_heating_period.save()
-
     def delete_heating_period(self,heating_period_id):
         heating_period = self.heating_period(heating_period_id)
         if heating_period:

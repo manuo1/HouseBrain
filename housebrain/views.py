@@ -124,13 +124,13 @@ def homepage(request):
 
 def heating_periods(request, heating_mode_id):
     if request.method == 'POST' and request.user.is_authenticated:
-
+        save_room_model = request.POST.get('save_room_model')
+        load_room_model = request.POST.get('load_room_model')
         add_heating_period = request.POST.get('add_heating_period')
         copy_room = request.POST.get('copy_room')
         copy_weekday = request.POST.get('copy_weekday')
         delete_heating_period = request.POST.get('delete_heating_period')
         modify_heating_period = request.POST.get('modify_heating_period')
-        reset_room = request.POST.get('reset_room')
 
         if modify_heating_period:
             # modify_heating_period if formated in html like a dictionary
@@ -152,13 +152,6 @@ def heating_periods(request, heating_mode_id):
                 }
                 heating_period_manager.modify_heating_period(modified_heating_period)
 
-        if reset_room:
-            reset_room = eval(reset_room)
-            heating_period_manager.reset_room(
-                reset_room["heating_mode"],
-                reset_room["weekday"],
-                reset_room["room"]
-            )
         if delete_heating_period:
             delete_heating_period = eval(delete_heating_period)
             heating_period_manager.delete_heating_period(

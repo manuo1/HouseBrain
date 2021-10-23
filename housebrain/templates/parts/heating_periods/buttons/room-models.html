@@ -1,0 +1,34 @@
+<!-- Button trigger offcanvas -->
+<button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#roomModels_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_OffcanvasRight" aria-controls="offcanvasRight" title = "Sauvegarder&#10;Ou Charger">
+  <i class="bi bi-folder2-open"></i>
+</button>
+
+<!-- Offcanvas -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="roomModels_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_OffcanvasRight" aria-labelledby="roomModels_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_OffcanvasRightLabel">
+  <!-- Offcanvas header -->
+  <div class="offcanvas-header">
+    <h5 id="roomModels_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_OffcanvasRightLabel">
+      Modèle de chauffage
+    </h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <!-- Offcanvas body -->
+  <form action="{% url 'housebrain:heating_periods' heating_mode.id %}?page={{ weekdays_pages.number }}" method="post">
+  {% csrf_token %}
+    <div class="offcanvas-body">
+      <!-- Load Part -->
+      Liste déroulante<br>
+      <button type="submit" value="{'heating_mode':{{heating_mode.id}},'weekday':'{{weekday}}','room':{{room.id}} }" name="load_room_model" class="btn btn-danger">Charger</button>
+
+      <hr>
+
+      <!-- Save Part -->
+      zone de texte pour nom<br>
+      <button type="submit" value="{'heating_mode':{{heating_mode.id}},'weekday':'{{weekday}}','room':{{room.id}} }" name="save_room_model" class="btn btn-danger">Sauvegarder</button>
+    </div>
+    <!-- Modal footer -->
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas" aria-label="Close">Annuler</button>
+    </div>
+  </form>
+</div>
