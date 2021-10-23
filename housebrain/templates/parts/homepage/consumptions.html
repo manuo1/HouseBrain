@@ -6,9 +6,9 @@
           <div class="container px-1">
             <div class="row gx-1 px-0">
               <div class="col-8">
-                {% for name, value in consumptions.0.values.items %}
-                  {{name}} : {{value}}
-                {% endfor %}
+                {% if consumptions %}
+                {{consumptions}}
+                {% endif %}
               </div>
               <div class="col-4">
                 -
@@ -23,7 +23,7 @@
           <div class="container px-1">
             <div class="row gx-1 px-0">
               <div class="col-8">
-
+                {% if consumptions %}
                 <table class="table">
                   <thead>
                     <tr>
@@ -44,8 +44,11 @@
                     {% endfor %}
                   </tbody>
                 </table>
+              {% else %}
+                no data
+              {% endif %}
               </div>
-              <div class="col-4">
+            <div class="col-4">
                 -
               </div>
             </div>

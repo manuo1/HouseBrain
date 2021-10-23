@@ -85,12 +85,19 @@ class TeleinfoManager(models.Manager):
                 if all([values != 0 for values in [start_hc,end_hc,start_hp,end_hp]]):
                     hc = end_hc - start_hc
                     hp = end_hp - start_hp
-                    percentage_hc = int((hc/(hc+hp))*100)
+                    percentage_hc = 50
+                    if not hc+hp == 0:
+                        percentage_hc = int((hc/(hc+hp))*100)
                     days_in_month = monthrange(date.year, date.month)[1]
+                    price = ( hc/1000*price_hc
+                            + hp/1000*price_hp
+                            + subscription_price/days_in_month
+                    )
                     daily_consumption["values"] = {
                             "HC": hc,
                             "HP": hp,
                             "HP-HC": f'{percentage_hc}% - {100-percentage_hc}%',
+                            "€" : f'{round(price,2):.2f}€',
                     }
 
         return daily_consumption
