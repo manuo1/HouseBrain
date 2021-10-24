@@ -39,28 +39,28 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarText">
               <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
                 {% if user.is_authenticated %}
-                  <li class="nav-item"><a class="nav-link active" href="{% url 'authentication:logout' %}">Déconnexion ({{user.username}})</a></li>
                   <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                       Périodes de chauffage
                     </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdownMenuLink">
                       {% for heating_mode in dropdown_menu_heating_modes %}
-                      <li><a class="dropdown-item" href="{% url 'housebrain:heating_periods' heating_mode.id %}?page=1">Mode : {{heating_mode}}</a></li>
+                      <li><a class="dropdown-item" href="{% url 'housebrain:heating_periods' heating_mode.id %}?page=1">Semaines {{heating_mode.name}}</a></li>
                       {% endfor %}
                     </ul>
                   </li>
-                  {% if user.is_superuser %}
-                  <li class="nav-item"><a class="nav-link active" href="{% url 'admin:index' %}">Admin</a></li>
-                  {% endif %}
+                  <li class="nav-item"><a class="nav-link" href="{% url 'housebrain:heating_calendar' %}"><i class="bi bi-calendar-date"></i> Calendrier</i></a></li>
+                  <li class="nav-item"><a class="nav-link" href="{% url 'authentication:logout' %}">{{user.username}} <i class="bi bi-box-arrow-right"></i></a></li>
+                  {% if user.is_superuser %}<li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Admin</a></li>{% endif %}
                 {% else %}
-                  <li class="nav-item"><a class="nav-link active" href="{% url 'authentication:login' %}">Connexion</a></li>
+                  <li class="nav-item"><a class="nav-link" href="{% url 'authentication:login' %}">Connexion</a></li>
                 {% endif %}
 
               </ul>
               <span class="navbar-text">
-                {% now "D w F Y  H:i" %}
+                {% now "D d F Y  H:i" %}
               </span>
             </div>
           </div>
