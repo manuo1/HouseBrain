@@ -88,6 +88,12 @@ class HeatingPeriodManager(models.Manager):
             heating_period = [None]
         return heating_period[0]
 
+    def room_model(self,room_model_id):
+        room_model = RoomHeatingModel.objects.filter( id = room_model_id )
+        if not room_model:
+            room_model = [None]
+        return room_model[0]
+
     def heating_mode(self, heating_mode_id):
         heating_mode = HeatingMode.objects.filter( id = heating_mode_id )
         if not heating_mode:
@@ -152,10 +158,56 @@ class HeatingPeriodManager(models.Manager):
         )
         return heating_period
 
-class RoomHeatingModel(models.Model):
-    name = models.CharField(max_length=100)
+    def save_room_heating_model(self,model_name):
+        model = RoomHeatingModel(name=model_name)
+        model.save()
+        return model
 
-class ModelHeatingPeriods(models.Model):
+    def save_model_heating_periods(self, model, heating_periods):
+        for period in heating_periods:
+            new_period = ModelHeatingPeriod(
+                start_time = period.start_time,
+                end_time = period.end_time,
+                setpoint_temperature = period.setpoint_temperature,
+                associated_room_heating_model = model,
+            )
+            new_period.save()
+
+    def all_room_heating_model(self):
+        return RoomHeatingModel.objects.all()
+
+    def load_room_model(self, room_model_id, pasted_room_data):
+        # delete old room heating_periods
+        self.all_heating_periods_with_params(
+            pasted_room_data['heating_mode'],
+            pasted_room_data['weekday'],
+            pasted_room_data['room']
+        ).delete()
+        # load new room heating_periods
+        room_model = self.room_model(room_model_id)
+        heating_periods = ModelHeatingPeriod.objects.filter(
+            associated_room_heating_model__id = room_model_id
+        )
+        if heating_periods:
+            for heating_period in heating_periods:
+                new_heating_period = {
+                    'start_time': heating_period.start_time,
+                    'end_time': heating_period.end_time,
+                    'setpoint_temperature': heating_period.setpoint_temperature,
+                    'str_weekday': pasted_room_data['weekday'],
+                    'room_id': pasted_room_data['room'],
+                    'heating_mode_id': pasted_room_data['heating_mode'],
+                }
+                self.add_heating_period(new_heating_period)
+
+
+class RoomHeatingModel(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
+class ModelHeatingPeriod(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
     setpoint_temperature = models.IntegerField(default=0)

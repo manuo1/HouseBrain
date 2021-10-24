@@ -1,12 +1,30 @@
 from django import forms
 from django.utils import timezone
 from datetime import datetime, timedelta
-from heating_manager.models import HeatingPeriod
+from heating_manager.models import (
+    HeatingPeriod,
+    RoomHeatingModel,
+    HeatingPeriodManager,
+)
 from rooms.models import Room
 from housebrain_config.settings.constants import (
     WEEKDAYS
 )
 WEEKDAYS_CHOICES = [ (day, day) for day in WEEKDAYS ]
+heating_period_manager = HeatingPeriodManager()
+
+class RoomHeatingModelCreateForm(forms.ModelForm):
+    class Meta:
+        model = RoomHeatingModel
+        fields = ['name']
+        labels = {
+            'name': 'Nom',
+        }
+        widgets = {
+                    'name': forms.TextInput(attrs={
+                            'class': 'form-control text-center',
+                        }),
+        }
 
 class RoomMultipleChoiceField(forms.ModelMultipleChoiceField):
     def label_from_instance(self, obj):
@@ -22,21 +40,20 @@ class HeatingPeriodCreateForm(forms.ModelForm):
             'setpoint_temperature': 'Température de consigne',
         }
         widgets = {
-                    'start_time': forms.TimeInput(attrs={
-                            'type': 'time',
-                            'class': 'form-control text-center',
-                            'value': '00:00',
-                        }),
-                    'end_time': forms.TimeInput(attrs={
-                            'type': 'time',
-                            'class': 'form-control text-center',
-                            'value': '00:00',
-                        }),
-                    'setpoint_temperature': forms.NumberInput(attrs={
-                            'class': 'form-control text-center',
-                            'value': '20',
-                        }),
-
+            'start_time': forms.TimeInput(attrs={
+                    'type': 'time',
+                    'class': 'form-control text-center',
+                    'value': '00:00',
+                }),
+            'end_time': forms.TimeInput(attrs={
+                    'type': 'time',
+                    'class': 'form-control text-center',
+                    'value': '00:00',
+                }),
+            'setpoint_temperature': forms.NumberInput(attrs={
+                    'class': 'form-control text-center',
+                    'value': '20',
+                }),
         }
 
 class HeatingPeriodModifyForm(forms.ModelForm):
@@ -68,8 +85,22 @@ class HeatingPeriodModifyForm(forms.ModelForm):
 class CopyRoomForm(forms.Form):
     room = RoomMultipleChoiceField(
             queryset=Room.objects.all(),
-            widget= forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
+            widget= forms.CheckboxSelectMultiple(
+                attrs={'class': 'form-check-input'}
+            ),
         )
+
+class HeatingModelChoiceForm(forms.Form):
+    heating_models = list(
+        heating_period_manager.all_room_heating_model()
+    )
+    CHOICES = [
+        (model.id, model.name ) for model in heating_models
+    ]
+    model = forms.ChoiceField(
+            widget=forms.RadioSelect(),
+            choices=CHOICES
+    )
 
 class CopyWeekdayForm(forms.Form):
     weekday = forms.MultipleChoiceField(
