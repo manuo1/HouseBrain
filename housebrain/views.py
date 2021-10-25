@@ -15,6 +15,7 @@ from .forms import (
     ManualTemperatureForm,
     RoomHeatingModelCreateForm,
     HeatingModelChoiceForm,
+    HeatingModeCreateForm,
  )
 from sensors.models import TemperatureSensorManager
 from heaters.models import HeaterManager
@@ -133,6 +134,7 @@ def homepage(request):
 
 def heating_periods(request, heating_mode_id):
     if request.method == 'POST' and request.user.is_authenticated:
+        add_heating_mode = request.POST.get('add_heating_mode')
         save_room_model = request.POST.get('save_room_model')
         load_room_model = request.POST.get('load_room_model')
         add_heating_period = request.POST.get('add_heating_period')
@@ -141,9 +143,13 @@ def heating_periods(request, heating_mode_id):
         delete_heating_period = request.POST.get('delete_heating_period')
         modify_heating_period = request.POST.get('modify_heating_period')
 
+        if add_heating_mode:
+            add_heating_mode_form = HeatingModeCreateForm(request.POST)
+            if add_heating_mode_form.is_valid():
+                heating_mode_name = add_heating_mode_form.cleaned_data.get('name')
+                heating_period_manager.add_heating_mode(heating_mode_name)
 
         if load_room_model:
-            # load_room_model is formated in html like a dictionary
             pasted_room_ids = eval(load_room_model)
             load_room_model_form = HeatingModelChoiceForm(request.POST)
             if load_room_model_form.is_valid():
@@ -255,6 +261,7 @@ def heating_periods(request, heating_mode_id):
     weekday_rooms_heating_periods = paginator.get_page(page_number)
 
     """ forms """
+    heating_mode_create_form = HeatingModeCreateForm()
     room_heating_model_create_form = RoomHeatingModelCreateForm()
     copy_room_form = CopyRoomForm()
     copy_weekday_form = CopyWeekdayForm()
@@ -281,6 +288,7 @@ def heating_periods(request, heating_mode_id):
         'modify_heating_period_form': modify_heating_period_form,
         'room_heating_model_create_form': room_heating_model_create_form,
         'heating_model_choice_form' : heating_model_choice_form,
+        'heating_mode_create_form' : heating_mode_create_form,
     }
 
     return render(request, 'heating_periods.html', context)

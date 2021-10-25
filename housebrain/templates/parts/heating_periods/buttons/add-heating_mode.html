@@ -1,4 +1,30 @@
-<!-- Button trigger modal -->
-<button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#addHeatingRoom_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_Modal" title = "Ajouter un mode de Chauffage">
-  <i class="bi bi-plus-square"></i>
+<!-- Button trigger offcanvas -->
+<button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="offcanvas" data-bs-target="#addHeatingMode_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_OffcanvasRight" title = "Copier le mode {{heating_mode.name}}">
+  <i class="bi bi-plus-lg"></i> Mode
 </button>
+
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="addHeatingMode_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_OffcanvasRight" aria-labelledby="offcanvasRightLabel">
+  <!-- Offcanvas header -->
+  <div class="offcanvas-header">
+    <h5 id="offcanvasRightLabel">
+      Nouveau Mode
+    </h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <!-- Offcanvas body -->
+  <form action="{% url 'housebrain:heating_periods' heating_mode.id %}?page={{ weekdays_pages.number }}" method="post">
+    {% csrf_token %}
+    <div class="offcanvas-body">
+      Nom du nouveau mode de chauffage
+
+      {{heating_mode_create_form.name}}
+
+    </div>
+    <!-- Modal footer -->
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas" aria-label="Close">Annuler</button>
+      <button type="submit" value="{'heating_mode':{{heating_mode.id}}}" name="add_heating_mode" class="btn btn-success">Copier</button>
+    </div>
+  </form>
+</div>

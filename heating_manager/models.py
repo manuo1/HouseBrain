@@ -22,6 +22,10 @@ class HeatingPeriodManager(models.Manager):
                 ]
             heating_period.save()
 
+    def add_heating_mode(self, heating_mode_name ):
+        new_heating_mode = HeatingMode(name=heating_mode_name)
+        new_heating_mode.save()
+
     def add_heating_period(self, period_data ):
         period_data['week_day'] = self.int_weekday(period_data['str_weekday'])
         period_data['associated_room'] = self.room(period_data['room_id'])
@@ -243,15 +247,11 @@ class HeatingPeriod(models.Model):
     setpoint_temperature = models.IntegerField(default=0)
     associated_room = models.ForeignKey(
         Room,
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
+        on_delete=models.CASCADE,
     )
     associated_heating_mode = models.ForeignKey(
         HeatingMode,
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
+        on_delete=models.CASCADE,
     )
     def save(self, *args, **kwargs):
         minutes_differences = (

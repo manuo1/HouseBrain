@@ -63,11 +63,12 @@ class TeleinfoManager(models.Manager):
         daily_teleinfo = list(TeleinformationHistory.objects.filter(
             date_time__date = date,
         ).order_by('date_time'))
-        next_date = date + timedelta(days=1)
-        midnight_teleinfo_of_the_next_day = TeleinformationHistory.objects.filter(
-            date_time__date = next_date,
-            date_time__hour = 0,
-            date_time__minute = 0,
+        midnight_teleinfo_of_the_next_day = (
+            TeleinformationHistory.objects.filter(
+                date_time__date = date + timedelta(days=1),
+                date_time__hour = 0,
+                date_time__minute = 0,
+            )
         )
         if daily_teleinfo:
             if midnight_teleinfo_of_the_next_day:
@@ -94,11 +95,11 @@ class TeleinfoManager(models.Manager):
                             + subscription_price/days_in_month
                     )
                     daily_consumption["values"] = {
-                            "HC": f'{round(hc/1000,1):.1f} kWh',
-                            "HP": f'{round(hp/1000,1):.1f} kWh',
-                            "+" : f'{round((hc+hp)/1000,1):.1f} kWh',
-                            "%": f'{percentage_hc}%HC - {100-percentage_hc}%HP',
-                            "€" : f'{round(price,2):.2f}€',
+                        "HC": f'{round(hc/1000,1):.1f} kWh',
+                        "HP": f'{round(hp/1000,1):.1f} kWh',
+                        "+" : f'{round((hc+hp)/1000,1):.1f} kWh',
+                        "%" : f'{percentage_hc}%HC {100-percentage_hc}%HP',
+                        "€" : f'{round(price,2):.2f}€',
                     }
 
         return daily_consumption

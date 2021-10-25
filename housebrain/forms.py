@@ -2,6 +2,7 @@ from django import forms
 from django.utils import timezone
 from datetime import datetime, timedelta
 from heating_manager.models import (
+    HeatingMode,
     HeatingPeriod,
     RoomHeatingModel,
     HeatingPeriodManager,
@@ -17,9 +18,7 @@ class RoomHeatingModelCreateForm(forms.ModelForm):
     class Meta:
         model = RoomHeatingModel
         fields = ['name']
-        labels = {
-            'name': 'Nom',
-        }
+        labels = {'name': 'Nom',}
         widgets = {
                     'name': forms.TextInput(attrs={
                             'class': 'form-control text-center',
@@ -29,6 +28,18 @@ class RoomHeatingModelCreateForm(forms.ModelForm):
 class RoomMultipleChoiceField(forms.ModelMultipleChoiceField):
     def label_from_instance(self, obj):
         return obj.name
+
+class HeatingModeCreateForm(forms.ModelForm):
+    class Meta:
+        model = HeatingMode
+        fields = ['name']
+        labels = {'name': 'Nom',}
+        widgets = {
+                    'name': forms.TextInput(attrs={
+                            'class': 'form-control text-center',
+                        }),
+        }
+
 
 class HeatingPeriodCreateForm(forms.ModelForm):
     class Meta:
