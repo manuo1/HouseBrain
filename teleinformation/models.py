@@ -96,8 +96,8 @@ class TeleinfoManager(models.Manager):
                     daily_consumption["values"] = {
                             "HC": f'{round(hc/1000,1):.1f} kWh',
                             "HP": f'{round(hp/1000,1):.1f} kWh',
-                            "HP + HC" : f'{round((hc+hp)/1000,1):.1f} kWh',
-                            "HP-HC": f'{percentage_hc}% - {100-percentage_hc}%',
+                            "+" : f'{round((hc+hp)/1000,1):.1f} kWh',
+                            "%": f'{percentage_hc}%HC - {100-percentage_hc}%HP',
                             "€" : f'{round(price,2):.2f}€',
                     }
 
