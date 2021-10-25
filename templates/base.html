@@ -46,7 +46,7 @@
                       Périodes de chauffage
                     </a>
                     <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdownMenuLink">
-                      {% for heating_mode in dropdown_menu_heating_modes %}
+                      {% for heating_mode in all_heating_modes %}
                       <li><a class="dropdown-item" href="{% url 'housebrain:heating_periods' heating_mode.id %}?page=1">Semaines {{heating_mode.name}}</a></li>
                       {% endfor %}
                     </ul>

@@ -52,7 +52,6 @@ class HeatingPeriodCreateForm(forms.ModelForm):
                 }),
             'setpoint_temperature': forms.NumberInput(attrs={
                     'class': 'form-control text-center',
-                    'value': '20',
                 }),
         }
 
@@ -81,7 +80,6 @@ class HeatingPeriodModifyForm(forms.ModelForm):
                         }),
         }
 
-
 class CopyRoomForm(forms.Form):
     room = RoomMultipleChoiceField(
             queryset=Room.objects.all(),
@@ -91,16 +89,17 @@ class CopyRoomForm(forms.Form):
         )
 
 class HeatingModelChoiceForm(forms.Form):
-    heating_models = list(
-        heating_period_manager.all_room_heating_model()
-    )
-    CHOICES = [
-        (model.id, model.name ) for model in heating_models
-    ]
-    model = forms.ChoiceField(
+    model = forms.ChoiceField()
+    def __init__(self, *args, **kwargs):
+        super(HeatingModelChoiceForm, self).__init__(*args, **kwargs)
+        self.fields['model'] = forms.ChoiceField(
             widget=forms.RadioSelect(),
-            choices=CHOICES
-    )
+            choices = [
+                (model.id, model.name ) for model in (
+                    heating_period_manager.all_room_heating_model()
+                )
+            ]
+        )
 
 class CopyWeekdayForm(forms.Form):
     weekday = forms.MultipleChoiceField(
@@ -127,23 +126,16 @@ class ManualTemperatureForm(forms.ModelForm):
                             'type': 'datetime-local',
                             'class': 'form-control text-center',
                             'required': 'required',
-                            'value': (
-                                timezone.now().strftime("%Y-%m-%dT%H:%M")
-                            ),
                         }),
 
                     'manual_mode_end': forms.DateTimeInput(attrs={
                             'type': 'datetime-local',
                             'class': 'form-control text-center',
                             'required': 'required',
-                            'value': (
-                                (timezone.now() + timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M")
-                            ),
                         }),
                     'manual_setpoint_temperature': forms.NumberInput(attrs={
                             'class': 'form-control text-center',
                             'required': 'required',
-                            'value': '20',
                         }),
 
         }

@@ -15,11 +15,15 @@
   <!-- Offcanvas body -->
   <div class="offcanvas-body">
     <!-- Loading a model - Part -->
+    <h6>Charger un modèle</h6>
     <form action="{% url 'housebrain:heating_periods' heating_mode.id %}?page={{ weekdays_pages.number }}" method="post">
       {% csrf_token %}
       <ul class="list-group">
+          <li class="list-group-item disabled" aria-current="true">Modèle(s)</li>
         {% for model_radio in heating_model_choice_form.model %}
           <li class="list-group-item">{{model_radio}}</li>
+        {% empty %}
+          <li class="list-group-item">Pas de modèle</li>
         {% endfor %}
       </ul>
       <br>
@@ -28,9 +32,11 @@
     <hr>
 
     <!-- Saving the model - Part -->
+    <h6>Sauvegarder cette pièce</h6>
     <form action="{% url 'housebrain:heating_periods' heating_mode.id %}?page={{ weekdays_pages.number }}" method="post">
       {% csrf_token %}
-      {{ room_heating_model_create_form }}
+      Entrez un nom pour le model :
+      {{ room_heating_model_create_form.name }}
       <br>
       <button type="submit" value="{'heating_mode':{{heating_mode.id}},'weekday':'{{weekday}}','room':{{room.id}} }" name="save_room_model" class="btn btn-danger">Sauvegarder</button>
     </form>

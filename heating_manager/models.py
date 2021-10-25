@@ -10,67 +10,67 @@ from rooms.models import Room
 
 class HeatingPeriodManager(models.Manager):
 
-    def modify_heating_period(self, modified_heating_period):
+    def modify_heating_period(self, period):
         heating_period = self.heating_period(
-                modified_heating_period['heating_period_id']
+                period['heating_period_id']
             )
         if heating_period:
-            heating_period.start_time = modified_heating_period['start_time']
-            heating_period.end_time = modified_heating_period['end_time']
-            heating_period.setpoint_temperature = modified_heating_period[
+            heating_period.start_time = period['start_time']
+            heating_period.end_time = period['end_time']
+            heating_period.setpoint_temperature = period[
                     'setpoint_temperature'
                 ]
             heating_period.save()
 
-    def add_heating_period(self, new_heating_period):
-        new_heating_period = HeatingPeriod(
-                week_day = self.int_weekday(new_heating_period['str_weekday']),
-                start_time = new_heating_period['start_time'],
-                end_time = new_heating_period['end_time'],
-                setpoint_temperature = new_heating_period['setpoint_temperature'],
-                associated_room = self.room(new_heating_period['room_id']),
-                associated_heating_mode = self.heating_mode(new_heating_period['heating_mode_id']),
-            )
-        new_heating_period.save()
+    def add_heating_period(self, period_data ):
+        period_data['week_day'] = self.int_weekday(period_data['str_weekday'])
+        period_data['associated_room'] = self.room(period_data['room_id'])
+        period_data['associated_heating_mode'] = self.heating_mode(
+                period_data['heating_mode_id'])
+        del period_data['room_id']
+        del period_data['str_weekday']
+        del period_data['heating_mode_id']
+        new_period = HeatingPeriod(**period_data)
+        new_period.save()
 
-    def copy_weekday(self, copied_weekday_data, pasted_weekdays):
+    def copy_weekday(self, copied_weekday_ids, pasted_weekdays):
         for pasted_weekday in pasted_weekdays:
             # delete pasted_weekday heating_periods
             HeatingPeriod.objects.filter(
                 associated_heating_mode = self.heating_mode(
-                    copied_weekday_data['heating_mode']
+                    copied_weekday_ids['heating_mode']
                 ),
                 week_day = self.int_weekday(pasted_weekday)
             ).delete()
             # duplicate copied_weekday heating_periods in pasted_weekday
             copied_weekday_heating_periods = HeatingPeriod.objects.filter(
                     associated_heating_mode = self.heating_mode(
-                        copied_weekday_data['heating_mode']
+                        copied_weekday_ids['heating_mode']
                     ),
-                    week_day = self.int_weekday(copied_weekday_data['weekday'])
+                    week_day = self.int_weekday(copied_weekday_ids['weekday'])
                 )
             for heating_period in copied_weekday_heating_periods:
                 heating_period.id = None
                 heating_period.week_day = self.int_weekday(pasted_weekday)
                 heating_period.save()
 
-    def copy_room(self, copied_room_data, pasted_rooms):
+    def copy_room(self, copied_room_ids, pasted_rooms):
         for pasted_room in pasted_rooms:
             # delete pasted_room heating_periods
             HeatingPeriod.objects.filter(
                 associated_room = pasted_room,
                 associated_heating_mode = self.heating_mode(
-                    copied_room_data['heating_mode']
+                    copied_room_ids['heating_mode']
                 ),
-                week_day = self.int_weekday(copied_room_data['weekday'])
+                week_day = self.int_weekday(copied_room_ids['weekday'])
             ).delete()
             # duplicate copied_room heating_periods in pasted_room
             copied_room_heating_periods = HeatingPeriod.objects.filter(
-                    associated_room = self.room(copied_room_data['room']),
+                    associated_room = self.room(copied_room_ids['room']),
                     associated_heating_mode = self.heating_mode(
-                        copied_room_data['heating_mode']
+                        copied_room_ids['heating_mode']
                     ),
-                    week_day = self.int_weekday(copied_room_data['weekday'])
+                    week_day = self.int_weekday(copied_room_ids['weekday'])
                 )
             for heating_period in copied_room_heating_periods:
                 heating_period.id = None
@@ -127,7 +127,7 @@ class HeatingPeriodManager(models.Manager):
     def all_heating_periods(self):
         return HeatingPeriod.objects.select_related().all()
 
-    def all_heating_periods_with_params(self, heating_mode_id, str_weekday, room_id):
+    def heating_periods_for(self, heating_mode_id, str_weekday, room_id):
         int_weekday = self.int_weekday(str_weekday)
         heating_periods = HeatingPeriod.objects.filter(
                 associated_room__id = room_id,
@@ -176,12 +176,12 @@ class HeatingPeriodManager(models.Manager):
     def all_room_heating_model(self):
         return RoomHeatingModel.objects.all()
 
-    def load_room_model(self, room_model_id, pasted_room_data):
+    def load_room_model(self, room_model_id, pasted_room_ids):
         # delete old room heating_periods
-        self.all_heating_periods_with_params(
-            pasted_room_data['heating_mode'],
-            pasted_room_data['weekday'],
-            pasted_room_data['room']
+        self.heating_periods_for(
+            pasted_room_ids['heating_mode'],
+            pasted_room_ids['weekday'],
+            pasted_room_ids['room']
         ).delete()
         # load new room heating_periods
         room_model = self.room_model(room_model_id)
@@ -194,9 +194,9 @@ class HeatingPeriodManager(models.Manager):
                     'start_time': heating_period.start_time,
                     'end_time': heating_period.end_time,
                     'setpoint_temperature': heating_period.setpoint_temperature,
-                    'str_weekday': pasted_room_data['weekday'],
-                    'room_id': pasted_room_data['room'],
-                    'heating_mode_id': pasted_room_data['heating_mode'],
+                    'str_weekday': pasted_room_ids['weekday'],
+                    'room_id': pasted_room_ids['room'],
+                    'heating_mode_id': pasted_room_ids['heating_mode'],
                 }
                 self.add_heating_period(new_heating_period)
 
