@@ -256,7 +256,7 @@ class HeatingMode(models.Model):
 class HeatingModeCalendar(models.Model):
     date_time_start = models.DateTimeField()
     date_time_end = models.DateTimeField()
-    heating_mode = models.OneToOneField(
+    heating_mode = models.ForeignKey(
         HeatingMode,
         on_delete=models.CASCADE,
     )
