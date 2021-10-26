@@ -2,9 +2,22 @@
 {% load static %}
 {% block title %}House Brain{% endblock %}
 {% block main %}
-
-{% for heating_mode_calendar in all_heating_mode_calendar%}
-  {{heating_mode_calendar}}<br>
-{% endfor %}
-
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Début</th>
+      <th scope="col">Fin</th>
+      <th scope="col">Mode de Chauffage</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for heating_mode_calendar in all_heating_mode_calendar%}
+    <tr>
+      <td>{{heating_mode_calendar.date_time_start|date:"D d/m/Y H:i"}}</td>
+      <td>{{heating_mode_calendar.date_time_end|date:"D d/m/Y H:i"}}</td>
+      <td>{{heating_mode_calendar.heating_mode.name}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 {% endblock %}

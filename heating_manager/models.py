@@ -262,8 +262,8 @@ class HeatingModeCalendar(models.Model):
     )
     def __str__(self):
         return (
-            f'{self.date_time_start:%d/%m/%Y %H:%M}'
-            f' - {self.date_time_end:%d/%m/%Y %H:%M}'
+            f'{self.date_time_start:%a %d/%m/%Y %H:%M}'
+            f' - {self.date_time_end:%a %d/%m/%Y %H:%M}'
             f' | {self.heating_mode.name}'
         )
 
