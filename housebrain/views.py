@@ -307,6 +307,7 @@ def heating_periods(request, heating_mode_id):
     return render(request, 'heating_periods.html', context)
 
 def heating_calendar(request):
+
     context = {
         'all_heating_modes' : heating_period_manager.all_heating_modes(),
     }

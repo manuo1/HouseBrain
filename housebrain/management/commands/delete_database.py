@@ -9,7 +9,6 @@ from heaters.models import Heater
 from heating_manager.models import (
     HeatingMode,
     HeatingPeriod,
-    CurrentHeatingMode
 )
 from rooms.models import Room
 from sensors.models import (TemperatureSensor, TemperatureHistory)
@@ -29,7 +28,6 @@ class Command(BaseCommand):
         Heater.objects.all().delete()
         HeatingMode.objects.all().delete()
         HeatingPeriod.objects.all().delete()
-        CurrentHeatingMode.objects.all().delete()
         Room.objects.all().delete()
         TemperatureSensor.objects.all().delete()
         TemperatureHistory.objects.all().delete()

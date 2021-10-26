@@ -93,7 +93,7 @@ class HeatingPeriodModifyForm(forms.ModelForm):
 
 class CopyRoomForm(forms.Form):
     room = RoomMultipleChoiceField(
-            queryset=Room.objects.all(),
+            queryset=Room.objects.all().order_by('heating_priority', 'name'),
             widget= forms.CheckboxSelectMultiple(
                 attrs={'class': 'form-check-input'}
             ),

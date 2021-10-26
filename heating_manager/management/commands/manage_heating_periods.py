@@ -11,8 +11,7 @@ room_manager = RoomManager()
 class Command(BaseCommand):
 
     help = """
-    will change the state of the heater of each room
-    according the temperatures and remaining intensity
+    will apply setpoints temperatures to each room
     """
 
     def handle(self, *args, **options):

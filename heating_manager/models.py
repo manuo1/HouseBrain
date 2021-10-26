@@ -141,7 +141,7 @@ class HeatingPeriodManager(models.Manager):
         return list(room_weekday_heating_periods)
 
     def all_heating_modes(self):
-        return HeatingMode.objects.all()
+        return HeatingMode.objects.all().order_by('name')
 
     def all_heating_periods(self):
         return HeatingPeriod.objects.select_related().all()
@@ -162,20 +162,30 @@ class HeatingPeriodManager(models.Manager):
             temperature = current_heating_period[0].setpoint_temperature
         return temperature
 
-    def current_heating_period(self, room):
+    def current_heating_period(self, room ):
+        heating_period = None
         now = timezone.now()
-        current_heating_mode = CurrentHeatingMode.objects.all()
+        current_heating_mode = self.current_heating_mode()
+        if current_heating_mode:
+            heating_period = HeatingPeriod.objects.filter(
+                associated_heating_mode = current_heating_mode,
+                week_day = now.weekday(),
+                associated_room = room,
+                start_time__lt = now.time(), #lower than now
+                end_time__gte = now.time() #Greater than or equal to now
+            )
+        return heating_period
+
+    def current_heating_mode(self):
+        current_heating_mode = HeatingModeCalendar.objects.filter(
+            date_time_start__lt = timezone.now(), #lower than now
+            date_time_end__gte = timezone.now() #Greater than or equal to now
+        )
         if current_heating_mode:
             current_heating_mode = current_heating_mode[0].heating_mode
-
-        heating_period = HeatingPeriod.objects.filter(
-            associated_heating_mode = current_heating_mode,
-            week_day = now.weekday(),
-            associated_room = room,
-            start_time__lt = now.time(), #lower than now
-            end_time__gte = now.time() #Greater than or equal to now
-        )
-        return heating_period
+        else:
+            current_heating_mode = None
+        return current_heating_mode
 
     def save_room_heating_model(self,model_name):
         model = RoomHeatingModel(name=model_name)
@@ -193,7 +203,7 @@ class HeatingPeriodManager(models.Manager):
             new_period.save()
 
     def all_room_heating_model(self):
-        return RoomHeatingModel.objects.all()
+        return RoomHeatingModel.objects.all().order_by('name')
 
     def load_room_model(self, room_model_id, pasted_room_ids):
         # delete old room heating_periods
@@ -219,7 +229,6 @@ class HeatingPeriodManager(models.Manager):
                 }
                 self.add_heating_period(new_heating_period)
 
-
 class RoomHeatingModel(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
@@ -240,6 +249,20 @@ class HeatingMode(models.Model):
 
     def __str__(self):
         return self.name
+
+class HeatingModeCalendar(models.Model):
+    date_time_start = models.DateTimeField()
+    date_time_end = models.DateTimeField()
+    heating_mode = models.OneToOneField(
+        HeatingMode,
+        on_delete=models.CASCADE,
+    )
+    def __str__(self):
+        return (
+            f'{self.date_time_start:%d/%m/%Y %H:%M}'
+            f' - {self.date_time_start:%d/%m/%Y %H:%M}'
+            f' | {self.heating_mode.name}'
+        )
 
 class HeatingPeriod(models.Model):
 
@@ -272,7 +295,7 @@ class HeatingPeriod(models.Model):
         minutes_differences = (
             (self.end_time.hour*60 + self.end_time.minute)
             - (self.start_time.hour*60 + self.start_time.minute))
-        """for beter display add one minute to change 23:59 like 24:00"""
+        """for beter display add one minute to change 23:59 for 24:00"""
         if self.end_time == 23 and self.end_time == 59:
             minutes_differences += 1
         self.day_percentage = (minutes_differences*100)/1439
@@ -299,16 +322,3 @@ class HeatingPeriod(models.Model):
             self.setpoint_temperature,
         )
         return ret
-
-class CurrentHeatingMode(models.Model):
-    heating_mode = models.OneToOneField(
-        HeatingMode,
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-    )
-    def __str__(self):
-        name = "None"
-        if self.heating_mode:
-            name = self.heating_mode.name
-        return f'Current : {name}'
