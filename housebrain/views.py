@@ -310,5 +310,6 @@ def heating_calendar(request):
 
     context = {
         'all_heating_modes' : heating_period_manager.all_heating_modes(),
+        'all_heating_mode_calendar' : heating_period_manager.all_heating_mode_calendar()
     }
     return render(request, 'heating_calendar.html', context)

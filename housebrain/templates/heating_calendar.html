@@ -3,7 +3,8 @@
 {% block title %}House Brain{% endblock %}
 {% block main %}
 
-
-Calendrier
+{% for heating_mode_calendar in all_heating_mode_calendar%}
+  {{heating_mode_calendar}}<br>
+{% endfor %}
 
 {% endblock %}

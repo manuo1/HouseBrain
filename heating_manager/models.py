@@ -146,6 +146,9 @@ class HeatingPeriodManager(models.Manager):
     def all_heating_periods(self):
         return HeatingPeriod.objects.select_related().all()
 
+    def all_heating_mode_calendar(self):
+        return HeatingModeCalendar.objects.select_related().all()
+
     def heating_periods_for(self, heating_mode_id, str_weekday, room_id):
         int_weekday = self.int_weekday(str_weekday)
         heating_periods = HeatingPeriod.objects.filter(
@@ -260,7 +263,7 @@ class HeatingModeCalendar(models.Model):
     def __str__(self):
         return (
             f'{self.date_time_start:%d/%m/%Y %H:%M}'
-            f' - {self.date_time_start:%d/%m/%Y %H:%M}'
+            f' - {self.date_time_end:%d/%m/%Y %H:%M}'
             f' | {self.heating_mode.name}'
         )
 
