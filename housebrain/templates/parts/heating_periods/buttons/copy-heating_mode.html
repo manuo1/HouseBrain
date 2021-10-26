@@ -4,7 +4,7 @@
 </button>
 
 
-<div class="offcanvas offcanvas-end" tabindex="-1" id="copyHeatingMode_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_OffcanvasRight" aria-labelledby="offcanvasRightLabel">
+<div class="offcanvas offcanvas-end text-center" tabindex="-1" id="copyHeatingMode_HM{{heating_mode.id}}W{{weekday}}R{{room.id}}HP{{heating_period.id}}_OffcanvasRight" aria-labelledby="offcanvasRightLabel">
   <!-- Offcanvas header -->
   <div class="offcanvas-header">
     <h5 id="offcanvasRightLabel">
@@ -16,14 +16,23 @@
   <form action="{% url 'housebrain:heating_periods' heating_mode.id %}?page={{ weekdays_pages.number }}" method="post">
     {% csrf_token %}
     <div class="offcanvas-body">
-      Choix du mode
-      <br><hr><strong>En cours de développement</strong><hr><br>
-
+      <p class = "text-danger" >Attention toutes les anciennes périodes de chauffage du mode de destination seront supprimées</p>
+      <h6>Choix du mode de destination</h6>
+      <ul class="list-group">
+          <li class="list-group-item bg-secondary text-white" aria-current="true">{{heating_mode.name}}</li>
+        {% for heating_mode_radio in heating_mode_choice_form.mode_id %}
+          {% if not heating_mode_radio.choice_label == heating_mode.name %}
+            <li class="list-group-item">{{heating_mode_radio}}</li>
+          {% endif %}
+        {% empty %}
+          <li class="list-group-item">Pas de mode</li>
+        {% endfor %}
+      </ul>
     </div>
     <!-- Modal footer -->
     <div class="modal-footer">
       <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas" aria-label="Close">Annuler</button>
-      <button type="submit" value="{'heating_mode':{{heating_mode.id}},'weekday':'{{weekday}}','room':{{room.id}} }" name="copy_heating_mode" class="btn btn-success">Copier</button>
+      <button type="submit" value="{ 'heating_mode':{{heating_mode.id}} }" name="copy_heating_mode" class="btn btn-success">Copier</button>
     </div>
   </form>
 </div>

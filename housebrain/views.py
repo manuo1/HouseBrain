@@ -14,8 +14,9 @@ from .forms import (
     HeatingPeriodModifyForm,
     ManualTemperatureForm,
     RoomHeatingModelCreateForm,
-    HeatingModelChoiceForm,
+    RoomHeatingModelChoiceForm,
     HeatingModeCreateForm,
+    HeatingModeChoiceForm,
  )
 from sensors.models import TemperatureSensorManager
 from heaters.models import HeaterManager
@@ -134,6 +135,7 @@ def homepage(request):
 
 def heating_periods(request, heating_mode_id):
     if request.method == 'POST' and request.user.is_authenticated:
+        copy_heating_mode = request.POST.get('copy_heating_mode')
         add_heating_mode = request.POST.get('add_heating_mode')
         save_room_model = request.POST.get('save_room_model')
         load_room_model = request.POST.get('load_room_model')
@@ -143,6 +145,15 @@ def heating_periods(request, heating_mode_id):
         delete_heating_period = request.POST.get('delete_heating_period')
         modify_heating_period = request.POST.get('modify_heating_period')
 
+        if copy_heating_mode:
+            copied_mode = eval(copy_heating_mode)
+            copy_heating_mode_form = HeatingModeChoiceForm(request.POST)
+            if copy_heating_mode_form.is_valid():
+                pasted_mode_id = copy_heating_mode_form.cleaned_data.get('mode_id')
+                heating_period_manager.copy_heating_mode(
+                    copied_mode['heating_mode'], pasted_mode_id
+                )
+
         if add_heating_mode:
             add_heating_mode_form = HeatingModeCreateForm(request.POST)
             if add_heating_mode_form.is_valid():
@@ -151,7 +162,7 @@ def heating_periods(request, heating_mode_id):
 
         if load_room_model:
             pasted_room_ids = eval(load_room_model)
-            load_room_model_form = HeatingModelChoiceForm(request.POST)
+            load_room_model_form = RoomHeatingModelChoiceForm(request.POST)
             if load_room_model_form.is_valid():
                 room_model_id = load_room_model_form.cleaned_data.get('model')
                 heating_period_manager.load_room_model(
@@ -261,6 +272,7 @@ def heating_periods(request, heating_mode_id):
     weekday_rooms_heating_periods = paginator.get_page(page_number)
 
     """ forms """
+    heating_mode_choice_form = HeatingModeChoiceForm()
     heating_mode_create_form = HeatingModeCreateForm()
     room_heating_model_create_form = RoomHeatingModelCreateForm()
     copy_room_form = CopyRoomForm()
@@ -271,7 +283,7 @@ def heating_periods(request, heating_mode_id):
     # Remove initial field for setpoint_temperature to allow modification
     #| of the initial value in the template
     modify_heating_period_form.fields['setpoint_temperature'].initial = None
-    heating_model_choice_form = HeatingModelChoiceForm()
+    room_heating_model_choice_form = RoomHeatingModelChoiceForm()
 
     rooms_with_heating_names = [
         room.name for room in heater_manager.rooms_with_heater()
@@ -287,8 +299,9 @@ def heating_periods(request, heating_mode_id):
         'create_heating_period_form': create_heating_period_form,
         'modify_heating_period_form': modify_heating_period_form,
         'room_heating_model_create_form': room_heating_model_create_form,
-        'heating_model_choice_form' : heating_model_choice_form,
+        'room_heating_model_choice_form' : room_heating_model_choice_form,
         'heating_mode_create_form' : heating_mode_create_form,
+        'heating_mode_choice_form' : heating_mode_choice_form,
     }
 
     return render(request, 'heating_periods.html', context)

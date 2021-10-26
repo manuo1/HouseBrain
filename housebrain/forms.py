@@ -99,15 +99,28 @@ class CopyRoomForm(forms.Form):
             ),
         )
 
-class HeatingModelChoiceForm(forms.Form):
+class RoomHeatingModelChoiceForm(forms.Form):
     model = forms.ChoiceField()
     def __init__(self, *args, **kwargs):
-        super(HeatingModelChoiceForm, self).__init__(*args, **kwargs)
+        super(RoomHeatingModelChoiceForm, self).__init__(*args, **kwargs)
         self.fields['model'] = forms.ChoiceField(
             widget=forms.RadioSelect(),
             choices = [
                 (model.id, model.name ) for model in (
                     heating_period_manager.all_room_heating_model()
+                )
+            ]
+        )
+
+class HeatingModeChoiceForm(forms.Form):
+    mode_id = forms.ChoiceField()
+    def __init__(self, *args, **kwargs):
+        super(HeatingModeChoiceForm, self).__init__(*args, **kwargs)
+        self.fields['mode_id'] = forms.ChoiceField(
+            widget=forms.RadioSelect(),
+            choices = [
+                (mode.id, mode.name ) for mode in (
+                    heating_period_manager.all_heating_modes()
                 )
             ]
         )

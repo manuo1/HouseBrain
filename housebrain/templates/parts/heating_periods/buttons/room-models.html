@@ -19,8 +19,8 @@
     <form action="{% url 'housebrain:heating_periods' heating_mode.id %}?page={{ weekdays_pages.number }}" method="post">
       {% csrf_token %}
       <ul class="list-group">
-          <li class="list-group-item disabled" aria-current="true">Modèle(s)</li>
-        {% for model_radio in heating_model_choice_form.model %}
+          <li class="list-group-item bg-secondary text-white" aria-current="true">Modèle(s)</li>
+        {% for model_radio in room_heating_model_choice_form.model %}
           <li class="list-group-item">{{model_radio}}</li>
         {% empty %}
           <li class="list-group-item">Pas de modèle</li>

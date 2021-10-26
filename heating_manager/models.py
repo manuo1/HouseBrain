@@ -58,6 +58,21 @@ class HeatingPeriodManager(models.Manager):
                 heating_period.week_day = self.int_weekday(pasted_weekday)
                 heating_period.save()
 
+    def copy_heating_mode( self, copied_mode_id, pasted_mode_id ):
+        pasted_mode = self.heating_mode(pasted_mode_id)
+        # delete pasted_mode heating_periods
+        HeatingPeriod.objects.filter(
+                associated_heating_mode__id = pasted_mode_id,
+                ).delete()
+        # get copied_mode heating_periods
+        copied_mode_heating_periods = HeatingPeriod.objects.filter(
+                associated_heating_mode__id = copied_mode_id,
+            )
+        for new_heating_period in copied_mode_heating_periods:
+            new_heating_period.id = None
+            new_heating_period.associated_heating_mode = pasted_mode
+            new_heating_period.save()
+
     def copy_room(self, copied_room_ids, pasted_rooms):
         for pasted_room in pasted_rooms:
             # delete pasted_room heating_periods
