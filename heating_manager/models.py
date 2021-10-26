@@ -206,7 +206,7 @@ class HeatingPeriodManager(models.Manager):
             new_period.save()
 
     def all_room_heating_model(self):
-        return RoomHeatingModel.objects.all().order_by('name')
+        return RoomHeatingModel.objects.all().order_by('start_time')
 
     def load_room_model(self, room_model_id, pasted_room_ids):
         # delete old room heating_periods
