@@ -147,7 +147,7 @@ class HeatingPeriodManager(models.Manager):
         return HeatingPeriod.objects.select_related().all()
 
     def all_heating_mode_calendar(self):
-        return HeatingModeCalendar.objects.select_related().all()
+        return HeatingModeCalendar.objects.select_related().all().order_by('start_time')
 
     def heating_periods_for(self, heating_mode_id, str_weekday, room_id):
         int_weekday = self.int_weekday(str_weekday)
@@ -206,7 +206,7 @@ class HeatingPeriodManager(models.Manager):
             new_period.save()
 
     def all_room_heating_model(self):
-        return RoomHeatingModel.objects.all().order_by('start_time')
+        return RoomHeatingModel.objects.all().order_by('name')
 
     def load_room_model(self, room_model_id, pasted_room_ids):
         # delete old room heating_periods
