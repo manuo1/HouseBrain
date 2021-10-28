@@ -1,6 +1,6 @@
 from .common import *
 
-ALLOWED_HOSTS = ["192.168.1.23"]
+ALLOWED_HOSTS = ["192.168.1.23","http://housebrain.ddns.net/"]
 
 DEBUG = False
 
