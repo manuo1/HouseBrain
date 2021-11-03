@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}House Brain{% endblock %}
+{% block main %}
+
+<br>
+
+<!-- Display all rooms without heating names and current température + a collapsible table with 7 days temperature history-->
+{% include "parts/heating_homepage/room_without_heating_accordion.html" %}
+<br>
+
+<!-- display all rooms with heating name heater state and couple current temperature / setpoint temperature + collapsible part with features-->
+{% include "parts/heating_homepage/room_with_heating_accordion.html" %}
+
+{% endblock %}

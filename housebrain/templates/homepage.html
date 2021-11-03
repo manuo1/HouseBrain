@@ -5,19 +5,6 @@
 
 <br>
 
-<!-- Display teleinformation-->
-
-<!-- Display all rooms without heating names and current température + a collapsible table with 7 days temperature history-->
-{% include "parts/homepage/room_without_heating_accordion.html" %}
-
-<br>
-
 <!-- display electric consumption + collapsible part with history -->
 {% include "parts/homepage/consumptions.html" %}
-
-<br>
-
-<!-- display all rooms with heating name heater state and couple current temperature / setpoint temperature + collapsible part with features-->
-{% include "parts/homepage/room_with_heating_accordion.html" %}
-
 {% endblock %}

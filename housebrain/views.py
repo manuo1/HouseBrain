@@ -30,7 +30,32 @@ t_sensor_manager = TemperatureSensorManager()
 heating_period_manager = HeatingPeriodManager()
 teleinfo_manager = TeleinfoManager()
 
+
+
+
 def homepage(request):
+    """ consumptions history """
+    consumptions = []
+    for day in list(range(8)):
+        consumptions.append(
+                teleinfo_manager.daily_consumption(
+                    (timezone.now().date() - timedelta(days=day))
+            )
+        )
+
+    context = {
+        'consumptions' : consumptions,
+        'all_heating_modes' : (
+            heating_period_manager.all_heating_modes()
+        ),
+
+    }
+
+    return render(request, 'homepage.html', context)
+
+
+
+def heating_homepage(request):
     if request.method == 'POST' and request.user.is_authenticated:
         set_manual_temperature = request.POST.get('set_manual_temperature')
         delete_manual_temperature = request.POST.get(
@@ -95,14 +120,6 @@ def homepage(request):
                             "temperature_history" : temperature_history,
                         }
                     )
-    """ consumptions history """
-    consumptions = []
-    for day in list(range(8)):
-        consumptions.append(
-                teleinfo_manager.daily_consumption(
-                    (timezone.now().date() - timedelta(days=day))
-            )
-        )
     """ forms """
     manual_temperature_form = ManualTemperatureForm()
     # manual_temperature_form initials values
@@ -119,7 +136,6 @@ def homepage(request):
         ].initial = 21
 
     context = {
-        'consumptions' : consumptions,
         'manual_temperature_form' : manual_temperature_form,
         'all_heating_modes' : (
             heating_period_manager.all_heating_modes()
@@ -131,7 +147,7 @@ def homepage(request):
         'str_weekdays' : WEEKDAYS,
 
     }
-    return render(request, 'homepage.html', context)
+    return render(request, 'heating_homepage.html', context)
 
 def heating_periods(request, heating_mode_id):
     if request.method == 'POST' and request.user.is_authenticated:
