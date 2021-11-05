@@ -50,7 +50,7 @@
             <div class="col-sm-12 col-lg-2 text-center">
               {% if user.is_authenticated %}
                 {% if room.room.manual_mode_start %}
-                  <form action="{% url 'housebrain:homepage' %}" method="post">
+                  <form action="{% url 'housebrain:heating_homepage' %}" method="post">
                     {% csrf_token %}
                     <button type="submit" value="{{room.room.id}}" name="delete_manual_temperature" class="btn btn-outline-secondary btn-sm" title = "Suprimer Température manuelle" ><i class="bi bi-trash"></i></button>
                   </form>
