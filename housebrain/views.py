@@ -44,6 +44,7 @@ def homepage(request):
         )
 
     context = {
+        'current_heating_mode' : heating_period_manager.current_heating_mode(),
         'consumptions' : consumptions,
         'all_heating_modes' : (
             heating_period_manager.all_heating_modes()
@@ -165,7 +166,9 @@ def heating_periods(request, heating_mode_id):
             copied_mode = eval(copy_heating_mode)
             copy_heating_mode_form = HeatingModeChoiceForm(request.POST)
             if copy_heating_mode_form.is_valid():
-                pasted_mode_id = copy_heating_mode_form.cleaned_data.get('mode_id')
+                pasted_mode_id = copy_heating_mode_form.cleaned_data.get(
+                        'mode_id'
+                    )
                 heating_period_manager.copy_heating_mode(
                     copied_mode['heating_mode'], pasted_mode_id
                 )
@@ -259,8 +262,12 @@ def heating_periods(request, heating_mode_id):
             copied_weekday_ids = eval(copy_weekday)
             pasted_weekday_form = CopyWeekdayForm(request.POST)
             if pasted_weekday_form.is_valid():
-                pasted_weekdays = pasted_weekday_form.cleaned_data.get('weekday')
-                heating_period_manager.copy_weekday(copied_weekday_ids, pasted_weekdays)
+                pasted_weekdays = pasted_weekday_form.cleaned_data.get(
+                        'weekday'
+                    )
+                heating_period_manager.copy_weekday(
+                    copied_weekday_ids, pasted_weekdays
+                )
 
 
     """ get mode heating_periods """
@@ -326,6 +333,8 @@ def heating_calendar(request):
 
     context = {
         'all_heating_modes' : heating_period_manager.all_heating_modes(),
-        'all_heating_mode_calendar' : heating_period_manager.all_heating_mode_calendar()
+        'all_heating_mode_calendar' : (
+            heating_period_manager.all_heating_mode_calendar()
+        )
     }
     return render(request, 'heating_calendar.html', context)

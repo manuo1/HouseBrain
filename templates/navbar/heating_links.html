@@ -6,7 +6,7 @@
     Chauffage
   </a>
   <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdownMenuLink">
-    <li><a class="dropdown-item" href="{% url 'housebrain:heating_homepage' %}">Pièces de la maison</a></li>
+    <li><a class="dropdown-item" href="{% url 'housebrain:heating_homepage' %}"><i class="bi bi-thermometer-half">Détail</i></a></li>
     <li><a class="dropdown-item" href="{% url 'housebrain:heating_calendar' %}"><i class="bi bi-calendar-date"> Calendrier </i></a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item disabled">Modes de chauffage :</a></li>
@@ -15,13 +15,3 @@
     {% endfor %}
   </ul>
 </li>
-
-
-{% if user.is_authenticated %}
-  <!-- logout Button -->
-  <li class="nav-item"><a class="nav-link" href="{% url 'authentication:logout' %}">{{user.username}} <i class="bi bi-box-arrow-right"></i></a></li>
-  <!-- Admin access -->
-  {% if user.is_superuser %}<li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Admin</a></li>{% endif %}
-{% else %}
-  <li class="nav-item"><a class="nav-link" href="{% url 'authentication:login' %}">Connexion</a></li>
-{% endif %}

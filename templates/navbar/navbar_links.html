@@ -1,24 +1,9 @@
 {% load static %}
 
 <!-- Heating links -->
-
-<li class="nav-item dropdown">
-  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-    Chauffage
-  </a>
-  <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdownMenuLink">
-    <li><a class="dropdown-item" href="{% url 'housebrain:heating_homepage' %}">Pièces de la maison</a></li>
-    <li><a class="dropdown-item" href="{% url 'housebrain:heating_calendar' %}"><i class="bi bi-calendar-date"> Calendrier </i></a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><a class="dropdown-item disabled">Modes de chauffage :</a></li>
-    {% for heating_mode in all_heating_modes %}
-    <li><a class="dropdown-item" href="{% url 'housebrain:heating_periods' heating_mode.id %}?page=1">{{heating_mode.name}}</a></li>
-    {% endfor %}
-  </ul>
-</li>
+{% include "navbar/heating_links.html" %}
 
 <!-- User links -->
-
 {% if user.is_authenticated %}
 <!-- logout Button -->
 <li class="nav-item"><a class="nav-link" href="{% url 'authentication:logout' %}">{{user.username}} <i class="bi bi-box-arrow-right"></i></a></li>
