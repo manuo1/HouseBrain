@@ -6,8 +6,8 @@
     Chauffage
   </a>
   <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdownMenuLink">
-    <li><a class="dropdown-item" href="{% url 'housebrain:heating_homepage' %}"><i class="bi bi-thermometer-half">Détail</i></a></li>
-    <li><a class="dropdown-item" href="{% url 'housebrain:heating_calendar' %}"><i class="bi bi-calendar-date"> Calendrier </i></a></li>
+    <li><a class="dropdown-item" href="{% url 'housebrain:heating_homepage' %}"><i class="bi bi-thermometer-half"> Températures</i></a></li>
+    <li><a class="dropdown-item" href="{% url 'housebrain:heating_calendar' %}"><i class="bi bi-calendar-date"> Calendrier</i></a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item disabled">Modes de chauffage :</a></li>
     {% for heating_mode in all_heating_modes %}

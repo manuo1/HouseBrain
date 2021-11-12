@@ -34,6 +34,56 @@ teleinfo_manager = TeleinfoManager()
 
 
 def homepage(request):
+    if request.method == 'POST' and request.user.is_authenticated:
+        turn_off_heating = request.POST.get('turn_off_heating')
+        if turn_off_heating:
+            manual_temperature_form = ManualTemperatureForm(request.POST)
+            if manual_temperature_form.is_valid():
+                manual_mode_data = {
+                    'manual_mode_start':
+                        manual_temperature_form.cleaned_data.get(
+                            'manual_mode_start'
+                        ),
+                    'manual_mode_end':
+                        manual_temperature_form.cleaned_data.get(
+                            'manual_mode_end'
+                        ),
+                    'manual_setpoint_temperature':
+                        manual_temperature_form.cleaned_data.get(
+                            'manual_setpoint_temperature'
+                        ),
+                }
+
+                rooms_ids = []
+                for room in room_manager.all_rooms():
+                    if heater_manager.room_heaters(room):
+                        rooms_ids.append(room.id)
+
+                for id in rooms_ids:
+                    room_manager.set_manual_temperature(
+                        id, manual_mode_data
+                    )
+                management.call_command('manage_heating_periods')
+                management.call_command('manage_heaters')
+
+    """ forms """
+    manual_temperature_form = ManualTemperatureForm()
+    # manual_temperature_form initials values
+    manual_temperature_form.fields[
+            'manual_mode_start'
+        ].initial = timezone.now().strftime("%Y-%m-%dT%H:%M")
+    manual_temperature_form.fields[
+            'manual_mode_end'
+        ].initial = (
+                timezone.now() + timedelta(hours=1)
+            ).strftime("%Y-%m-%dT%H:%M")
+    manual_temperature_form.fields[
+            'manual_setpoint_temperature'
+        ].initial = 5
+
+
+
+
     """ consumptions history """
     consumptions = []
     for day in list(range(8)):
@@ -44,6 +94,7 @@ def homepage(request):
         )
 
     context = {
+    'manual_temperature_form' : manual_temperature_form,
         'current_heating_mode' : heating_period_manager.current_heating_mode(),
         'consumptions' : consumptions,
         'all_heating_modes' : (

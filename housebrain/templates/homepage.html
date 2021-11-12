@@ -9,7 +9,15 @@
       <a href="{% url 'housebrain:heating_calendar' %}" class="btn btn-secondary btn-lg d-block" role="button">{% if current_heating_mode %}Mode de chauffage : {{current_heating_mode.name}}{% else %}Pas de Mode de chauffage selectionné{% endif %}</a>
     </div>
     <div class="col-lg-6 pb-2">
-      <a href="{% url 'housebrain:heating_homepage' %}" class="btn btn-secondary btn-lg d-block" role="button"><i class="bi bi-thermometer-half">Températures</i></a>
+      <a href="{% url 'housebrain:heating_homepage' %}" class="btn btn-secondary btn-lg d-block" role="button"><i class="bi bi-thermometer-half"></i> Températures</a>
+    </div>
+  </div>
+  <div class="row align-items-center">
+    <div class="col-lg-6 pb-2">
+      {% include "parts/homepage/buttons/turn_off_heating.html" %}
+    </div>
+    <div class="col-lg-6 pb-2">
+      <a href="#" class="btn btn-secondary btn-lg d-block" role="button">-</a>
     </div>
   </div>
 </div>

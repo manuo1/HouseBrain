@@ -57,10 +57,9 @@
                 {% else %}
                   {% include "parts/heating_homepage/buttons/set_manual_temperature.html" %}
                 {% endif%}
-
-                {% else %}
-                  <a class="nav-link active" href="{% url 'authentication:login' %}">Connectez vous pour atteindre ces fonctionnalitées</a>
-                {% endif%}
+              {% else %}
+                <a class="nav-link active" href="{% url 'authentication:login' %}">Connectez vous pour atteindre ces fonctionnalitées</a>
+              {% endif%}
             </div>
           </div>
         </div>
