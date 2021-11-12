@@ -1,0 +1,28 @@
+<!-- Button trigger modal -->
+<a type="button" class="btn btn-danger btn-lg d-block" data-bs-toggle="modal" data-bs-target="#cancel_manual_turn_off_heating_Modal" title = "Annuler Eteindre le chauffage temporairement">
+  <i class="bi bi-power"></i> Annuler Eteindre le chauffage temporairement
+</a>
+
+<!-- Modal -->
+<div class="modal fade" id="cancel_manual_turn_off_heating_Modal" tabindex="-1" aria-labelledby="cancel_manual_turn_off_heating_ModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <!-- Modal header -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="cancel_manual_turn_off_heating_ModalLabel">
+            Annuler Eteindre le chauffage temporairement<br>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <!-- Modal body & Form -->
+      <form action="{% url 'housebrain:homepage' %}" method="post">
+      {% csrf_token %}
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" value="cancel_manual_turn_off_heating" name="cancel_manual_turn_off_heating" class="btn btn-success">Valider</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

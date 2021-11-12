@@ -35,8 +35,10 @@ teleinfo_manager = TeleinfoManager()
 
 def homepage(request):
     if request.method == 'POST' and request.user.is_authenticated:
-        turn_off_heating = request.POST.get('turn_off_heating')
-        if turn_off_heating:
+        manual_turn_off_heating = request.POST.get('manual_turn_off_heating')
+        cancel_manual_turn_off_heating = request.POST.get('cancel_manual_turn_off_heating')
+
+        if manual_turn_off_heating:
             manual_temperature_form = ManualTemperatureForm(request.POST)
             if manual_temperature_form.is_valid():
                 manual_mode_data = {
@@ -54,17 +56,26 @@ def homepage(request):
                         ),
                 }
 
-                rooms_ids = []
-                for room in room_manager.all_rooms():
-                    if heater_manager.room_heaters(room):
-                        rooms_ids.append(room.id)
-
-                for id in rooms_ids:
+                for room in heating_period_manager.rooms_with_heater():
                     room_manager.set_manual_temperature(
-                        id, manual_mode_data
+                        room.id, manual_mode_data
                     )
+
                 management.call_command('manage_heating_periods')
                 management.call_command('manage_heaters')
+
+        if cancel_manual_turn_off_heating:
+            for room in heating_period_manager.rooms_with_heater():
+                room_manager.delete_manual_temperature(room)
+            management.call_command('manage_heating_periods')
+            management.call_command('manage_heaters')
+
+
+
+    """ chek if the heating is temporarily switched off """
+    heating_is_temporarily_off = False
+    if all(room.manual_mode_end for room in heating_period_manager.rooms_with_heater()):
+        heating_is_temporarily_off = True
 
     """ forms """
     manual_temperature_form = ManualTemperatureForm()
@@ -81,9 +92,6 @@ def homepage(request):
             'manual_setpoint_temperature'
         ].initial = 5
 
-
-
-
     """ consumptions history """
     consumptions = []
     for day in list(range(8)):
@@ -94,7 +102,8 @@ def homepage(request):
         )
 
     context = {
-    'manual_temperature_form' : manual_temperature_form,
+        'heating_is_temporarily_off' : heating_is_temporarily_off,
+        'manual_temperature_form' : manual_temperature_form,
         'current_heating_mode' : heating_period_manager.current_heating_mode(),
         'consumptions' : consumptions,
         'all_heating_modes' : (

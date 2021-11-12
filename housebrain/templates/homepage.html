@@ -14,7 +14,11 @@
   </div>
   <div class="row align-items-center">
     <div class="col-lg-6 pb-2">
-      {% include "parts/homepage/buttons/turn_off_heating.html" %}
+      {% if heating_is_temporarily_off %}
+        {% include "parts/homepage/buttons/manual_turn_on_heating.html" %}
+      {% else %}
+        {% include "parts/homepage/buttons/manual_turn_off_heating.html" %}
+      {% endif %}
     </div>
     <div class="col-lg-6 pb-2">
       <a href="#" class="btn btn-secondary btn-lg d-block" role="button">-</a>

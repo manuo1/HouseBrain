@@ -6,9 +6,19 @@ from django.utils import timezone
 from housebrain_config.settings.constants import (
     DEFAULT_TEMPERATURE, WEEKDAYS
 )
-from rooms.models import Room
+from rooms.models import Room, RoomManager
+from heaters.models import HeaterManager
+room_manager = RoomManager()
+heater_manager = HeaterManager()
 
 class HeatingPeriodManager(models.Manager):
+
+    def rooms_with_heater(self):
+        rooms = []
+        for room in room_manager.all_rooms():
+            if heater_manager.room_heaters(room):
+                rooms.append(room)
+        return rooms
 
     def modify_heating_period(self, period):
         heating_period = self.heating_period(
