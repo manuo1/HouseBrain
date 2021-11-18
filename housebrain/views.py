@@ -70,6 +70,7 @@ def homepage(request):
             management.call_command('manage_heating_periods')
             management.call_command('manage_heaters')
 
+    print(t_sensor_manager.previous_days(5))
 
 
     """ chek if the heating is temporarily switched off """
@@ -94,7 +95,7 @@ def homepage(request):
 
     """ consumptions history """
     consumptions = []
-    for day in list(range(8)):
+    for day in list(range(14)):
         consumptions.append(
                 teleinfo_manager.daily_consumption(
                     (timezone.now().date() - timedelta(days=day))
@@ -122,7 +123,6 @@ def heating_homepage(request):
         delete_manual_temperature = request.POST.get(
                 'delete_manual_temperature'
             )
-
 
         if delete_manual_temperature:
             room_id = int(delete_manual_temperature)

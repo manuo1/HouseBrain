@@ -4,7 +4,7 @@ from housebrain_config.settings.constants import (
     DEBUG_TEMPERATURE,
     ERROR_TEMPERATURE,
     TEMPERATURE_FILE,
-    SENSOR_READING_MAX_ATTEMPTS as max_attemps,
+    SENSOR_READING_MAX_ATTEMPTS as max_attempts,
 )
 from sensors.models import TemperatureSensorManager
 from django.core.management.base import BaseCommand
@@ -29,7 +29,7 @@ class Command(BaseCommand):
         for sensor in sensor_manager.all_sensors():
             temperature = None
             attempt = 0
-            while not temperature and attempt != max_attemps:
+            while not temperature and attempt != max_attempts:
                 temperature = self.read_temperature(sensor)
                 attempt += 1
             if temperature:

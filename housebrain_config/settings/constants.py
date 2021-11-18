@@ -104,3 +104,12 @@ PRICE_PER_KILOWATT_HOUR_HP = 0.1821
 PRICE_PER_KILOWATT_HOUR_HC = 0.1360
 MONTHLY_SUBSCRIPTION_PRICE = 15.42
 HC_PERIODS = [( "02:00" , "07:00" ), ( "13:00" , "16:00" )]
+
+##############################################################################
+# heating need requirement
+##############################################################################
+# to calculate the heating requirement we make for each hour of a day the
+#| difference between the outside temperature and the reference temperature
+#| then we add all its differences
+
+HEATING_NEED_REFERENCE_TEMPERATURE = 21000

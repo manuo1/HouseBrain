@@ -3,7 +3,8 @@ from django.db import models, IntegrityError
 from django.utils import timezone
 from datetime import datetime, timedelta
 from housebrain_config.settings.constants import (
-    ERROR_TEMPERATURE
+    ERROR_TEMPERATURE,
+    HEATING_NEED_REFERENCE_TEMPERATURE as reference_temperature,
 )
 from housebrain_config.settings.messages import (
     NO_ASSOCIATED_ROOM,
@@ -14,17 +15,19 @@ from rooms.models import Room
 
 class TemperatureSensorManager(models.Manager):
 
-    def seven_days_sensor_temperature_history(self,sensor):
+    def previous_days(self, number_of_days):
         now = timezone.now()
-        weekdays = {
-            (now.date() - timedelta(days=6)) : [],
-            (now.date() - timedelta(days=5)) : [],
-            (now.date() - timedelta(days=4)) : [],
-            (now.date() - timedelta(days=3)) : [],
-            (now.date() - timedelta(days=2)) : [],
-            (now.date() - timedelta(days=1)) : [],
-            now.date() : [],
-        }
+        previous_days = {}
+        for day in range(number_of_days):
+            previous_days.update(
+                {(now.date() - timedelta(days= number_of_days - day)) : []}
+            )
+        previous_days.update({now.date() : []})
+        return previous_days
+
+    def seven_days_sensor_temperature_history(self,sensor):
+        weekdays = self.previous_days(6)
+        now = timezone.now()
         seven_days_before = list(weekdays.keys())[0]
         temperature_history = TemperatureHistory.objects.filter(
                 associated_sensor = sensor,
@@ -78,6 +81,18 @@ class TemperatureSensorManager(models.Manager):
     def clear_all_temperature_history(self):
         TemperatureHistory.objects.all().delete()
 
+    def heating_need_of_the_day(self, date):
+        daytime_outdoor_temperatures = TemperatureHistory.objects.filter(
+                associated_sensor__is_the_outdoor_sensor=True,
+                date_time__date=date,
+                date_time__minute=0,
+            ).order_by('date_time')
+        heating_need = 0
+        for day_history in daytime_outdoor_temperatures:
+            heating_need += (reference_temperature - day_history.temperature)
+        return heating_need
+
+
 class TemperatureSensor(models.Model):
     """ temperature sensors model """
     name = models.CharField(
@@ -95,6 +110,7 @@ class TemperatureSensor(models.Model):
         blank=True,
         null=True,
     )
+    is_the_outdoor_sensor = models.BooleanField(default=False)
     date_time_update = models.DateTimeField(auto_now=True)
     last_measured_temperature = models.IntegerField(
         default=ERROR_TEMPERATURE

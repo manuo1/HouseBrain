@@ -8,6 +8,9 @@ from housebrain_config.settings.constants import (
     PRICE_PER_KILOWATT_HOUR_HC as price_hc,
     MONTHLY_SUBSCRIPTION_PRICE as subscription_price,
 )
+from sensors.models import TemperatureSensorManager
+
+temperature_sensor_manager = TemperatureSensorManager()
 
 """
 /!\ Teleinformation comes from the French electric network, docstrings
@@ -15,6 +18,7 @@ from housebrain_config.settings.constants import (
 """
 
 class TeleinfoManager(models.Manager):
+
     def save_teleinfo(self, teleinfo):
         if teleinfo["date_time"].minute != self.last_teleinfo_minute():
             new_teleinfo_history = TeleinformationHistory()
@@ -94,11 +98,14 @@ class TeleinfoManager(models.Manager):
                             + hp/1000*price_hp
                             + subscription_price/days_in_month
                     )
+                    heating_need = (
+                        temperature_sensor_manager.heating_need_of_the_day(date)
+                    )
                     daily_consumption["values"] = {
-                        "HC": f'{round(hc/1000,1):.1f} kWh',
-                        "HP": f'{round(hp/1000,1):.1f} kWh',
-                        "+" : f'{round((hc+hp)/1000,1):.1f} kWh',
-                        "%" : f'{percentage_hc}%HC {100-percentage_hc}%HP',
+                        "HC": f'{round(hc/1000,1):.1f} kWh ({percentage_hc}%)',
+                        "HP": f'{round(hp/1000,1):.1f} kWh ({100-percentage_hc}%)',
+                        "∑" : f'{round((hc+hp)/1000,1):.1f} kWh',
+                        "#°" : f'{round(heating_need/1000)}°',
                         "€" : f'{round(price,2):.2f}€',
                     }
 
