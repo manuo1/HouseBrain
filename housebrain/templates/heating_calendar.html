@@ -8,16 +8,38 @@
       <th scope="col">Début</th>
       <th scope="col">Fin</th>
       <th scope="col">Mode de Chauffage</th>
-      <th scope="col"><i class="bi bi-gear"></i></th>
+      <th scope="col"></th>
     </tr>
   </thead>
   <tbody>
     {% for heating_mode_calendar in all_heating_mode_calendar%}
-    <tr>
+    <tr 
+      {% if heating_mode_calendar.date_time_end <= now%}
+        class="bg-secondary"
+      {% endif %}
+    >
       <td>{{heating_mode_calendar.date_time_start|date:"D d/m/Y H:i"}}</td>
       <td>{{heating_mode_calendar.date_time_end|date:"D d/m/Y H:i"}}</td>
-      <td>{{heating_mode_calendar.heating_mode.name}}</td>
-      <td><i class="bi bi-trash"><i class="bi bi-trash"><i class="bi bi-trash"></i></td>
+
+      <td>
+        <a class="btn btn-sm text-center d-block 
+        {% if heating_mode_calendar.date_time_end <= now%}
+        btn-outline-light
+        {%else%}
+        btn-outline-secondary
+        {% endif %}"
+        title = "Voir le mode {{heating_mode_calendar.heating_mode.name}}" 
+        href="{% url 'housebrain:heating_periods' heating_mode_calendar.heating_mode.id %}?page=1">
+        {{heating_mode_calendar.heating_mode.name}}
+        </a>
+      </td>
+      <td>
+        {% if not heating_mode_calendar.date_time_end <= now%}
+        {% include "parts/heating_calendar/buttons/insert-heating_mode_period.html" %}
+        {% include "parts/heating_calendar/buttons/delette-heating_mode_period.html" %}
+        {% endif %}
+
+      </td>
     </tr>
     {% endfor %}
   </tbody>

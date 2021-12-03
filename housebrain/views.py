@@ -331,7 +331,6 @@ def heating_periods(request, heating_mode_id):
 
 
     """ get mode heating_periods """
-    heating_modes = {}
     mode = heating_period_manager.heating_mode(heating_mode_id)
     rooms = heater_manager.rooms_with_heater()
     page_list = []
@@ -392,6 +391,7 @@ def heating_periods(request, heating_mode_id):
 def heating_calendar(request):
 
     context = {
+        'now' : timezone.now(),
         'all_heating_modes' : heating_period_manager.all_heating_modes(),
         'all_heating_mode_calendar' : (
             heating_period_manager.all_heating_mode_calendar()
