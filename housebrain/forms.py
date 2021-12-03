@@ -40,7 +40,6 @@ class HeatingModeCreateForm(forms.ModelForm):
                         }),
         }
 
-
 class HeatingPeriodCreateForm(forms.ModelForm):
     class Meta:
         model = HeatingPeriod

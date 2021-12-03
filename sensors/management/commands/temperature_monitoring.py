@@ -55,8 +55,8 @@ class Command(BaseCommand):
         else :
             temperature = self.str_to_int(self.read_sensor_file(sensor))
             # no diff between 0 reading value or error reading value
-            #| so don't save 0 value
-            if temperature == 0:
+            #| need to check if previous value is in range (-1°,+1°)
+            if temperature == 0 and not sensor.previous_measured_temperature in range(-1,1):
                 temperature = None
         return temperature
 
@@ -74,7 +74,7 @@ class Command(BaseCommand):
             ) as file:
                 temperature = file.readline()
         except FileNotFoundError:
-            pass
+            self.stdout.write(f'Error, Can\'t find sensor :\n{sensor}')
         except Exception as e:
-            self.stdout.write(f'error during reading temperature :\n{e}')
+            self.stdout.write(f'Error during reading temperature :\n{e}')
         return temperature

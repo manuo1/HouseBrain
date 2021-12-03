@@ -8,6 +8,7 @@
       <th scope="col">Début</th>
       <th scope="col">Fin</th>
       <th scope="col">Mode de Chauffage</th>
+      <th scope="col"><i class="bi bi-gear"></i></th>
     </tr>
   </thead>
   <tbody>
@@ -16,6 +17,7 @@
       <td>{{heating_mode_calendar.date_time_start|date:"D d/m/Y H:i"}}</td>
       <td>{{heating_mode_calendar.date_time_end|date:"D d/m/Y H:i"}}</td>
       <td>{{heating_mode_calendar.heating_mode.name}}</td>
+      <td><i class="bi bi-trash"><i class="bi bi-trash"><i class="bi bi-trash"></i></td>
     </tr>
     {% endfor %}
   </tbody>
