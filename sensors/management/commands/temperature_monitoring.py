@@ -56,7 +56,7 @@ class Command(BaseCommand):
             temperature = self.str_to_int(self.read_sensor_file(sensor))
             # no diff between 0 reading value or error reading value
             #| need to check if previous value is in range (-1°,+1°)
-            if temperature == 0 and not sensor.previous_measured_temperature in range(-1,1):
+            if temperature == 0 and not sensor.previous_measured_temperature in range(-1000,1000):
                 temperature = None
         return temperature
 
