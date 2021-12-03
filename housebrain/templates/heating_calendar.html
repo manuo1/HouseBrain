@@ -2,6 +2,11 @@
 {% load static %}
 {% block title %}House Brain{% endblock %}
 {% block main %}
+<div class="d-flex flex-row-reverse bd-highlight m-2 p-2">
+  {% include "parts/heating_calendar/buttons/insert-heating_mode_period.html" %}
+</div>
+
+        
 <table class="table table-striped">
   <thead>
     <tr>
@@ -35,10 +40,8 @@
       </td>
       <td>
         {% if not heating_mode_calendar.date_time_end <= now%}
-        {% include "parts/heating_calendar/buttons/insert-heating_mode_period.html" %}
         {% include "parts/heating_calendar/buttons/delette-heating_mode_period.html" %}
         {% endif %}
-
       </td>
     </tr>
     {% endfor %}

@@ -394,7 +394,7 @@ def heating_calendar(request):
         'now' : timezone.now(),
         'all_heating_modes' : heating_period_manager.all_heating_modes(),
         'all_heating_mode_calendar' : (
-            heating_period_manager.all_heating_mode_calendar()
+            heating_period_manager.all_heating_mode_calendar("desc")
         )
     }
     return render(request, 'heating_calendar.html', context)

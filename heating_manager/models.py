@@ -156,8 +156,16 @@ class HeatingPeriodManager(models.Manager):
     def all_heating_periods(self):
         return HeatingPeriod.objects.select_related().all()
 
-    def all_heating_mode_calendar(self):
-        return HeatingModeCalendar.objects.select_related().all().order_by('date_time_start')
+    def all_heating_mode_calendar(self,*args):
+        """ 
+            order accept "desc" arg to to reverse the sort order.
+            defaut
+        """
+        order_by = 'date_time_start'
+        for arg in args:
+            if arg == "desc":
+                order_by = '-date_time_start'           
+        return HeatingModeCalendar.objects.select_related().all().order_by(order_by)
 
     def heating_periods_for(self, heating_mode_id, str_weekday, room_id):
         int_weekday = self.int_weekday(str_weekday)
@@ -226,7 +234,6 @@ class HeatingPeriodManager(models.Manager):
             pasted_room_ids['room']
         ).delete()
         # load new room heating_periods
-        room_model = self.room_model(room_model_id)
         heating_periods = ModelHeatingPeriod.objects.filter(
             associated_room_heating_model__id = room_model_id
         )
