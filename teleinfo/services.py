@@ -87,23 +87,24 @@ def get_data_in_line(byte_data):
     key, value, checksum = split_data(cleaned_data)
     if data_is_valid(key, value, checksum):
         return key, value
-    return INVALIDE_KEY, INVALIDE_KEY
+    return INVALIDE_KEY, ""
 
 
-def teleinfo_frame_is_complete(buffer):
+def teleinfo_frame_is_complete(buffer: dict) -> bool:
     return all(
         key in buffer for key in [FIRST_TELEINFO_FRAME_KEY, LAST_TELEINFO_FRAME_KEY]
     )
 
 
-def add_data_to_buffer(key: str, value: str, buffer: dict) -> dict:
-    if not key == INVALIDE_KEY and key not in buffer.keys():
-        buffer[key] = value
+def buffer_is_empty(buffer):
+    return not buffer
 
-    # si LAST_TELEINFO_FRAME_KEY et present sans LAST_TELEINFO_FRAME_KEY
-    # cela veux dire que l'on a commencé à enregistrer la trame au milieu
-    # donc on ne garde pas cette trame
-    if key == LAST_TELEINFO_FRAME_KEY and FIRST_TELEINFO_FRAME_KEY not in buffer.keys():
-        buffer.clear()
 
-    return buffer
+def buffer_can_accept_new_data(key: str, buffer: dict) -> bool:
+    return key != INVALIDE_KEY and (
+        # on ne peut commencer à écrire dans le buffer qu'en début de trame donc si
+        # le buffer vide et la clé est la première attendue dans la trame
+        (buffer_is_empty(buffer) and key == FIRST_TELEINFO_FRAME_KEY)
+        # ou la première clé attendue dans la trame est déjà présente dans le buffer
+        or FIRST_TELEINFO_FRAME_KEY in buffer.keys()
+    )

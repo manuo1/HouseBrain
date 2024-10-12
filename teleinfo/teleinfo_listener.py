@@ -11,7 +11,7 @@ from teleinfo.constants import (
     UNPLUGGED_MODE,
 )
 from teleinfo.services import (
-    add_data_to_buffer,
+    buffer_can_accept_new_data,
     get_data_in_line,
     teleinfo_frame_is_complete,
 )
@@ -37,12 +37,13 @@ class TeleinfoListener:
     def listen(self):
         while self.running:
             if self.ser.in_waiting:
-                data = self.ser.readline()
-                self.process_data(data)
+                raw_data_line = self.ser.readline()
+                self.process_data(raw_data_line)
 
-    def process_data(self, data):
-        key, value = get_data_in_line(data)
-        self.buffer = add_data_to_buffer(key, value, self.buffer)
+    def process_data(self, raw_data_line):
+        key, value = get_data_in_line(raw_data_line)
+        if buffer_can_accept_new_data(key, self.buffer):
+            self.buffer[key] = value
         if teleinfo_frame_is_complete(self.buffer):
             print(self.buffer)
             self.buffer.clear()
