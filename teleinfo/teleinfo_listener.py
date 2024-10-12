@@ -2,12 +2,7 @@ import serial
 import threading
 
 from teleinfo.constants import (
-    SERIAL_BYTESIZE,
-    SERIAL_PARITY,
-    SERIAL_PORT,
-    SERIAL_BAUDRATE,
-    SERIAL_STOPBITS,
-    SERIAL_TIMEOUT,
+    SerialConfig,
     UNPLUGGED_MODE,
 )
 from teleinfo.services import (
@@ -18,29 +13,29 @@ from teleinfo.services import (
 
 
 class TeleinfoListener:
-    def __init__(self):
+    def __init__(self) -> None:
         self.ser = self.get_serial_port()
         self.running = True
         self.buffer = {}
 
-    def get_serial_port(self):
+    def get_serial_port(self) -> serial.Serial:
         serial_port = serial.Serial(
-            port=SERIAL_PORT,
-            baudrate=SERIAL_BAUDRATE,
-            parity=SERIAL_PARITY,
-            stopbits=SERIAL_STOPBITS,
-            bytesize=SERIAL_BYTESIZE,
-            timeout=SERIAL_TIMEOUT,
+            port=SerialConfig.PORT.value,
+            baudrate=SerialConfig.BAUDRATE.value,
+            parity=SerialConfig.PARITY.value,
+            stopbits=SerialConfig.STOPBITS.value,
+            bytesize=SerialConfig.BYTESIZE.value,
+            timeout=SerialConfig.TIMEOUT.value,
         )
         return serial_port
 
-    def listen(self):
+    def listen(self) -> None:
         while self.running:
             if self.ser.in_waiting:
                 raw_data_line = self.ser.readline()
                 self.process_data(raw_data_line)
 
-    def process_data(self, raw_data_line):
+    def process_data(self, raw_data_line: bytes) -> None:
         key, value = get_data_in_line(raw_data_line)
         if buffer_can_accept_new_data(key, self.buffer):
             self.buffer[key] = value
@@ -48,12 +43,12 @@ class TeleinfoListener:
             print(self.buffer)
             self.buffer.clear()
 
-    def stop(self):
+    def stop(self) -> None:
         self.running = False
         self.ser.close()
 
 
-def start_listener():
+def start_listener() -> TeleinfoListener:
 
     if UNPLUGGED_MODE:
         print("Running in unplugged mode. Teleinfo listener will not start.")

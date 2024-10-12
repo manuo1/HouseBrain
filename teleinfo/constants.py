@@ -1,17 +1,55 @@
+from enum import Enum, StrEnum
 import os
 import serial
 
 UNPLUGGED_MODE = os.getenv("UNPLUGGED_MODE", "False") == "True"
 
-"""Raspberry serial port config"""
-SERIAL_PORT = os.getenv("SERIAL_PORT", "/dev/ttyS0")
-SERIAL_BAUDRATE = 1200
-SERIAL_PARITY = serial.PARITY_NONE
-SERIAL_STOPBITS = serial.STOPBITS_ONE
-SERIAL_BYTESIZE = serial.SEVENBITS
-SERIAL_TIMEOUT = 1  # 1 seconde
+
+# Raspberry serial port config
+class SerialConfig(Enum):
+    PORT = os.getenv("SERIAL_PORT", "/dev/ttyS0")
+    BAUDRATE = 1200
+    PARITY = serial.PARITY_NONE
+    STOPBITS = serial.STOPBITS_ONE
+    BYTESIZE = serial.SEVENBITS
+    TIMEOUT = 1  # 1 seconde
+
 
 INVALIDE_KEY = "invalid"
 
-FIRST_TELEINFO_FRAME_KEY = "ADCO"
-LAST_TELEINFO_FRAME_KEY = "MOTDETAT"
+
+class TeleinfoLabel(StrEnum):
+    ADCO = "ADCO"  # Adresse du compteur
+    OPTARIF = "OPTARIF"  # Option tarifaire choisie
+    ISOUSC = "ISOUSC"  # Intensité souscrite
+    BASE = "BASE"  # Index option Base
+    HCHC = "HCHC"  # Index Heures Creuses
+    HCHP = "HCHP"  # Index Heures Pleines
+    EJPHN = "EJPHN"  # Index Heures Normales EJP
+    EJPHPM = "EJPHPM"  # Index Heures de Pointe Mobile EJP
+    BBRHCJB = "BBRHCJB"  # Heures Creuses Jours Bleus Tempo
+    BBRHPJB = "BBRHPJB"  # Heures Pleines Jours Bleus Tempo
+    BBRHCJW = "BBRHCJW"  # Heures Creuses Jours Blancs Tempo
+    BBRHPJW = "BBRHPJW"  # Heures Pleines Jours Blancs Tempo
+    BBRHCJR = "BBRHCJR"  # Heures Creuses Jours Rouges Tempo
+    BBRHPJR = "BBRHPJR"  # Heures Pleines Jours Rouges Tempo
+    PEJP = "PEJP"  # Préavis Début EJP (30 min)
+    PTEC = "PTEC"  # Période Tarifaire en cours
+    DEMAIN = "DEMAIN"  # Couleur du lendemain (Tempo)
+    IINST = "IINST"  # Intensité Instantanée
+    ADPS = "ADPS"  # Avertissement de Dépassement De Puissance Souscrite
+    IMAX = "IMAX"  # Intensité maximale appelée
+    PAPP = "PAPP"  # Puissance apparente
+    HHPHC = "HHPHC"  # Horaire Heures Pleines Heures Creuses
+    MOTDETAT = "MOTDETAT"  # Mot d'état du compteur
+
+
+FIRST_TELEINFO_FRAME_KEY = TeleinfoLabel.ADCO
+LAST_TELEINFO_FRAME_KEY = TeleinfoLabel.MOTDETAT
+
+UNUSED_CHARS_IN_TELEINFO = {
+    "\r": "",  # Carriage Return
+    "\n": "",  # New line
+    "\x03": "",  # End of Text (ETX)
+    "\x02": "",  # Start of Text (STX)
+}

@@ -1,4 +1,4 @@
-# teleinfo lines sample:
+# teleinfo sample:
 # b'ADCO 021728123456 =\r\n'
 # b'OPTARIF HC.. <\r\n'
 # b'ISOUSC 45 ?\r\n'
@@ -16,28 +16,22 @@ from teleinfo.constants import (
     FIRST_TELEINFO_FRAME_KEY,
     INVALIDE_KEY,
     LAST_TELEINFO_FRAME_KEY,
+    UNUSED_CHARS_IN_TELEINFO,
 )
 
 
-def decode_byte(byte_data):
+def decode_byte(byte_data: bytes) -> str:
     try:
         return byte_data.decode("utf-8")
     except UnicodeDecodeError:
         return ""
 
 
-def clean_data(data):
-    remove_chars = {
-        "\r": "",  # Carriage Return
-        "\n": "",  # New line
-        "\x03": "",  # End of Text (ETX)
-        "\x02": "",  # Start of Text (STX)
-    }
-    # Utilisation de str.translate pour appliquer toutes les remplacements en une fois
-    return data.translate(str.maketrans(remove_chars))
+def clean_data(data: str) -> str:
+    return data.translate(str.maketrans(UNUSED_CHARS_IN_TELEINFO))
 
 
-def split_data(cleaned_data):
+def split_data(cleaned_data: str) -> str:
     default_splitted = [" ", " ", " "]
     if not cleaned_data:
         return default_splitted
