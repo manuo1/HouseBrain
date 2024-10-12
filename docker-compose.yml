@@ -13,6 +13,7 @@ services:
     env_file:
       - .env
     devices:
+      # port série du raspberry
       - "${SERIAL_PORT}:${SERIAL_PORT}"
     # restart: always
 

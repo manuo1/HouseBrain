@@ -10,13 +10,18 @@ from teleinfo.constants import (
     SERIAL_TIMEOUT,
     UNPLUGGED_MODE,
 )
-from teleinfo.services import get_data_in_line
+from teleinfo.services import (
+    add_data_to_buffer,
+    get_data_in_line,
+    teleinfo_frame_is_complete,
+)
 
 
 class TeleinfoListener:
     def __init__(self):
         self.ser = self.get_serial_port()
         self.running = True
+        self.buffer = {}
 
     def get_serial_port(self):
         serial_port = serial.Serial(
@@ -36,13 +41,11 @@ class TeleinfoListener:
                 self.process_data(data)
 
     def process_data(self, data):
-        # Logique pour traiter les données reçues
-        a = []
-        line_data = get_data_in_line(data)
-        a.append(line_data)
-        if len(a) > 5:
-            print(a)
-            a = []
+        key, value = get_data_in_line(data)
+        self.buffer = add_data_to_buffer(key, value, self.buffer)
+        if teleinfo_frame_is_complete(self.buffer):
+            print(self.buffer)
+            self.buffer.clear()
 
     def stop(self):
         self.running = False
@@ -56,11 +59,8 @@ def start_listener():
         print("(see .env to change mode)")
         return None
 
-    # Démarrer l'écouteur
     listener = TeleinfoListener()
     listener_thread = threading.Thread(target=listener.listen)
-    listener_thread.daemon = (
-        True  # Permet d'arrêter le thread avec le processus principal
-    )
+    listener_thread.daemon = True
     listener_thread.start()
     return listener
