@@ -2,7 +2,6 @@ import logging
 import serial
 import threading
 from result import Err, Ok
-from serial.serialutil import SerialException
 from teleinfo.constants import (
     SerialConfig,
     UNPLUGGED_MODE,
@@ -35,12 +34,9 @@ class TeleinfoListener:
 
     def listen(self) -> None:
         while self.running:
-            try:
-                if self.ser.in_waiting:
-                    raw_data_line = self.ser.readline()
-                    self.process_data(raw_data_line)
-            except SerialException as e:
-                logger.error(e)
+            if self.ser.in_waiting:
+                raw_data_line = self.ser.readline()
+                self.process_data(raw_data_line)
 
     def process_data(self, raw_data_line: bytes) -> None:
         match get_data_in_line(raw_data_line):
@@ -58,8 +54,8 @@ class TeleinfoListener:
 
         match teleinfo_frame_is_complete(self.buffer):
             case Ok(_):
-                # do something with this :)
                 print(self.buffer)
+                # do something
                 self.buffer.clear()
             case Err(e):
                 return
