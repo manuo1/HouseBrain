@@ -1,5 +1,8 @@
+import logging
 from django.apps import AppConfig
 from teleinfo.teleinfo_listener import start_listener
+
+logger = logging.getLogger(__name__)
 
 
 class TeleinfoConfig(AppConfig):
@@ -7,7 +10,7 @@ class TeleinfoConfig(AppConfig):
     name = "teleinfo"
 
     def ready(self):
-        print("Starting Teleinfo listener")
+        logger.info("Starting Teleinfo listener")
         listener = start_listener()
         if listener:
-            print(f"Teleinfo listener started: {listener.running}")
+            logger.info(f"Teleinfo listener started: {listener.running}")
