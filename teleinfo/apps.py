@@ -10,7 +10,14 @@ class TeleinfoConfig(AppConfig):
     name = "teleinfo"
 
     def ready(self):
-        logger.info("Starting Teleinfo listener")
+        logger.info("Initializing Teleinfo listener...")
+
+        # Démarrer le listener
         listener = start_listener()
+
         if listener:
             logger.info(f"Teleinfo listener started: {listener.running}")
+        else:
+            logger.warning(
+                "Teleinfo listener could not be started. Running in unplugged mode."
+            )
