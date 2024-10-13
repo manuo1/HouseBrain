@@ -1,6 +1,6 @@
 import serial
 import threading
-
+from result import Err, Ok
 from teleinfo.constants import (
     SerialConfig,
     UNPLUGGED_MODE,
@@ -36,12 +36,25 @@ class TeleinfoListener:
                 self.process_data(raw_data_line)
 
     def process_data(self, raw_data_line: bytes) -> None:
-        key, value = get_data_in_line(raw_data_line)
-        if buffer_can_accept_new_data(key, self.buffer):
-            self.buffer[key] = value
-        if teleinfo_frame_is_complete(self.buffer):
-            print(self.buffer)
-            self.buffer.clear()
+        match get_data_in_line(raw_data_line):
+            case Ok(data):
+                key, value = data
+            case Err(e):
+                print(e)
+                return
+        match buffer_can_accept_new_data(key, self.buffer):
+            case Ok(_):
+                self.buffer[key] = value
+            case Err(e):
+                print(e)
+                return
+
+        match teleinfo_frame_is_complete(self.buffer):
+            case Ok(_):
+                print(self.buffer)
+                self.buffer.clear()
+            case Err(e):
+                return
 
     def stop(self) -> None:
         self.running = False

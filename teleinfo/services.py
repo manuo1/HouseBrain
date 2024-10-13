@@ -1,55 +1,50 @@
-# teleinfo sample:
-# b'ADCO 021728123456 =\r\n'
-# b'OPTARIF HC.. <\r\n'
-# b'ISOUSC 45 ?\r\n'
-# b'HCHC 050977332 *\r\n'
-# b'HCHP 056567645 ?\r\n'
-# b'PTEC HP..  \r\n'
-# b'IINST 004 [\r\n'
-# b'IMAX 057 K\r\n'
-# b'PAPP 00850 .\r\n'
-# b'HHPHC E 0\r\n'
-# b'MOTDETAT 000000 B\r\x03\x02\n'
-
-
+from result import Err, Ok, Result
 from teleinfo.constants import (
     FIRST_TELEINFO_FRAME_KEY,
-    INVALIDE_KEY,
     LAST_TELEINFO_FRAME_KEY,
     UNUSED_CHARS_IN_TELEINFO,
 )
 
 
-def decode_byte(byte_data: bytes) -> str:
+def decode_byte(byte_data: bytes) -> Result[str, str]:
     try:
-        return byte_data.decode("utf-8")
+        return Ok(byte_data.decode("utf-8"))
     except UnicodeDecodeError:
-        return ""
+        return Err("'byte_data' contains invalid UTF-8.")
+    except AttributeError:
+        return Err("'byte_data' must be of type 'bytes'.")
 
 
-def clean_data(data: str) -> str:
-    return data.translate(str.maketrans(UNUSED_CHARS_IN_TELEINFO))
+def clean_data(data: str) -> Result[str, str]:
+    try:
+        return Ok(data.translate(str.maketrans(UNUSED_CHARS_IN_TELEINFO)))
+    except TypeError:
+        return Err("'data' must be of type 'string'")
 
 
-def split_data(cleaned_data: str) -> str:
-    default_splitted = [" ", " ", " "]
-    if not cleaned_data:
-        return default_splitted
+def split_data(cleaned_data: str) -> Result[list[str, str, str], str]:
+    if (
+        not isinstance(cleaned_data, str)
+        or len(cleaned_data) < 5
+        or " " not in cleaned_data
+    ):
+        return Err("Can't split invalid 'cleaned_data'")
 
-    splitted = cleaned_data.split(" ")
+    splitted = cleaned_data.split()
 
-    # sometimes the checksum (last character) is a space which breaks the split logic
-    if cleaned_data[-1] == " " and len(splitted) >= 3:
-        splitted = [*splitted[:2], " "]
+    # On attend len = 3 (key,value,checksum) mais parfois le checksum
+    # est un espace donc split le supprime
+    if len(splitted) not in (2, 3):
+        return Err("Can't split invalid 'cleaned_data'")
 
-    # must have 3 elements in list (key, value, checksum)
-    if len(splitted) != 3:
-        return default_splitted
+    # Si splitted a une longueur de 2 ou 3
+    # key = splitted[1]
+    # value = splitted[2]
+    # checksum = dernier caractère de cleaned_data
+    return Ok([*splitted[:2], cleaned_data[-1]])
 
-    return splitted
 
-
-def calculate_checksum(key, value):
+def calculate_checksum(key: str, value: str) -> Result[str, str]:
     """
     La "checksum" est calculée sur l'ensemble des caractères allant du début
     du champ étiquette à la fin du champ donnée, caractère SP inclus.
@@ -61,44 +56,88 @@ def calculate_checksum(key, value):
     Le résultat sera donc toujours un caractère ASCII imprimable
     (signe, chiffre, lettre majuscule) allant de 20 à 5F en Hexadécimal.
     """
+    if not isinstance(key, str) or not isinstance(value, str):
+        return Err("'key' and 'value' must be of type 'str'.")
+
     data = key + " " + value
-    # Calculer la somme des codes ASCII des caractères de l'étiquette et de la valeur
+    # Calculer la somme des codes ASCII des caractères de key et value
     ascii_sum = sum(ord(c) for c in data)
     # Conserver les 6 bits de poids faible
     low_6_bits = ascii_sum & 0x3F
     # Ajouter 20 en hexadécimal
     checksum = low_6_bits + 0x20
-    return chr(checksum)
+    try:
+        return Ok(chr(checksum))
+    except ValueError:
+        return Err("Error: Invalid checksum character.")
 
 
-def data_is_valid(key, value, checksum):
-    return checksum == calculate_checksum(key, value)
+def data_is_valid(key: str, value: str, checksum: str) -> Result[bool, str]:
+    if (
+        not isinstance(key, str)
+        or not isinstance(value, str)
+        or not isinstance(checksum, str)
+    ):
+        return Err("'key', 'value' and 'checksum' must be of type 'str'.")
+    match calculate_checksum(key, value):
+        case Ok(calculated_checksum):
+            if calculated_checksum == checksum:
+                return Ok(True)
+            else:
+                return Err("calculated_checksum != checksum")
+        case Err(e):
+            return Err(e)
 
 
-def get_data_in_line(byte_data):
-    data = decode_byte(byte_data)
-    cleaned_data = clean_data(data)
-    key, value, checksum = split_data(cleaned_data)
-    if data_is_valid(key, value, checksum):
-        return key, value
-    return INVALIDE_KEY, ""
+def get_data_in_line(byte_data: bytes) -> Result[tuple[str, str], str]:
+    match decode_byte(byte_data):
+        case Ok(data):
+            pass
+        case Err(e):
+            return Err(e)
+
+    match clean_data(data):
+        case Ok(cleaned_data):
+            pass
+        case Err(e):
+            return Err(e)
+
+    match split_data(cleaned_data):
+        case Ok(splitted_data):
+            key, value, checksum = splitted_data
+        case Err(e):
+            return Err(e)
+
+    match data_is_valid(key, value, checksum):
+        case Ok(_):
+            return Ok((key, value))
+        case Err(e):
+            return Err(e)
 
 
-def teleinfo_frame_is_complete(buffer: dict) -> bool:
-    return all(
-        key in buffer for key in [FIRST_TELEINFO_FRAME_KEY, LAST_TELEINFO_FRAME_KEY]
-    )
-
-
-def buffer_is_empty(buffer):
-    return not buffer
-
-
-def buffer_can_accept_new_data(key: str, buffer: dict) -> bool:
-    return key != INVALIDE_KEY and (
+def buffer_can_accept_new_data(key: str, buffer: dict[str, str]) -> Result[bool, str]:
+    if not isinstance(buffer, dict):
+        return Err("'buffer' must be of type 'dict'.")
+    if not isinstance(key, str):
+        return Err("'key' must be of type 'str'.")
+    if (
         # on ne peut commencer à écrire dans le buffer qu'en début de trame donc si
         # le buffer vide et la clé est la première attendue dans la trame
-        (buffer_is_empty(buffer) and key == FIRST_TELEINFO_FRAME_KEY)
+        (not buffer and key == FIRST_TELEINFO_FRAME_KEY)
         # ou la première clé attendue dans la trame est déjà présente dans le buffer
         or FIRST_TELEINFO_FRAME_KEY in buffer.keys()
-    )
+    ):
+        return Ok(True)
+    else:
+        return Err("Buffer can't accept this data")
+
+
+def teleinfo_frame_is_complete(buffer: dict[str, str]) -> Result[bool, str]:
+    if not isinstance(buffer, dict):
+        return Err("'buffer' must be of type 'dict'.")
+    if all(
+        key in buffer for key in [FIRST_TELEINFO_FRAME_KEY, LAST_TELEINFO_FRAME_KEY]
+    ):
+        return Ok(True)
+    else:
+        return Err("Teleinfo isn't complete")

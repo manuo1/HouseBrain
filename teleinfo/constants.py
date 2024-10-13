@@ -15,9 +15,6 @@ class SerialConfig(Enum):
     TIMEOUT = 1  # 1 seconde
 
 
-INVALIDE_KEY = "invalid"
-
-
 class TeleinfoLabel(StrEnum):
     ADCO = "ADCO"  # Adresse du compteur
     OPTARIF = "OPTARIF"  # Option tarifaire choisie
@@ -53,3 +50,16 @@ UNUSED_CHARS_IN_TELEINFO = {
     "\x03": "",  # End of Text (ETX)
     "\x02": "",  # Start of Text (STX)
 }
+
+# teleinfo sample:
+# b'ADCO 021728123456 =\r\n'
+# b'OPTARIF HC.. <\r\n'
+# b'ISOUSC 45 ?\r\n'
+# b'HCHC 050977332 *\r\n'
+# b'HCHP 056567645 ?\r\n'
+# b'PTEC HP..  \r\n'
+# b'IINST 004 [\r\n'
+# b'IMAX 057 K\r\n'
+# b'PAPP 00850 .\r\n'
+# b'HHPHC E 0\r\n'
+# b'MOTDETAT 000000 B\r\x03\x02\n'
