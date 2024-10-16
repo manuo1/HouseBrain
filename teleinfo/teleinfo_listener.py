@@ -1,4 +1,3 @@
-from datetime import datetime
 import logging
 import serial
 import threading
@@ -10,7 +9,6 @@ from teleinfo.constants import (
 )
 from django.utils import timezone
 from teleinfo.mutators import save_teleinfo
-from teleinfo.selectors import get_last_teleinfo_created_datetime
 from teleinfo.services import (
     buffer_can_accept_new_data,
     get_data_in_line,
@@ -26,16 +24,8 @@ class TeleinfoListener:
         self.running = True
         self.buffer = {}
         self.teleinfo = Teleinfo()
+        self.teleinfo.last_save = None
         self.lock = threading.Lock()  # Verrou pour empêcher un accès concurrent
-
-        # récupère le last_save en bdd
-        match get_last_teleinfo_created_datetime():
-            case Ok(last_teleinfo_dt):
-                self.teleinfo.last_save = last_teleinfo_dt
-            case Err(_):
-                self.teleinfo.last_save = datetime.min.replace(
-                    tzinfo=timezone.get_current_timezone()
-                )
 
     def get_serial_port(self) -> serial.Serial:
         try:
