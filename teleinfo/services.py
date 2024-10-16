@@ -1,3 +1,4 @@
+from datetime import datetime
 from result import Err, Ok, Result
 from teleinfo.constants import (
     FIRST_TELEINFO_FRAME_KEY,
@@ -120,24 +121,33 @@ def buffer_can_accept_new_data(key: str, buffer: dict[str, str]) -> Result[bool,
         return Err("'buffer' must be of type 'dict'.")
     if not isinstance(key, str):
         return Err("'key' must be of type 'str'.")
-    if (
+
+    return Ok(
         # on ne peut commencer à écrire dans le buffer qu'en début de trame donc si
-        # le buffer vide et la clé est la première attendue dans la trame
+        # le buffer est vide et que la clé est la première attendue dans la trame
         (not buffer and key == FIRST_TELEINFO_FRAME_KEY)
         # ou la première clé attendue dans la trame est déjà présente dans le buffer
         or FIRST_TELEINFO_FRAME_KEY in buffer.keys()
-    ):
-        return Ok(True)
-    else:
-        return Err("Buffer can't accept this data")
+    )
 
 
 def teleinfo_frame_is_complete(buffer: dict[str, str]) -> Result[bool, str]:
     if not isinstance(buffer, dict):
         return Err("'buffer' must be of type 'dict'.")
-    if all(
-        key in buffer for key in [FIRST_TELEINFO_FRAME_KEY, LAST_TELEINFO_FRAME_KEY]
-    ):
+    return Ok(
+        all(
+            key in buffer for key in [FIRST_TELEINFO_FRAME_KEY, LAST_TELEINFO_FRAME_KEY]
+        )
+    )
+
+
+def is_new_hour(old_datetime: datetime, new_datetime: datetime) -> Result[bool, str]:
+    if not isinstance(old_datetime, datetime) or not isinstance(new_datetime, datetime):
+        return Err("'old_datetime' and 'new_datetime' must be of type 'datetime'.")
+
+    rounded_old_datetime = old_datetime.replace(minute=0, second=0, microsecond=0)
+    rounded_new_datetime = new_datetime.replace(minute=0, second=0, microsecond=0)
+    if rounded_new_datetime > rounded_old_datetime:
         return Ok(True)
     else:
-        return Err("Teleinfo isn't complete")
+        return Ok(False)

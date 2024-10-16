@@ -1,3 +1,5 @@
+from dataclasses import dataclass, field
+from datetime import datetime
 from enum import Enum, StrEnum
 import os
 import serial
@@ -63,3 +65,10 @@ UNUSED_CHARS_IN_TELEINFO = {
 # b'PAPP 00850 .\r\n'
 # b'HHPHC E 0\r\n'
 # b'MOTDETAT 000000 B\r\x03\x02\n'
+
+
+@dataclass
+class Teleinfo:
+    created: datetime | None = None
+    data: dict = field(default_factory=dict)
+    last_save: datetime | None = None

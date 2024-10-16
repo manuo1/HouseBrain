@@ -1,6 +1,6 @@
 import logging
 from django.apps import AppConfig
-from teleinfo.teleinfo_listener import start_listener
+
 
 logger = logging.getLogger(__name__)
 
@@ -11,6 +11,7 @@ class TeleinfoConfig(AppConfig):
 
     def ready(self):
         logger.info("Initializing Teleinfo listener...")
+        from teleinfo.teleinfo_listener import start_listener
 
         # Démarrer le listener
         listener = start_listener()

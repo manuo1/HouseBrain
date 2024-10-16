@@ -1,3 +1,9 @@
 from django.db import models
 
-# Create your models here.
+
+class TeleinformationHistory(models.Model):
+    created = models.DateTimeField()
+    data = models.JSONField()
+
+    def __str__(self):
+        return f"{self.created:%d/%m/%Y %H:%M}"
