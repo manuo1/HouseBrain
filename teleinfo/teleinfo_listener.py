@@ -1,14 +1,12 @@
+from datetime import datetime
 import logging
 import serial
 import threading
 from result import Err, Ok
-from teleinfo.constants import (
-    SerialConfig,
-    UNPLUGGED_MODE,
-    Teleinfo,
-)
+from teleinfo.constants import SerialConfig, UNPLUGGED_MODE, Teleinfo
 from django.utils import timezone
 from teleinfo.mutators import save_teleinfo
+from teleinfo.selectors import get_last_teleinfo_created_datetime
 from teleinfo.services import (
     buffer_can_accept_new_data,
     get_data_in_line,
@@ -24,8 +22,16 @@ class TeleinfoListener:
         self.running = True
         self.buffer = {}
         self.teleinfo = Teleinfo()
-        self.teleinfo.last_save = None
         self.lock = threading.Lock()  # Verrou pour empêcher un accès concurrent
+
+        # récupère le last_save en bdd
+        match get_last_teleinfo_created_datetime():
+            case Ok(last_teleinfo_dt):
+                self.teleinfo.last_save = last_teleinfo_dt
+            case Err(_):
+                self.teleinfo.last_save = datetime.min.replace(
+                    tzinfo=timezone.get_current_timezone()
+                )
 
     def get_serial_port(self) -> serial.Serial:
         try:
@@ -39,20 +45,23 @@ class TeleinfoListener:
             )
             return serial_port
         except serial.SerialException as e:
-            logger.error(f"Error opening serial port: {e}")
+            logger.error(f"[TeleinfoListener] Error opening serial port: {e}")
             raise  # Relancer l'exception à traiter plus haut
 
     def listen(self) -> None:
         while self.running:
+            print("while self.running")
             try:
                 if self.serial_port.in_waiting:
+                    print("self.serial_port.in_waiting")
                     raw_data_line = self.serial_port.readline()
+                    print(raw_data_line)
                     self.process_data(raw_data_line)
             except serial.SerialException as e:
-                logger.error(f"Error reading from serial port: {e}")
+                logger.error(f"[TeleinfoListener] Error reading from serial port: {e}")
                 break
             except Exception as e:
-                logger.error(f"Unexpected error in listener: {e}")
+                logger.error(f"[TeleinfoListener] Unexpected error in listener: {e}")
 
     def perform_functions_using_teleinfo(self):
         match save_teleinfo(self.teleinfo):
@@ -73,7 +82,7 @@ class TeleinfoListener:
             case Ok(data):
                 key, value = data
             case Err(e):
-                logger.error(e)
+                logger.error(f"[TeleinfoListener] {e}")
                 return
         match buffer_can_accept_new_data(key, self.buffer):
             case Ok(buffer_can_accept):
@@ -82,7 +91,7 @@ class TeleinfoListener:
                 else:
                     return
             case Err(e):
-                logger.error(e)
+                logger.error(f"[TeleinfoListener] {e}")
                 return
         match teleinfo_frame_is_complete(self.buffer):
             case Ok(is_complete):
@@ -90,11 +99,16 @@ class TeleinfoListener:
                     self.teleinfo.created = timezone.now()
                     self.teleinfo.data = self.buffer.copy()
                     self.buffer.clear()
+                    print("teleinfo complete")
+                    print(self.teleinfo)
                     self.perform_functions_using_teleinfo()
                 else:
+                    print("teleinfo incomplete")
+                    print(self.buffer)
+
                     return
             case Err(e):
-                logger.error(e)
+                logger.error(f"[TeleinfoListener] {e}")
                 return
 
     def stop(self) -> None:
@@ -102,18 +116,23 @@ class TeleinfoListener:
         try:
             self.serial_port.close()
         except serial.SerialException as e:
-            logger.error(f"Error closing serial port: {e}")
-        logger.info("Teleinfo listener stopped.")
+            logger.error(f"[TeleinfoListener] Error closing serial port: {e}")
+        logger.info("[TeleinfoListener] stopped.")
 
 
 def start_listener() -> TeleinfoListener:
     if UNPLUGGED_MODE:
-        logger.info("Running in unplugged mode. Teleinfo listener will not start.\n")
+        logger.warning(
+            "[TeleinfoListener] Running in unplugged mode. Teleinfo listener will not start.\n"
+        )
         return None
 
     listener = TeleinfoListener()
     listener_thread = threading.Thread(target=listener.listen)
     listener_thread.daemon = True
     listener_thread.start()
-    logger.info("Teleinfo listener thread started.")
+    print("[TeleinfoListener] Teleinfo listener thread started.")
+    logger.info("[TeleinfoListener] Teleinfo listener thread started.")
     return listener
+
+    # TODO verifier si le .lock ne dois pas être mis sur le listener_thread et aps le listener
