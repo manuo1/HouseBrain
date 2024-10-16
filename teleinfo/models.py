@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 class TeleinformationHistory(models.Model):
@@ -6,4 +7,6 @@ class TeleinformationHistory(models.Model):
     data = models.JSONField()
 
     def __str__(self):
-        return f"{self.created:%d/%m/%Y %H:%M}"
+
+        local_created = timezone.localtime(self.created)
+        return f"{local_created:%d/%m/%Y %H:%M} {local_created.tzname()}"
