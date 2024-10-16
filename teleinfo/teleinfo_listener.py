@@ -27,7 +27,6 @@ class TeleinfoListener:
         self.buffer = {}
         self.teleinfo = Teleinfo()
         self.lock = threading.Lock()  # Verrou pour empêcher un accès concurrent
-        self.created = timezone.now()
 
         # récupère le last_save en bdd
         match get_last_teleinfo_created_datetime():
@@ -69,7 +68,6 @@ class TeleinfoListener:
         match save_teleinfo(self.teleinfo):
             case Ok(saved):
                 if saved:
-                    print(self.teleinfo)
                     self.teleinfo.last_save = self.teleinfo.created
                 else:
                     pass
@@ -77,7 +75,7 @@ class TeleinfoListener:
                 logger.error(e)
                 return
         # save indexes
-        # monitor_overconsumption_and_shed_load()
+        # monitor overconsumption and shed load
         return
 
     def process_data(self, raw_data_line: bytes) -> None:
@@ -125,7 +123,6 @@ def start_listener() -> TeleinfoListener:
 
     listener = TeleinfoListener()
     listener_thread = threading.Thread(target=listener.listen)
-    # Pour que le thread se termine lorsque le programme principal se termine
     listener_thread.daemon = True
     listener_thread.start()
     logger.info("Teleinfo listener thread started.")

@@ -13,7 +13,6 @@ class TeleinfoConfig(AppConfig):
         logger.info("Initializing Teleinfo listener...")
         from teleinfo.teleinfo_listener import start_listener
 
-        # Démarrer le listener
         listener = start_listener()
 
         if listener:
