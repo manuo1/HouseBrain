@@ -100,7 +100,7 @@ class TeleinfoListener:
             case Ok(is_complete):
                 if is_complete:
                     self.teleinfo.created = timezone.now()
-                    self.teleinfo.data = self.buffer
+                    self.teleinfo.data = self.buffer.copy()
                     self.buffer.clear()
                     self.perform_functions_using_teleinfo()
                 else:
