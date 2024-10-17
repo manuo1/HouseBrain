@@ -72,3 +72,6 @@ class Teleinfo:
     created: datetime | None = None
     data: dict = field(default_factory=dict)
     last_save: datetime | None = None
+
+
+TELEINFO_LISTENER_THREAD_NAME = "teleinfo_listener"
