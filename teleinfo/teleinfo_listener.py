@@ -2,7 +2,7 @@ from datetime import datetime
 import logging
 import serial
 import threading
-from result import Err, Ok
+from result import Err, Ok, Result
 from teleinfo.constants import SerialConfig, UNPLUGGED_MODE, Teleinfo
 from django.utils import timezone
 from teleinfo.mutators import save_teleinfo
@@ -13,7 +13,8 @@ from teleinfo.services import (
     teleinfo_frame_is_complete,
 )
 
-logger = logging.getLogger(__name__)
+
+logger = logging.getLogger("django")
 
 
 class TeleinfoListener:
@@ -50,12 +51,9 @@ class TeleinfoListener:
 
     def listen(self) -> None:
         while self.running:
-            print("while self.running")
             try:
                 if self.serial_port.in_waiting:
-                    print("self.serial_port.in_waiting")
                     raw_data_line = self.serial_port.readline()
-                    print(raw_data_line)
                     self.process_data(raw_data_line)
             except serial.SerialException as e:
                 logger.error(f"[TeleinfoListener] Error reading from serial port: {e}")
@@ -99,13 +97,8 @@ class TeleinfoListener:
                     self.teleinfo.created = timezone.now()
                     self.teleinfo.data = self.buffer.copy()
                     self.buffer.clear()
-                    print("teleinfo complete")
-                    print(self.teleinfo)
                     self.perform_functions_using_teleinfo()
                 else:
-                    print("teleinfo incomplete")
-                    print(self.buffer)
-
                     return
             case Err(e):
                 logger.error(f"[TeleinfoListener] {e}")
@@ -120,19 +113,17 @@ class TeleinfoListener:
         logger.info("[TeleinfoListener] stopped.")
 
 
-def start_listener() -> TeleinfoListener:
+def start_listener() -> Result[TeleinfoListener, str]:
     if UNPLUGGED_MODE:
-        logger.warning(
+        return Err(
             "[TeleinfoListener] Running in unplugged mode. Teleinfo listener will not start.\n"
         )
-        return None
 
     listener = TeleinfoListener()
     listener_thread = threading.Thread(target=listener.listen)
     listener_thread.daemon = True
     listener_thread.start()
-    print("[TeleinfoListener] Teleinfo listener thread started.")
     logger.info("[TeleinfoListener] Teleinfo listener thread started.")
-    return listener
+    return Ok(listener)
 
     # TODO verifier si le .lock ne dois pas être mis sur le listener_thread et aps le listener

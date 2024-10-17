@@ -4,7 +4,8 @@ from teleinfo.models import TeleinformationHistory
 from teleinfo.services import is_new_hour
 from teleinfo.teleinfo_listener import Teleinfo
 
-logger = logging.getLogger(__name__)
+
+logger = logging.getLogger("django")
 
 
 def save_teleinfo(teleinfo: Teleinfo) -> Result[bool, str]:
