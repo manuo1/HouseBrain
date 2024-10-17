@@ -1,8 +1,7 @@
 import logging
 from django.apps import AppConfig
-from django.db.models.signals import post_migrate
 from result import Err, Ok
-
+from django.db.models.signals import post_migrate
 
 logger = logging.getLogger("django")
 
@@ -13,7 +12,7 @@ def start_listener_after_migrations(sender, **kwargs):
     logger.info("[TeleinfoListener] Initializing...")
     match start_listener():
         case Ok(_):
-            logger.info("[TeleinfoListener] Started")
+            pass
         case Err(e):
             logger.error(e)
 

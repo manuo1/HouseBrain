@@ -44,14 +44,24 @@ class TeleinfoListener:
                 bytesize=SerialConfig.BYTESIZE.value,
                 timeout=SerialConfig.TIMEOUT.value,
             )
+            if serial_port.is_open:
+                logger.info(
+                    f"[TeleinfoListener] Serial port {SerialConfig.PORT.value} opened successfully."
+                )
+            else:
+                logger.error(
+                    f"[TeleinfoListener] Failed to open serial port {SerialConfig.PORT.value}."
+                )
             return serial_port
         except serial.SerialException as e:
             logger.error(f"[TeleinfoListener] Error opening serial port: {e}")
-            raise  # Relancer l'exception à traiter plus haut
+            raise  # propager l'exception plus haut
 
     def listen(self) -> None:
+        logger.info("[TeleinfoListener] Listening on serial port...")
         while self.running:
             try:
+                # si des données sont disponibles dans le tampon d'entrée du port série
                 if self.serial_port.in_waiting:
                     raw_data_line = self.serial_port.readline()
                     self.process_data(raw_data_line)
@@ -96,6 +106,7 @@ class TeleinfoListener:
                 if is_complete:
                     self.teleinfo.created = timezone.now()
                     self.teleinfo.data = self.buffer.copy()
+                    logger.info(f"[TeleinfoListener] Complete : {self.teleinfo}")
                     self.buffer.clear()
                     self.perform_functions_using_teleinfo()
                 else:
@@ -108,9 +119,9 @@ class TeleinfoListener:
         self.running = False
         try:
             self.serial_port.close()
+            logger.info("[TeleinfoListener] stopped.")
         except serial.SerialException as e:
             logger.error(f"[TeleinfoListener] Error closing serial port: {e}")
-        logger.info("[TeleinfoListener] stopped.")
 
 
 def start_listener() -> Result[TeleinfoListener, str]:
@@ -118,10 +129,8 @@ def start_listener() -> Result[TeleinfoListener, str]:
         return Err(
             "[TeleinfoListener] Running in unplugged mode. Teleinfo listener will not start.\n"
         )
-
     listener = TeleinfoListener()
     listener_thread = threading.Thread(target=listener.listen)
-    listener_thread.daemon = True
     listener_thread.start()
     logger.info("[TeleinfoListener] Teleinfo listener thread started.")
     return Ok(listener)
