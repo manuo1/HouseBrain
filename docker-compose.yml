@@ -1,17 +1,15 @@
 version: '3.8'
-
 services:
   django:
     build: .
     container_name: "django"
-    # command: python manage.py runserver 0.0.0.0:8000
     ports:
       - "8000:8000"
     volumes:
       - .:/app
     depends_on:
       postgres:
-        condition: service_healthy 
+        condition: service_healthy
       celery:
         condition: service_healthy
     env_file:
@@ -23,14 +21,14 @@ services:
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/"]
       interval: 10s
-      retries: 5
+      retries: 15
       start_period: 15s
       timeout: 10s
+    entrypoint: ["/app/docker-entrypoint.sh", "django"]
 
   celery:
     build: .
     container_name: "celery"
-    command: celery -A core worker --loglevel=info
     volumes:
       - .:/app
     depends_on:
@@ -43,9 +41,10 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "celery inspect ping --destination celery@$$HOSTNAME"]
       interval: 30s
-      retries: 3
+      retries: 15
       start_period: 5s
       timeout: 10s
+    entrypoint: ["/app/docker-entrypoint.sh", "celery"]
 
   redis:
     image: redis:7.4-alpine
@@ -55,7 +54,7 @@ services:
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
-      retries: 5
+      retries: 15
       start_period: 15s
       timeout: 10s
 
@@ -71,7 +70,7 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
-      retries: 5
+      retries: 15
       start_period: 15s
       timeout: 10s
 
