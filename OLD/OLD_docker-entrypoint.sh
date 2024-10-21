@@ -9,9 +9,6 @@ else
     echo ".env file already exists. No need to create it."
 fi
 
-#!/bin/bash
-
-# Vérifier si le service est Django ou autre
 if [ "$1" = "django" ]; then
     echo "Applying database migrations..."
     python manage.py migrate --noinput
@@ -29,7 +26,6 @@ if not User.objects.filter(username='$DJANGO_SUPERUSER_USERNAME').exists():
 else:
     print('Superuser already exists.')
 END
-
     # Lancer le serveur Django
     echo "Starting Django server..."
     exec python manage.py runserver 0.0.0.0:8000

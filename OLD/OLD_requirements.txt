@@ -1,0 +1,10 @@
+asgiref==3.8.1
+celery==5.4.0
+Django==5.1
+django-extensions==3.2.3
+psycopg2-binary==2.9.9
+pyserial==3.5
+python-dotenv==1.0.1
+redis==5.1.1
+result==0.17.0
+sqlparse==0.5.1

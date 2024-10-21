@@ -1,78 +1,81 @@
 version: '3.8'
-services:
-  django:
-    build: .
-    container_name: "django"
-    ports:
-      - "8000:8000"
-    volumes:
-      - .:/app
-    depends_on:
-      postgres:
-        condition: service_healthy
-      celery:
-        condition: service_healthy
-    env_file:
-      - .env
-    devices:
-      - "${SERIAL_PORT}:${SERIAL_PORT}"
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
-      interval: 10s
-      retries: 15
-      start_period: 15s
-      timeout: 10s
-    entrypoint: ["/app/docker-entrypoint.sh", "django"]
 
-  celery:
-    build: .
-    container_name: "celery"
+services:
+  web:
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: housebrain_web
+    # '/start' is the shell script used to run the service
+    command: /start
+    # this volume is used to map the files and folders on the host to the container
+    # so if we change code on the host, code in the docker container will also be changed
     volumes:
       - .:/app
-    depends_on:
-      redis:
-        condition: service_healthy
+    ports:
+      - 8010:8000
+    # env_file is used to manage the env variables of our project
     env_file:
-      - .env
+      - ./.env/.dev-sample
+    depends_on:
+      - redis
+      - db
+
+  db:
+    image: postgres:17-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
     environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-    healthcheck:
-      test: ["CMD-SHELL", "celery inspect ping --destination celery@$$HOSTNAME"]
-      interval: 30s
-      retries: 15
-      start_period: 5s
-      timeout: 10s
-    entrypoint: ["/app/docker-entrypoint.sh", "celery"]
+      - POSTGRES_DB=hello_django
+      - POSTGRES_USER=hello_django
+      - POSTGRES_PASSWORD=hello_django
 
   redis:
-    image: redis:7.4-alpine
-    container_name: "redis"
-    ports:
-      - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      retries: 15
-      start_period: 15s
-      timeout: 10s
+    image: redis:7-alpine
 
-  postgres:
-    image: postgres:17.0-alpine
-    container_name: "postgres"
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  celery_worker:
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: housebrain_celery_worker
+    command: /start-celeryworker
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 10s
-      retries: 15
-      start_period: 15s
-      timeout: 10s
+      - .:/app
+    env_file:
+      - ./.env/.dev-sample
+    depends_on:
+      - redis
+      - db
+
+  celery_beat:
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: housebrain_celery_beat
+    command: /start-celerybeat
+    volumes:
+      - .:/app
+    env_file:
+      - ./.env/.dev-sample
+    depends_on:
+      - redis
+      - db
+
+  flower:
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: housebrain_celery_flower
+    command: /start-flower
+    volumes:
+      - .:/app
+    env_file:
+      - ./.env/.dev-sample
+    ports:
+      - 5557:5555
+    depends_on:
+      - redis
+      - db
 
 volumes:
   postgres_data:
