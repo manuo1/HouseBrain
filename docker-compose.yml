@@ -13,10 +13,13 @@ services:
     volumes:
       - .:/app
     ports:
-      - 8010:8000
-    # env_file is used to manage the env variables of our project
+      - 8000:8000
+    # .env file is used to manage the env variables of our project
     env_file:
-      - ./.env/.dev-sample
+      - .env
+    # allow container using raspberry serial port
+    devices:
+      - "${SERIAL_PORT}:${SERIAL_PORT}"
     depends_on:
       - redis
       - db
@@ -25,10 +28,12 @@ services:
     image: postgres:17-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - .env
     environment:
-      - POSTGRES_DB=hello_django
-      - POSTGRES_USER=hello_django
-      - POSTGRES_PASSWORD=hello_django
+      POSTGRES_DB: ${SQL_DATABASE}
+      POSTGRES_USER: ${SQL_USER}
+      POSTGRES_PASSWORD: ${SQL_PASSWORD}
 
   redis:
     image: redis:7-alpine
@@ -42,7 +47,9 @@ services:
     volumes:
       - .:/app
     env_file:
-      - ./.env/.dev-sample
+      - .env
+    devices:
+      - "${SERIAL_PORT}:${SERIAL_PORT}"
     depends_on:
       - redis
       - db
@@ -56,7 +63,7 @@ services:
     volumes:
       - .:/app
     env_file:
-      - ./.env/.dev-sample
+      - .env
     depends_on:
       - redis
       - db
@@ -70,7 +77,7 @@ services:
     volumes:
       - .:/app
     env_file:
-      - ./.env/.dev-sample
+      - .env
     ports:
       - 5557:5555
     depends_on:

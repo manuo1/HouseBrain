@@ -1,14 +1,8 @@
 from datetime import datetime
 import logging
 import serial
-import threading
 from result import Err, Ok, Result
-from teleinfo.constants import (
-    TELEINFO_LISTENER_THREAD_NAME,
-    SerialConfig,
-    UNPLUGGED_MODE,
-    Teleinfo,
-)
+from teleinfo.constants import SerialConfig, UNPLUGGED_MODE, Teleinfo
 from django.utils import timezone
 from teleinfo.mutators import save_teleinfo
 from teleinfo.services import (
@@ -17,18 +11,14 @@ from teleinfo.services import (
     teleinfo_frame_is_complete,
 )
 
-
 logger = logging.getLogger("django")
 
 
 class TeleinfoListener:
     def __init__(self) -> None:
-        self.running = False
+        self.running = True
         self.buffer = {}
         self.teleinfo = Teleinfo()
-        self.thread = threading.Thread(
-            target=self.listen, name=TELEINFO_LISTENER_THREAD_NAME
-        )
         self.serial_port = serial.Serial(
             port=SerialConfig.PORT.value,
             baudrate=SerialConfig.BAUDRATE.value,
@@ -90,9 +80,6 @@ class TeleinfoListener:
                 if frame_is_complete:
                     self.teleinfo.created = timezone.now()
                     self.teleinfo.data = self.buffer.copy()
-                    logger.info(
-                        f"[TeleinfoListener] Complete : {self.teleinfo} {self.created}"
-                    )
                     self.buffer.clear()
                     self.perform_functions_using_teleinfo()
                 else:
@@ -109,15 +96,6 @@ class TeleinfoListener:
         except serial.SerialException as e:
             logger.error(f"[TeleinfoListener] Error closing serial port: {e}")
 
-        self.thread.join()
-
-
-def teleinfo_listener_thread_is_active() -> Result[bool, str]:
-    for thread in threading.enumerate():
-        if thread.name == TELEINFO_LISTENER_THREAD_NAME:
-            return Ok(True)
-    return Ok(False)
-
 
 def start_listener() -> Result[TeleinfoListener, str]:
     if UNPLUGGED_MODE:
@@ -125,15 +103,4 @@ def start_listener() -> Result[TeleinfoListener, str]:
             "[TeleinfoListener] Running in unplugged mode. Teleinfo listener will not start.\n"
         )
     listener = TeleinfoListener()
-    listener.thread.daemon = True
-    listener.thread.start()
-
-    match teleinfo_listener_thread_is_active():
-        case Ok(is_active):
-            if is_active:
-                listener.running = True
-                return Ok(listener)
-            else:
-                return Err(
-                    f"[TeleinfoListener] Can't found {listener.thread.name} thread"
-                )
+    return Ok(listener)

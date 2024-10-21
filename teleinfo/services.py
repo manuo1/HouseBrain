@@ -29,14 +29,14 @@ def split_data(cleaned_data: str) -> Result[list[str, str, str], str]:
         or len(cleaned_data) < 5
         or " " not in cleaned_data
     ):
-        return Err("Can't split invalid 'cleaned_data'")
+        return Err("Can't split invalid 'cleaned_data' : {cleaned_data}")
 
     splitted = cleaned_data.split()
 
     # On attend len = 3 (key,value,checksum) mais parfois le checksum
     # est un espace donc split le supprime
     if len(splitted) not in (2, 3):
-        return Err("Can't split invalid 'cleaned_data'")
+        return Err("Can't split invalid 'cleaned_data' : {cleaned_data}")
 
     # Si splitted a une longueur de 2 ou 3
     # key = splitted[1]
@@ -56,8 +56,10 @@ def calculate_checksum(key: str, value: str) -> Result[str, str]:
     calculée et 03Fh). Enfin, on ajoute 20 en hexadécimal.
     Le résultat sera donc toujours un caractère ASCII imprimable
     (signe, chiffre, lettre majuscule) allant de 20 à 5F en Hexadécimal.
+
+    !!! 20 est le caractère espace !!!
     """
-    if not isinstance(key, str) or not isinstance(value, str):
+    if not all(isinstance(var, str) for var in (key, value)):
         return Err("'key' and 'value' must be of type 'str'.")
 
     data = key + " " + value
@@ -74,11 +76,7 @@ def calculate_checksum(key: str, value: str) -> Result[str, str]:
 
 
 def data_is_valid(key: str, value: str, checksum: str) -> Result[bool, str]:
-    if (
-        not isinstance(key, str)
-        or not isinstance(value, str)
-        or not isinstance(checksum, str)
-    ):
+    if not all(isinstance(var, str) for var in (key, value, checksum)):
         return Err("'key', 'value' and 'checksum' must be of type 'str'.")
     match calculate_checksum(key, value):
         case Ok(calculated_checksum):
@@ -142,7 +140,7 @@ def teleinfo_frame_is_complete(buffer: dict[str, str]) -> Result[bool, str]:
 
 
 def is_new_hour(old_datetime: datetime, new_datetime: datetime) -> Result[bool, str]:
-    if not isinstance(old_datetime, datetime) or not isinstance(new_datetime, datetime):
+    if not all(isinstance(var, datetime) for var in (old_datetime, new_datetime)):
         return Err("'old_datetime' and 'new_datetime' must be of type 'datetime'.")
 
     rounded_old_datetime = old_datetime.replace(minute=0, second=0, microsecond=0)

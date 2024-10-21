@@ -5,16 +5,17 @@ import os
 import serial
 
 UNPLUGGED_MODE = os.getenv("UNPLUGGED_MODE", "False") == "True"
+SERIAL_PORT = os.getenv("SERIAL_PORT", "/dev/ttyS0")
 
 
 # Raspberry serial port config
 class SerialConfig(Enum):
-    PORT = os.getenv("SERIAL_PORT", "/dev/ttyS0")
+    PORT = SERIAL_PORT
     BAUDRATE = 1200
     PARITY = serial.PARITY_NONE
     STOPBITS = serial.STOPBITS_ONE
     BYTESIZE = serial.SEVENBITS
-    TIMEOUT = 1  # 1 seconde
+    TIMEOUT = 1  # seconde
 
 
 class TeleinfoLabel(StrEnum):
@@ -72,6 +73,3 @@ class Teleinfo:
     created: datetime | None = None
     data: dict = field(default_factory=dict)
     last_save: datetime | None = None
-
-
-TELEINFO_LISTENER_THREAD_NAME = "teleinfo_listener"
