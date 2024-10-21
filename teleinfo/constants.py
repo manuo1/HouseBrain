@@ -9,7 +9,7 @@ UNPLUGGED_MODE = os.getenv("UNPLUGGED_MODE", "False") == "True"
 
 # Raspberry serial port config
 class SerialConfig(Enum):
-    PORT = os.getenv("SERIAL_PORT", "/dev/ttyS0")
+    PORT = "/dev/ttyS0"
     BAUDRATE = 1200
     PARITY = serial.PARITY_NONE
     STOPBITS = serial.STOPBITS_ONE

@@ -17,6 +17,8 @@ services:
     # env_file is used to manage the env variables of our project
     env_file:
       - ./.env/.dev-sample
+    devices:
+      - "/dev/ttyS0:/dev/ttyS0"
     depends_on:
       - redis
       - db
@@ -43,6 +45,8 @@ services:
       - .:/app
     env_file:
       - ./.env/.dev-sample
+    devices:
+      - "/dev/ttyS0:/dev/ttyS0"
     depends_on:
       - redis
       - db
