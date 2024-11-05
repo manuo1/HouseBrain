@@ -29,14 +29,14 @@ def split_data(cleaned_data: str) -> Result[list[str, str, str], str]:
         or len(cleaned_data) < 5
         or " " not in cleaned_data
     ):
-        return Err("Can't split invalid 'cleaned_data' : {cleaned_data}")
+        return Err(f"Can't split invalid 'cleaned_data' : {cleaned_data}")
 
     splitted = cleaned_data.split()
 
     # On attend len = 3 (key,value,checksum) mais parfois le checksum
     # est un espace donc split le supprime
     if len(splitted) not in (2, 3):
-        return Err("Can't split invalid 'cleaned_data' : {cleaned_data}")
+        return Err(f"Can't split invalid 'cleaned_data' : {cleaned_data}")
 
     # Si splitted a une longueur de 2 ou 3
     # key = splitted[1]

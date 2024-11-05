@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     # perso
     "accounts",
     "teleinfo",
+    "radiators",
 ]
 
 MIDDLEWARE = [
