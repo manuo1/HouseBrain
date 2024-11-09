@@ -44,8 +44,14 @@ class TeleinfoLabel(StrEnum):
     MOTDETAT = "MOTDETAT"  # Mot d'état du compteur
 
 
+REQUIRED_TELEINFO_KEYS = [
+    TeleinfoLabel.ADCO,
+    TeleinfoLabel.MOTDETAT,
+    TeleinfoLabel.IINST,
+    TeleinfoLabel.ISOUSC,
+]
+
 FIRST_TELEINFO_FRAME_KEY = TeleinfoLabel.ADCO
-LAST_TELEINFO_FRAME_KEY = TeleinfoLabel.MOTDETAT
 
 UNUSED_CHARS_IN_TELEINFO = {
     "\r": "",  # Carriage Return

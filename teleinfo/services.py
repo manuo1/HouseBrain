@@ -2,7 +2,7 @@ from datetime import datetime
 from result import Err, Ok, Result
 from teleinfo.constants import (
     FIRST_TELEINFO_FRAME_KEY,
-    LAST_TELEINFO_FRAME_KEY,
+    REQUIRED_TELEINFO_KEYS,
     UNUSED_CHARS_IN_TELEINFO,
 )
 
@@ -132,11 +132,7 @@ def buffer_can_accept_new_data(key: str, buffer: dict[str, str]) -> Result[bool,
 def teleinfo_frame_is_complete(buffer: dict[str, str]) -> Result[bool, str]:
     if not isinstance(buffer, dict):
         return Err("'buffer' must be of type 'dict'.")
-    return Ok(
-        all(
-            key in buffer for key in [FIRST_TELEINFO_FRAME_KEY, LAST_TELEINFO_FRAME_KEY]
-        )
-    )
+    return Ok(all(key in buffer for key in REQUIRED_TELEINFO_KEYS))
 
 
 def is_new_hour(old_datetime: datetime, new_datetime: datetime) -> Result[bool, str]:
