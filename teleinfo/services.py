@@ -4,6 +4,7 @@ from teleinfo.constants import (
     FIRST_TELEINFO_FRAME_KEY,
     REQUIRED_TELEINFO_KEYS,
     UNUSED_CHARS_IN_TELEINFO,
+    Teleinfo,
 )
 
 
@@ -145,3 +146,12 @@ def is_new_hour(old_datetime: datetime, new_datetime: datetime) -> Result[bool, 
         return Ok(True)
     else:
         return Ok(False)
+
+
+def get_available_intensity(teleinfo: Teleinfo) -> Result[(int, int), str]:
+    try:
+        return int(teleinfo.data["ISOUSC"]) - int(teleinfo.data["IINST"])
+    except KeyError:
+        return Err("Missing IINST or ISOUSC in teleinfo data")
+    except ValueError:
+        return Err("Invalid value for IINST or ISOUSC")

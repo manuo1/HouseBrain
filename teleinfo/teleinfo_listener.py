@@ -1,7 +1,7 @@
 from datetime import datetime
 import logging
 import serial
-from load_shedding.devices import manage_load_shedding
+from load_shedding.sevices import manage_load_shedding
 from result import Err, Ok, Result
 from teleinfo.constants import SerialConfig, UNPLUGGED_MODE, Teleinfo
 from django.utils import timezone

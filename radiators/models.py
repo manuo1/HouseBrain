@@ -1,6 +1,8 @@
 import logging
 from django.db import models
 
+from core.constants import DEFAULT_VOLTAGE
+from core.services import watt_to_ampere
 from radiators.mcp23017_control import set_mcp23017_pin_state
 from result import Err, Ok
 from teleinfo.constants import UNPLUGGED_MODE
@@ -64,3 +66,18 @@ class Radiator(models.Model):
             for radiator in cls.objects.filter(is_on=True):
                 radiator.is_on = False
                 radiator.save()
+
+    @classmethod
+    def get_all_states(cls):
+        return {
+            radiator.name: {
+                "state": "on" if radiator.is_on else "off",
+                "power": radiator.power,
+                "intensity": (
+                    watt_to_ampere(radiator.power).unwrap()
+                    if isinstance(watt_to_ampere(radiator.power, DEFAULT_VOLTAGE), Ok)
+                    else 0
+                ),
+            }
+            for radiator in Radiator.objects.all()
+        }

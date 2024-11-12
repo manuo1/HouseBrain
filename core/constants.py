@@ -1,0 +1,1 @@
+DEFAULT_VOLTAGE = 230  # volts
