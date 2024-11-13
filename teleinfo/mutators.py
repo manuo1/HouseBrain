@@ -1,7 +1,7 @@
 import logging
+from core.services import is_new_hour
 from result import Err, Ok, Result
 from teleinfo.models import TeleinformationHistory
-from teleinfo.services import is_new_hour
 from teleinfo.teleinfo_listener import Teleinfo
 
 

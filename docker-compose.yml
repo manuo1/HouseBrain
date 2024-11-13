@@ -69,6 +69,7 @@ services:
     command: /start-celeryworker
     volumes:
       - .:/app
+      - /dev/i2c-1:/dev/i2c-1
     env_file:
       - .env
     devices:

@@ -1,10 +1,10 @@
-from datetime import datetime
 from result import Err, Ok, Result
 from teleinfo.constants import (
     FIRST_TELEINFO_FRAME_KEY,
     REQUIRED_TELEINFO_KEYS,
     UNUSED_CHARS_IN_TELEINFO,
     Teleinfo,
+    TeleinfoLabel,
 )
 
 
@@ -12,16 +12,16 @@ def decode_byte(byte_data: bytes) -> Result[str, str]:
     try:
         return Ok(byte_data.decode("utf-8"))
     except UnicodeDecodeError:
-        return Err("'byte_data' contains invalid UTF-8.")
+        return Err("invalid UTF-8.")
     except AttributeError:
-        return Err("'byte_data' must be of type 'bytes'.")
+        return Err("must be of type 'bytes'.")
 
 
 def clean_data(data: str) -> Result[str, str]:
     try:
         return Ok(data.translate(str.maketrans(UNUSED_CHARS_IN_TELEINFO)))
-    except TypeError:
-        return Err("'data' must be of type 'string'")
+    except (TypeError, AttributeError):
+        return Err("must be of type 'string'")
 
 
 def split_data(cleaned_data: str) -> Result[list[str, str, str], str]:
@@ -30,14 +30,14 @@ def split_data(cleaned_data: str) -> Result[list[str, str, str], str]:
         or len(cleaned_data) < 5
         or " " not in cleaned_data
     ):
-        return Err(f"Can't split invalid 'cleaned_data' : {cleaned_data}")
+        return Err(f"Can't split : {cleaned_data}")
 
     splitted = cleaned_data.split()
 
     # On attend len = 3 (key,value,checksum) mais parfois le checksum
     # est un espace donc split le supprime
     if len(splitted) not in (2, 3):
-        return Err(f"Can't split invalid 'cleaned_data' : {cleaned_data}")
+        return Err(f"Can't split : {cleaned_data}")
 
     # Si splitted a une longueur de 2 ou 3
     # key = splitted[1]
@@ -70,15 +70,12 @@ def calculate_checksum(key: str, value: str) -> Result[str, str]:
     low_6_bits = ascii_sum & 0x3F
     # Ajouter 20 en hexadécimal
     checksum = low_6_bits + 0x20
-    try:
-        return Ok(chr(checksum))
-    except ValueError:
-        return Err("Error: Invalid checksum character.")
+    return Ok(chr(checksum))
 
 
 def data_is_valid(key: str, value: str, checksum: str) -> Result[bool, str]:
     if not all(isinstance(var, str) for var in (key, value, checksum)):
-        return Err("'key', 'value' and 'checksum' must be of type 'str'.")
+        return Err("params must be of type 'str'.")
     match calculate_checksum(key, value):
         case Ok(calculated_checksum):
             if calculated_checksum == checksum:
@@ -136,22 +133,15 @@ def teleinfo_frame_is_complete(buffer: dict[str, str]) -> Result[bool, str]:
     return Ok(all(key in buffer for key in REQUIRED_TELEINFO_KEYS))
 
 
-def is_new_hour(old_datetime: datetime, new_datetime: datetime) -> Result[bool, str]:
-    if not all(isinstance(var, datetime) for var in (old_datetime, new_datetime)):
-        return Err("'old_datetime' and 'new_datetime' must be of type 'datetime'.")
-
-    rounded_old_datetime = old_datetime.replace(minute=0, second=0, microsecond=0)
-    rounded_new_datetime = new_datetime.replace(minute=0, second=0, microsecond=0)
-    if rounded_new_datetime > rounded_old_datetime:
-        return Ok(True)
-    else:
-        return Ok(False)
-
-
-def get_available_intensity(teleinfo: Teleinfo) -> Result[(int, int), str]:
+def get_available_intensity(teleinfo: Teleinfo) -> Result[int, str]:
     try:
-        return int(teleinfo.data["ISOUSC"]) - int(teleinfo.data["IINST"])
+        return Ok(
+            int(teleinfo.data[TeleinfoLabel.ISOUSC])
+            - int(teleinfo.data[TeleinfoLabel.IINST])
+        )
     except KeyError:
-        return Err("Missing IINST or ISOUSC in teleinfo data")
+        return Err(
+            f"Missing {TeleinfoLabel.ISOUSC} or {TeleinfoLabel.IINST} in teleinfo data"
+        )
     except ValueError:
-        return Err("Invalid value for IINST or ISOUSC")
+        return Err(f"Invalid value for {TeleinfoLabel.ISOUSC} or {TeleinfoLabel.IINST}")

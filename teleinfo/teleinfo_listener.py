@@ -1,9 +1,10 @@
 from datetime import datetime
 import logging
 import serial
+from core.constants import UNPLUGGED_MODE
 from load_shedding.sevices import manage_load_shedding
 from result import Err, Ok, Result
-from teleinfo.constants import SerialConfig, UNPLUGGED_MODE, Teleinfo
+from teleinfo.constants import SerialConfig, Teleinfo
 from django.utils import timezone
 from teleinfo.mutators import save_teleinfo
 from teleinfo.services import (
@@ -31,7 +32,6 @@ class TeleinfoListener:
         self.teleinfo.last_save = datetime.min.replace(
             tzinfo=timezone.get_current_timezone()
         )
-        self.created = timezone.now()
 
     def listen(self) -> None:
         logger.info("[TeleinfoListener] Listening on serial port...")

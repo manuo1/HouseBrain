@@ -1,11 +1,10 @@
 import logging
 from django.db import models
 
-from core.constants import DEFAULT_VOLTAGE
+from core.constants import DEFAULT_VOLTAGE, UNPLUGGED_MODE
 from core.services import watt_to_ampere
 from radiators.mcp23017_control import set_mcp23017_pin_state
 from result import Err, Ok
-from teleinfo.constants import UNPLUGGED_MODE
 
 logger = logging.getLogger("django")
 

@@ -4,7 +4,6 @@ from enum import Enum, StrEnum
 import os
 import serial
 
-UNPLUGGED_MODE = os.getenv("UNPLUGGED_MODE", "False") == "True"
 SERIAL_PORT = os.getenv("SERIAL_PORT", "/dev/ttyS0")
 
 

@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     "accounts",
     "teleinfo",
     "radiators",
+    "load_shedding",
 ]
 
 MIDDLEWARE = [
