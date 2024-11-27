@@ -4,14 +4,11 @@ ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
 RUN apt-get update \
-  # dependencies for building Python packages
   && apt-get install -y build-essential \
-  # psycopg2 dependencies
   && apt-get install -y libpq-dev \
-  # Translations dependencies
   && apt-get install -y gettext \
-  # Additional dependencies
   && apt-get install -y git \
+  && apt-get update && apt-get install -y bluez \
   # cleaning up unused files
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
   && rm -rf /var/lib/apt/lists/*

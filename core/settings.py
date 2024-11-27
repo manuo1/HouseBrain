@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     "teleinfo",
     "radiators",
     "load_shedding",
+    "sensors",
 ]
 
 MIDDLEWARE = [
