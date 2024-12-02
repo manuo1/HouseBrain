@@ -1,8 +1,15 @@
+import logging
 from bleak import BleakScanner
 import asyncio
+from result import Result, Ok, Err
+from sensors.constants import BLUETOOTH_SCAN_DURATION
+
+logger = logging.getLogger("django")
 
 
-def decode_bthome_payload(payload):
+def decode_bthome_payload(payload) -> Result[dict, str]:
+    if len(payload) < 5:
+        return Err("Invalid Bluetooth payload")
     # https://bthome.io/format/
 
     measurement_types = {
@@ -35,13 +42,12 @@ def decode_bthome_payload(payload):
             i += 1
         else:
             continue
-
         measurements[name] = value * factor
 
-    return measurements
+    return Ok(measurements)
 
 
-async def scan_bthome_devices(scan_duration=10):
+async def scan_bthome_devices() -> dict[str, dict[str, str]]:
     """
     Scanne les appareils Bluetooth et retourne un dictionnaire des capteurs détectés.
     Les capteurs non pertinents sont ignorés.
@@ -50,23 +56,25 @@ async def scan_bthome_devices(scan_duration=10):
 
     def detection_callback(device, advertisement_data):
         for _, payload in advertisement_data.service_data.items():
-            measurements = decode_bthome_payload(payload)
-            if measurements:
-                sensors[device.address] = {
-                    "mac_address": device.address,
-                    "name": device.name or "Unknown",
-                    "rssi": advertisement_data.rssi,
-                    **measurements,
-                }
+            match decode_bthome_payload(payload):
+                case Ok(measurements):
+                    if measurements:
+                        sensors[device.address] = {
+                            "mac_address": device.address,
+                            "name": device.name or "Unknown",
+                            "rssi": advertisement_data.rssi,
+                            **measurements,
+                        }
+                case Err(e):
+                    logger.error(e)
 
     scanner = BleakScanner(detection_callback=detection_callback)
 
     await scanner.start()
-    await asyncio.sleep(scan_duration)
+    await asyncio.sleep(BLUETOOTH_SCAN_DURATION)
     await scanner.stop()
-
     return sensors
 
 
-def get_bluetooth_bthome_th_sensors_data(scan_duration=10):
-    return asyncio.run(scan_bthome_devices(scan_duration))
+def get_bluetooth_bthome_th_sensors_data():
+    return asyncio.run(scan_bthome_devices())

@@ -1,0 +1,1 @@
+BLUETOOTH_SCAN_DURATION = 10  # secondes
