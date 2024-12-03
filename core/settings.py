@@ -19,10 +19,11 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # perso
     "accounts",
-    "teleinfo",
-    "radiators",
+    "homezones",
     "load_shedding",
+    "radiators",
     "sensors",
+    "teleinfo",
 ]
 
 MIDDLEWARE = [

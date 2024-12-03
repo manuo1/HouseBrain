@@ -7,3 +7,4 @@ from radiators.models import Radiator
 class RadiatorAdmin(admin.ModelAdmin):
     list_display = ("name", "power", "priority", "control_pin", "is_on")
     list_editable = ("is_on",)
+    search_fields = ("name",)
