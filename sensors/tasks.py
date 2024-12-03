@@ -1,7 +1,11 @@
 import logging
 from celery import shared_task
 from sensors.bluetooth_reading import get_bluetooth_bthome_th_sensors_data
-from sensors.mutators import create_new_sensors, update_temperature_and_humidity_values
+from sensors.mutators import (
+    create_new_sensors,
+    invalidate_stale_measurements,
+    update_temperature_and_humidity_values,
+)
 from result import Err, Ok
 from core.celery import app
 from celery.schedules import crontab
@@ -33,6 +37,15 @@ def scan_and_update_bluetooth_bthome_th_sensors():
         case Ok(updated_amount):
             if updated_amount:
                 logger.info(f"{updated_amount} sensor was updated")
+        case Err(e):
+            logger.error(e)
+
+    match invalidate_stale_measurements():
+        case Ok(stale_measurements_amount):
+            if stale_measurements_amount:
+                logger.warning(
+                    f"{stale_measurements_amount} sensors have obsolete measurements"
+                )
         case Err(e):
             logger.error(e)
 

@@ -1,5 +1,7 @@
+from datetime import datetime, timedelta
 import logging
 from result import Result, Ok, Err
+from sensors.constants import STALE_THRESHOLD_MINUTES
 from sensors.models import TemperatureHumiditySensor
 from django.utils import timezone
 
@@ -47,9 +49,18 @@ def update_temperature_and_humidity_values(sensors_data: dict) -> Result[int, st
                 temperature=data["temperature"],
                 humidity=data["humidity"],
                 rssi=data["rssi"],
-                last_update=timezone.now(),
+                last_update=timezone.now().replace(second=0, microsecond=0),
             )
             sensors_updated_amount += affected_rows
         except KeyError:
             logger.error(f"Incorrects temperature humidity sensor data{data}")
     return Ok(sensors_updated_amount)
+
+
+def invalidate_stale_measurements() -> Result[int, str]:
+
+    affected_rows = TemperatureHumiditySensor.objects.filter(
+        last_update__lte=datetime.now() - timedelta(minutes=STALE_THRESHOLD_MINUTES)
+    ).update(temperature=None, humidity=None)
+
+    return Ok(affected_rows)
