@@ -46,8 +46,8 @@ def update_temperature_and_humidity_values(sensors_data: dict) -> Result[int, st
             affected_rows = TemperatureHumiditySensor.objects.filter(
                 mac_address=data["mac_address"]
             ).update(
-                temperature=data["temperature"],
-                humidity=data["humidity"],
+                temperature=round(data["temperature"], 1),
+                humidity=round(data["humidity"], 0),
                 rssi=data["rssi"],
                 last_update=timezone.now().replace(second=0, microsecond=0),
             )
@@ -58,9 +58,9 @@ def update_temperature_and_humidity_values(sensors_data: dict) -> Result[int, st
 
 
 def invalidate_stale_measurements() -> Result[int, str]:
-
     affected_rows = TemperatureHumiditySensor.objects.filter(
-        last_update__lte=datetime.now() - timedelta(minutes=STALE_THRESHOLD_MINUTES)
+        last_update__lte=datetime.now() - timedelta(minutes=STALE_THRESHOLD_MINUTES),
+        temperature__isnull=False,
     ).update(temperature=None, humidity=None)
 
     return Ok(affected_rows)
