@@ -17,7 +17,17 @@ class HomeZoneAdmin(admin.ModelAdmin):
     autocomplete_fields = ("temperature_humidity_sensor", "radiator")
     fieldsets = (
         (None, {"fields": ("name", "temperature_humidity_sensor", "radiator")}),
-        ("Heating Settings", {"fields": ("target_temperature", "heating_mode")}),
+        (
+            "Heating Settings",
+            {
+                "fields": (
+                    "target_temperature",
+                    "heating_mode",
+                    "heating_efficiency",
+                    "heating_efficiency_correction_mode",
+                )
+            },
+        ),
     )
 
     def temperature(self, obj):
