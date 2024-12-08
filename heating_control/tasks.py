@@ -13,6 +13,12 @@ logger = logging.getLogger("django")
 
 
 @app.on_after_finalize.connect
+def setup_on_start(**kwargs):
+    Radiator.turn_off_all()
+    logger.info("All the radiators were turned off")
+
+
+@app.on_after_finalize.connect
 def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(crontab(minute="*/1"), heating_control.s())
 
