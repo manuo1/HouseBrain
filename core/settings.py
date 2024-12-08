@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # perso
     "accounts",
+    "heating_control",
     "homezones",
     "load_shedding",
     "radiators",

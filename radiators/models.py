@@ -1,8 +1,9 @@
 import logging
 from django.db import models
-
+from contextlib import suppress
 from core.constants import DEFAULT_VOLTAGE, UNPLUGGED_MODE
 from core.services import watt_to_ampere
+from heating_control.constants import RadiatorState
 from radiators.mcp23017_control import set_mcp23017_pin_state
 from result import Err, Ok
 
@@ -54,9 +55,6 @@ class Radiator(models.Model):
 
     @classmethod
     def turn_off_all(cls):
-        """
-        Éteindre tous les radiateurs.
-        """
         if UNPLUGGED_MODE:
             cls.objects.filter(is_on=True).update(is_on=False)
         else:
@@ -80,3 +78,14 @@ class Radiator(models.Model):
             }
             for radiator in Radiator.objects.all()
         }
+
+    @classmethod
+    def update_is_on_states(cls, radiators_to_modify: list[RadiatorState]) -> int:
+        updated = 0
+        for radiator_state in radiators_to_modify:
+            with suppress(cls.DoesNotExist):
+                radiator = cls.objects.get(id=radiator_state.radiator_id)
+                radiator.is_on = radiator_state.is_on
+                radiator.save()
+                updated += 1
+        return updated
