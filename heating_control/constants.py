@@ -6,12 +6,14 @@ class RadiatorStateChange:
     radiator_id: int
     current_state: bool
     next_state: bool
+    priority: int
 
 
 @dataclass
 class RadiatorState:
     radiator_id: int
     is_on: bool
+    priority: int
 
 
 TEMPERATURE_TO_HEATING_DURATION = [

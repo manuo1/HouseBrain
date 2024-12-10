@@ -37,7 +37,7 @@ def heating_control():
     match remove_the_unchanged_radiator(radiators_with_states):
         case Ok(radiators_to_modify):
             if radiators_to_modify:
-                updated = Radiator.update_is_on_states(radiators_to_modify)
+                updated = Radiator.turn_on_or_off_radiators(radiators_to_modify)
         case Err(e):
             logger.error(e)
 

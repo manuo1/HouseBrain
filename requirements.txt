@@ -3,6 +3,7 @@ adafruit-circuitpython-mcp230xx==2.5.15
 bleak==0.22.3
 django==5.0
 celery==5.4.0
+django-redis==5.4.0 
 factory_boy==3.3.1
 flower==2.0.1
 psycopg2-binary==2.9.9

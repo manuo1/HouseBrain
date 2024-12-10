@@ -7,6 +7,9 @@ from heating_control.constants import RadiatorState
 from radiators.mcp23017_control import set_mcp23017_pin_state
 from result import Err, Ok
 
+from teleinfo.services import get_last_available_intensity
+from user_settings.models import UserSettings
+
 logger = logging.getLogger("django")
 
 
@@ -80,12 +83,65 @@ class Radiator(models.Model):
         }
 
     @classmethod
-    def update_is_on_states(cls, radiators_to_modify: list[RadiatorState]) -> int:
+    def turn_on_or_off_radiators(cls, radiators_to_modify: list[RadiatorState]) -> int:
         updated = 0
-        for radiator_state in radiators_to_modify:
-            with suppress(cls.DoesNotExist):
-                radiator = cls.objects.get(id=radiator_state.radiator_id)
-                radiator.is_on = radiator_state.is_on
-                radiator.save()
-                updated += 1
+
+        try:
+            allow_heating_without_teleinfo = (
+                UserSettings.objects.last().allow_heating_without_teleinfo
+            )
+        except UserSettings.DoesNotExist:
+            allow_heating_without_teleinfo = False
+
+        if allow_heating_without_teleinfo:
+            for radiator_new_state in radiators_to_modify:
+                with suppress(cls.DoesNotExist):
+                    radiator = cls.objects.get(id=radiator_new_state.radiator_id)
+                    radiator.is_on = radiator_new_state.is_on
+                    radiator.save()
+                    updated += 1
+        else:
+            # on éteint tous les radiateur à éteindre et
+            # on allume les autres par ordre de priorité en respectant l'intensité maximum disponible
+
+            match get_last_available_intensity():
+                case Ok(available_intensity):
+                    pass
+                case Err(e):
+                    available_intensity = 0
+                    logger.error(e)
+
+            # Trier avec is_on=False en premier, puis is_on=True trié par priority
+            sorted_radiators_to_modify = sorted(
+                radiators_to_modify,
+                key=lambda r: (r.is_on, r.priority if r.is_on else 0),
+            )
+
+            for radiator_new_state in sorted_radiators_to_modify:
+                with suppress(cls.DoesNotExist):
+                    radiator = cls.objects.get(id=radiator_new_state.radiator_id)
+                    match watt_to_ampere(radiator.power, DEFAULT_VOLTAGE):
+                        case Ok(radiator_intensity):
+                            pass
+                        case Err(e):
+                            logger.error(e)
+                            radiator_intensity = 999999
+                    if not radiator_new_state.is_on:
+                        # si on doit éteindre un radiateur
+                        # on rajoute son intensité à l'intensité disponible
+                        available_intensity += radiator_intensity
+                    elif (
+                        radiator_new_state.is_on
+                        and available_intensity > radiator_intensity
+                    ):
+                        available_intensity -= radiator_intensity
+                    else:
+                        logger.warning(
+                            f"Radiator {radiator} not on to avoid load shedding"
+                        )
+                        continue
+                    radiator.is_on = radiator_new_state.is_on
+                    radiator.save()
+                    updated += 1
+
         return updated

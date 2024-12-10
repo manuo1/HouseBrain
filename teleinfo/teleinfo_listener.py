@@ -1,6 +1,7 @@
 from datetime import datetime
 import logging
 import serial
+
 from core.constants import UNPLUGGED_MODE
 from load_shedding.sevices import manage_load_shedding
 from result import Err, Ok, Result
@@ -8,6 +9,7 @@ from teleinfo.constants import SerialConfig, Teleinfo
 from django.utils import timezone
 from teleinfo.mutators import save_teleinfo
 from teleinfo.services import (
+    add_available_intensity_to_cache,
     buffer_can_accept_new_data,
     get_data_in_line,
     teleinfo_frame_is_complete,
@@ -47,6 +49,12 @@ class TeleinfoListener:
 
     def perform_functions_using_teleinfo(self) -> None:
         manage_load_shedding(self.teleinfo)
+
+        match add_available_intensity_to_cache(self.teleinfo):
+            case Ok(available_intensity):
+                logger.info(f"available_intensity = {available_intensity}")
+            case Err(e):
+                logger.error(e)
 
         match save_teleinfo(self.teleinfo):
             case Ok(saved):

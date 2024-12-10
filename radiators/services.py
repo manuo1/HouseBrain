@@ -19,6 +19,7 @@ def remove_the_unchanged_radiator(
         RadiatorState(
             radiator_id=radiator_states.radiator_id,
             is_on=radiator_states.next_state,
+            priority=radiator_states.priority,
         )
         for radiator_states in radiators_with_states
         if radiator_states.current_state != radiator_states.next_state

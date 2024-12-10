@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     "radiators",
     "sensors",
     "teleinfo",
+    "user_settings",
 ]
 
 MIDDLEWARE = [
@@ -118,6 +119,17 @@ LOGGING = {
 }
 
 
-# Celery configuration
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://127.0.0.1:6379/0")
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND", "redis://127.0.0.1:6379/0")
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+        "TIMEOUT": 300,
+    }
+}

@@ -12,7 +12,10 @@ def get_non_auto_home_zones_radiators_states() -> (
     return Ok(
         [
             RadiatorStateChange(
-                radiator_id=data[0], current_state=data[1], next_state=data[2]
+                radiator_id=data[0],
+                current_state=data[1],
+                next_state=data[2],
+                priority=data[3],
             )
             for data in list(
                 HomeZone.objects.exclude(heating_mode="auto")
@@ -26,7 +29,9 @@ def get_non_auto_home_zones_radiators_states() -> (
                         output_field=BooleanField(),
                     ),
                 )
-                .values_list("radiator_id", "current_is_on", "next_is_on")
+                .values_list(
+                    "radiator_id", "current_is_on", "next_is_on", "radiator__priority"
+                )
             )
         ]
     )

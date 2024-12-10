@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from result import Err, Ok, Result
 from teleinfo.constants import (
     FIRST_TELEINFO_FRAME_KEY,
@@ -145,3 +146,25 @@ def get_available_intensity(teleinfo: Teleinfo) -> Result[int, str]:
         )
     except ValueError:
         return Err(f"Invalid value for {TeleinfoLabel.ISOUSC} or {TeleinfoLabel.IINST}")
+
+
+def add_available_intensity_to_cache(teleinfo: Teleinfo) -> Result[int, str]:
+    match get_available_intensity(teleinfo):
+        case Ok(available_intensity):
+            try:
+                cache.set("last_available_intensity", available_intensity, timeout=5)
+                return Ok(available_intensity)
+            except (ConnectionError, TimeoutError) as e:
+                return Err(e)
+        case Err(e):
+            return Err(e)
+
+
+def get_last_available_intensity() -> Result[int, str]:
+    try:
+        last_available_intensity = cache.get("last_available_intensity")
+        if last_available_intensity is None:
+            return Err("No last_available_intensity in cache")
+        return Ok(last_available_intensity)
+    except (ConnectionError, TimeoutError) as e:
+        return Err(e)
