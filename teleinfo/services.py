@@ -1,5 +1,7 @@
 from django.core.cache import cache
 from result import Err, Ok, Result
+from core.constants import DEFAULT_VOLTAGE
+from core.services import ampere_to_watt
 from teleinfo.constants import (
     FIRST_TELEINFO_FRAME_KEY,
     REQUIRED_TELEINFO_KEYS,
@@ -13,16 +15,16 @@ def decode_byte(byte_data: bytes) -> Result[str, str]:
     try:
         return Ok(byte_data.decode("utf-8"))
     except UnicodeDecodeError:
-        return Err("invalid UTF-8.")
+        return Err("[Teleinfo] invalid UTF-8.")
     except AttributeError:
-        return Err("must be of type 'bytes'.")
+        return Err("[Teleinfo] must be of type 'bytes'.")
 
 
 def clean_data(data: str) -> Result[str, str]:
     try:
         return Ok(data.translate(str.maketrans(UNUSED_CHARS_IN_TELEINFO)))
     except (TypeError, AttributeError):
-        return Err("must be of type 'string'")
+        return Err("[Teleinfo] must be of type 'string'")
 
 
 def split_data(cleaned_data: str) -> Result[list[str, str, str], str]:
@@ -31,14 +33,14 @@ def split_data(cleaned_data: str) -> Result[list[str, str, str], str]:
         or len(cleaned_data) < 5
         or " " not in cleaned_data
     ):
-        return Err(f"Can't split : {cleaned_data}")
+        return Err(f"[Teleinfo] Can't split : {cleaned_data}")
 
     splitted = cleaned_data.split()
 
     # On attend len = 3 (key,value,checksum) mais parfois le checksum
     # est un espace donc split le supprime
     if len(splitted) not in (2, 3):
-        return Err(f"Can't split : {cleaned_data}")
+        return Err(f"[Teleinfo] Can't split : {cleaned_data}")
 
     # Si splitted a une longueur de 2 ou 3
     # key = splitted[1]
@@ -62,7 +64,7 @@ def calculate_checksum(key: str, value: str) -> Result[str, str]:
     !!! 20 est le caractère espace !!!
     """
     if not all(isinstance(var, str) for var in (key, value)):
-        return Err("'key' and 'value' must be of type 'str'.")
+        return Err("[Teleinfo] 'key' and 'value' must be of type 'str'.")
 
     data = key + " " + value
     # Calculer la somme des codes ASCII des caractères de key et value
@@ -76,13 +78,13 @@ def calculate_checksum(key: str, value: str) -> Result[str, str]:
 
 def data_is_valid(key: str, value: str, checksum: str) -> Result[bool, str]:
     if not all(isinstance(var, str) for var in (key, value, checksum)):
-        return Err("params must be of type 'str'.")
+        return Err("[Teleinfo] params must be of type 'str'.")
     match calculate_checksum(key, value):
         case Ok(calculated_checksum):
             if calculated_checksum == checksum:
                 return Ok(True)
             else:
-                return Err("calculated_checksum != checksum")
+                return Err("[Teleinfo] calculated_checksum != checksum")
         case Err(e):
             return Err(e)
 
@@ -115,9 +117,9 @@ def get_data_in_line(byte_data: bytes) -> Result[tuple[str, str], str]:
 
 def buffer_can_accept_new_data(key: str, buffer: dict[str, str]) -> Result[bool, str]:
     if not isinstance(buffer, dict):
-        return Err("'buffer' must be of type 'dict'.")
+        return Err("[Teleinfo] 'buffer' must be of type 'dict'.")
     if not isinstance(key, str):
-        return Err("'key' must be of type 'str'.")
+        return Err("[Teleinfo] 'key' must be of type 'str'.")
 
     return Ok(
         # on ne peut commencer à écrire dans le buffer qu'en début de trame donc si
@@ -130,7 +132,7 @@ def buffer_can_accept_new_data(key: str, buffer: dict[str, str]) -> Result[bool,
 
 def teleinfo_frame_is_complete(buffer: dict[str, str]) -> Result[bool, str]:
     if not isinstance(buffer, dict):
-        return Err("'buffer' must be of type 'dict'.")
+        return Err("[Teleinfo] 'buffer' must be of type 'dict'.")
     return Ok(all(key in buffer for key in REQUIRED_TELEINFO_KEYS))
 
 
@@ -142,29 +144,37 @@ def get_available_intensity(teleinfo: Teleinfo) -> Result[int, str]:
         )
     except KeyError:
         return Err(
-            f"Missing {TeleinfoLabel.ISOUSC} or {TeleinfoLabel.IINST} in teleinfo data"
+            f"[Teleinfo] Missing {TeleinfoLabel.ISOUSC} or {TeleinfoLabel.IINST} in teleinfo data"
         )
     except ValueError:
-        return Err(f"Invalid value for {TeleinfoLabel.ISOUSC} or {TeleinfoLabel.IINST}")
+        return Err(
+            f"[Teleinfo] Invalid value for {TeleinfoLabel.ISOUSC} or {TeleinfoLabel.IINST}"
+        )
 
 
-def add_available_intensity_to_cache(teleinfo: Teleinfo) -> Result[int, str]:
+def add_available_power_to_cache(teleinfo: Teleinfo) -> Result[bool, str]:
     match get_available_intensity(teleinfo):
         case Ok(available_intensity):
-            try:
-                cache.set("last_available_intensity", available_intensity, timeout=5)
-                return Ok(available_intensity)
-            except (ConnectionError, TimeoutError) as e:
-                return Err(e)
+            pass
         case Err(e):
-            return Err(e)
-
-
-def get_last_available_intensity() -> Result[int, str]:
+            return Err(f"[Teleinfo] {e}")
+    match ampere_to_watt(available_intensity, DEFAULT_VOLTAGE):
+        case Ok(available_power):
+            pass
+        case Err(e):
+            return Err(f"[Teleinfo] {e}")
     try:
-        last_available_intensity = cache.get("last_available_intensity")
-        if last_available_intensity is None:
-            return Err("No last_available_intensity in cache")
-        return Ok(last_available_intensity)
+        cache.set("available_power", int(available_power), timeout=10)
+        return Ok(True)
     except (ConnectionError, TimeoutError) as e:
-        return Err(e)
+        return Err(f"[Teleinfo] {e}")
+
+
+def get_available_power() -> Result[int, str]:
+    try:
+        available_power = cache.get("available_power")
+    except (ConnectionError, TimeoutError) as e:
+        return Err(f"[Teleinfo] {e}")
+    if available_power is None:
+        return Err("[Teleinfo] No available_power set in cache")
+    return Ok(available_power)

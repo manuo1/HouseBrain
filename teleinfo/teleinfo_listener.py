@@ -9,7 +9,7 @@ from teleinfo.constants import SerialConfig, Teleinfo
 from django.utils import timezone
 from teleinfo.mutators import save_teleinfo
 from teleinfo.services import (
-    add_available_intensity_to_cache,
+    add_available_power_to_cache,
     buffer_can_accept_new_data,
     get_data_in_line,
     teleinfo_frame_is_complete,
@@ -48,14 +48,17 @@ class TeleinfoListener:
                 break
 
     def perform_functions_using_teleinfo(self) -> None:
+        # coupe tous les chauffage si on est en dépassement d'intensité
         manage_load_shedding(self.teleinfo)
 
-        match add_available_intensity_to_cache(self.teleinfo):
-            case Ok(available_intensity):
-                logger.info(f"available_intensity = {available_intensity}")
+        # stock la puissance disponible dans le cache
+        match add_available_power_to_cache(self.teleinfo):
+            case Ok(_):
+                pass
             case Err(e):
-                logger.error(e)
+                logger.error(f"[TeleinfoListener] {e}")
 
+        # sauvegarde la teleinfo toutes les heures
         match save_teleinfo(self.teleinfo):
             case Ok(saved):
                 if saved:
@@ -64,7 +67,7 @@ class TeleinfoListener:
                 else:
                     pass
             case Err(e):
-                logger.error(e)
+                logger.error(f"[TeleinfoListener] {e}")
 
     def process_data(self, raw_data_line: bytes) -> None:
         match get_data_in_line(raw_data_line):

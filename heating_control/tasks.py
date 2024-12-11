@@ -1,12 +1,10 @@
 import logging
 from celery import shared_task
-from result import Err, Ok
 from core.celery import app
 from celery.schedules import crontab
 
-from homezones.selectors import get_non_auto_home_zones_radiators_states
+from heating_control.constants import HeatingMode
 from radiators.models import Radiator
-from radiators.services import remove_the_unchanged_radiator
 
 
 logger = logging.getLogger("django")
@@ -15,7 +13,7 @@ logger = logging.getLogger("django")
 @app.on_after_finalize.connect
 def setup_on_start(**kwargs):
     Radiator.turn_off_all()
-    logger.info("All the radiators were turned off")
+    logger.info("[Heating Control] All the radiators were turned off")
 
 
 @app.on_after_finalize.connect
@@ -25,20 +23,20 @@ def setup_periodic_tasks(sender, **kwargs):
 
 @shared_task
 def heating_control():
-    radiators_with_states = []
-    match get_non_auto_home_zones_radiators_states():
-        case Ok(non_auto_radiators_with_states):
-            radiators_with_states.extend(non_auto_radiators_with_states)
-        case Err(e):
-            logger.error(e)
+    radiators_to_turn_on = []
+    radiators_to_turn_off = []
+    radiators = Radiator.with_heating_mode_home_zone()
+    radiators_to_turn_on.extend(
+        [r for r in radiators if not r.is_on and r.heating_mode == HeatingMode.MANUAL]
+    )
+    radiators_to_turn_off.extend(
+        [r for r in radiators if r.is_on and r.heating_mode == HeatingMode.OFF]
+    )
 
     # TODO implementer le chauffage en auto
 
-    match remove_the_unchanged_radiator(radiators_with_states):
-        case Ok(radiators_to_modify):
-            if radiators_to_modify:
-                updated = Radiator.turn_on_or_off_radiators(radiators_to_modify)
-        case Err(e):
-            logger.error(e)
+    radiators_on = Radiator.toggle_radiators_state(
+        radiators_to_turn_on, radiators_to_turn_off
+    )
 
-    return f"Heating control task ok, {updated} radiators updated"
+    return f"[Heating Control] task ok, {radiators_on} radiators Updated"
