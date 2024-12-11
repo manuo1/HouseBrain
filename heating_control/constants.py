@@ -1,20 +1,18 @@
-from dataclasses import dataclass
+from enum import StrEnum
 
 
-@dataclass
-class RadiatorStateChange:
-    radiator_id: int
-    current_state: bool
-    next_state: bool
-    priority: int
+class HeatingMode(StrEnum):
+    MANUAL = "manual"
+    AUTO = "auto"
+    OFF = "off"
 
 
-@dataclass
-class RadiatorState:
-    radiator_id: int
-    is_on: bool
-    priority: int
+class HeatingEfficiencyCorrectionMode(StrEnum):
+    MANUAL = "manual"
+    AUTO = "auto"
 
+
+VERY_HIGH_INTENSITY = 999999
 
 TEMPERATURE_TO_HEATING_DURATION = [
     # (T_min, T_max, heating_duration)

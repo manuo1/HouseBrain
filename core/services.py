@@ -6,7 +6,7 @@ def watt_to_ampere(power_watts, voltage) -> Result[float, str]:
     try:
         return Ok(power_watts / voltage)
     except ZeroDivisionError:
-        return Err("Voltage can't be zero.")
+        return Err("Unable to convert watt to ampere Voltage can't be zero.")
 
 
 def is_new_hour(old_datetime: datetime, new_datetime: datetime) -> Result[bool, str]:

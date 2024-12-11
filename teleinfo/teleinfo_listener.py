@@ -48,14 +48,17 @@ class TeleinfoListener:
                 break
 
     def perform_functions_using_teleinfo(self) -> None:
+        # coupe tous les chauffage si on est en dépassement d'intensité
         manage_load_shedding(self.teleinfo)
 
+        # stocke l’intensité disponible dans le cache
         match add_available_intensity_to_cache(self.teleinfo):
-            case Ok(available_intensity):
-                logger.info(f"available_intensity = {available_intensity}")
+            case Ok(_):
+                pass
             case Err(e):
                 logger.error(e)
 
+        # sauvegarde la teleinfo toutes les heures
         match save_teleinfo(self.teleinfo):
             case Ok(saved):
                 if saved:

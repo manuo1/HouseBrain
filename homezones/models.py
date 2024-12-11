@@ -1,18 +1,14 @@
 from django.db import models
 
+from heating_control.constants import HeatingEfficiencyCorrectionMode, HeatingMode
 from radiators.models import Radiator
 from sensors.models import TemperatureHumiditySensor
 
 
 class HomeZone(models.Model):
-    HEATING_MODES = [
-        ("manual", "Manual"),
-        ("auto", "Automatic"),
-        ("off", "Off"),
-    ]
-    HEATING_EFFICIENCY_CORRECTION_MODE = [
-        ("manual", "Manual"),
-        ("auto", "Automatic"),
+    HEATING_MODES = [(mode.value, mode.name.capitalize()) for mode in HeatingMode]
+    HEATING_EFFICIENCY_CORRECTION_MODES = [
+        (mode.value, mode.name.capitalize()) for mode in HeatingEfficiencyCorrectionMode
     ]
 
     name = models.CharField(max_length=100, unique=True)
@@ -32,7 +28,7 @@ class HomeZone(models.Model):
     )
     heating_efficiency_correction_mode = models.CharField(
         max_length=10,
-        choices=HEATING_EFFICIENCY_CORRECTION_MODE,
+        choices=HEATING_EFFICIENCY_CORRECTION_MODES,
         default="auto",
         help_text=(
             "heating_efficiency sera ajusté automatiquement sauf en mode manuel"

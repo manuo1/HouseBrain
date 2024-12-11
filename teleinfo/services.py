@@ -148,23 +148,23 @@ def get_available_intensity(teleinfo: Teleinfo) -> Result[int, str]:
         return Err(f"Invalid value for {TeleinfoLabel.ISOUSC} or {TeleinfoLabel.IINST}")
 
 
-def add_available_intensity_to_cache(teleinfo: Teleinfo) -> Result[int, str]:
+def add_available_intensity_to_cache(teleinfo: Teleinfo) -> Result[bool, str]:
     match get_available_intensity(teleinfo):
         case Ok(available_intensity):
             try:
-                cache.set("last_available_intensity", available_intensity, timeout=5)
-                return Ok(available_intensity)
+                cache.set("last_available_intensity", available_intensity, timeout=10)
+                return Ok(True)
             except (ConnectionError, TimeoutError) as e:
-                return Err(e)
+                return Err(f"[Teleinfo] {e}")
         case Err(e):
-            return Err(e)
+            return Err(f"[Teleinfo] {e}")
 
 
 def get_last_available_intensity() -> Result[int, str]:
     try:
         last_available_intensity = cache.get("last_available_intensity")
         if last_available_intensity is None:
-            return Err("No last_available_intensity in cache")
+            return Err("[Teleinfo] No last_available_intensity in cache")
         return Ok(last_available_intensity)
     except (ConnectionError, TimeoutError) as e:
-        return Err(e)
+        return Err(f"[Teleinfo] {e}")

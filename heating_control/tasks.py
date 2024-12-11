@@ -1,12 +1,9 @@
 import logging
 from celery import shared_task
-from result import Err, Ok
 from core.celery import app
 from celery.schedules import crontab
 
-from homezones.selectors import get_non_auto_home_zones_radiators_states
 from radiators.models import Radiator
-from radiators.services import remove_the_unchanged_radiator
 
 
 logger = logging.getLogger("django")
@@ -25,20 +22,19 @@ def setup_periodic_tasks(sender, **kwargs):
 
 @shared_task
 def heating_control():
-    radiators_with_states = []
-    match get_non_auto_home_zones_radiators_states():
-        case Ok(non_auto_radiators_with_states):
-            radiators_with_states.extend(non_auto_radiators_with_states)
-        case Err(e):
-            logger.error(e)
+    radiators_to_turn_on = []
+    radiators_to_turn_off = []
+    radiators_to_turn_on.extend(
+        [r for r in Radiator.in_manual_heating_home_zone() if not r.is_on]
+    )
+    radiators_to_turn_off.extend(
+        [r for r in Radiator.in_off_heating_home_zone() if r.is_on]
+    )
 
     # TODO implementer le chauffage en auto
 
-    match remove_the_unchanged_radiator(radiators_with_states):
-        case Ok(radiators_to_modify):
-            if radiators_to_modify:
-                updated = Radiator.turn_on_or_off_radiators(radiators_to_modify)
-        case Err(e):
-            logger.error(e)
+    radiators_on = Radiator.toggle_radiators_state(
+        radiators_to_turn_on, radiators_to_turn_off
+    )
 
-    return f"Heating control task ok, {updated} radiators updated"
+    return f"Heating control task ok, {radiators_on} radiators are On"
